@@ -9,7 +9,7 @@ const LeftSideBar = () => {
   const router = useRouter();
   const pathname = usePathname();
   return (
-    <div className="bg-dark-2 px-6 sticky w-fit pt-30 pb-20 flex flex-col justify-between  max-md:hidden">
+    <div className="bg-dark-2 px-6 sticky w-fit top-0 left-0 pt-30 pb-20 flex flex-col justify-between max-md:hidden custom-scrollbar overflow-auto h-screen">
       <div className="w-full flex flex-col gap-5">
         {sidebarLinks.map((link, index) => {
           const isActive =

@@ -2,13 +2,15 @@
 import React from "react";
 import Image from "next/image";
 import Button from "@/components/shared/Button";
+import AccountProfile from '@/components/forms/AccountProfile'
 
 const page = () => {
   return (
     <div>
       <h1 className="text-light-1 text-[30px] leading-[140%] font-[600] mb-5">Edit profile</h1>
       <p className="text-light-2 text-[16px] leading-[140%] font-[400]">Make any changes</p>
-      <div className="flex gap-5 items-center mt-10">
+       <AccountProfile btnTitle="Continue"/>
+      {/*<div className="flex gap-5 items-center mt-10">
         <div className="">
           <Image
             src="/assets/profile.svg"
@@ -23,6 +25,7 @@ const page = () => {
         </div>
       </div>
 
+     
       <div>
         <p className="text-white pb-3 pt-5">Name</p>
         <input
@@ -49,7 +52,8 @@ const page = () => {
       <Button 
       children="continue"
       onclick={()=>{}}
-      />
+      />*/}
+
     </div>
   );
 };

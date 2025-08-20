@@ -1,11 +1,11 @@
 import React from 'react';
 
-const Input = () => {
+const page = () => {
   return (
     <div>
-      
+      <h1>ONBOARDING</h1>
     </div>
   );
 }
 
-export default Input;
+export default page;

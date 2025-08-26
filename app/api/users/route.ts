@@ -81,18 +81,20 @@ export async function PUT(request: Request) {
 
 
 
-/*import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import User from "../../../lib/models/user.model";
 import { currentUser } from "@clerk/nextjs/server";
 import connectToDatabase from "@/lib/mongoose";
+import { auth } from "@clerk/nextjs/server";
 
 export async function POST(request: Request) {
-  const user = await currentUser();
-  //const userId = 'user_30bENXpLy7NmUoGNEu4Kavjrurn';
-  const userId = user?.id
+  //const user = await currentUser();
+    const userId = 'user_30bENXpLy7NmUoGNEu4Kavjrurn';
+  //const userId = user?.id
+
 
   try {
-    // ✅ UNCOMMENT THIS - IT'S ESSENTIAL!
+   
     if (!userId) {
       return NextResponse.json(
         { success: false, message: "Unauthorized: No user session found" },
@@ -112,7 +114,7 @@ export async function POST(request: Request) {
     }
 
     const createdUser = await User.create({
-      id: userId, // This will now have a valid value
+      id: userId, 
       bio,
       name, 
       username, 
@@ -135,7 +137,7 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}*/
+}
  
 
 /*import { NextResponse } from "next/server";

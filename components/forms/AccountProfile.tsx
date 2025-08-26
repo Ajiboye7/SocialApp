@@ -19,6 +19,12 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { toast } from "sonner";
+import axios from "axios";
+import { useUser } from "@clerk/nextjs";
+
+
+const { user } = useUser();
+const userId = user?.id;
 
 interface Props {
   btnTitle: string;
@@ -37,14 +43,25 @@ const AccountProfile = ({ btnTitle }: Props) => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof profileValidation>) {
-    toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  async function onSubmit(value: z.infer<typeof profileValidation>) {
+   try {
+  const response = await axios.put("/api/users", {
+    id: userId,
+    name: value.name,
+    bio: value.bio,
+    username: value.username,
+    profile_picture: value.profile_photo,
+  });
+
+  if (response.data.success) {
+    toast.success("Profile updated successfully!");
+  } else {
+    toast.error("Something went wrong!");
+  }
+} catch (err) {
+  console.error(err);
+  toast.error("Error updating profile.");
+}
   }
 
   const handleImage = (

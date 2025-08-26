@@ -87,24 +87,23 @@ import { currentUser } from "@clerk/nextjs/server";
 import connectToDatabase from "@/lib/mongoose";
 import { auth } from "@clerk/nextjs/server";
 
-export async function POST(request: Request) {
-  //const user = await currentUser();
-    const userId = 'user_30bENXpLy7NmUoGNEu4Kavjrurn';
-  //const userId = user?.id
+export async function PUT(request: Request) {
 
 
+  const user = await currentUser()
+
+  const userId = user?.id
+  
   try {
-   
+    const body = await request.json();
+    const { bio, name, username, profile_picture } = body;
+
     if (!userId) {
       return NextResponse.json(
         { success: false, message: "Unauthorized: No user session found" },
         { status: 401 }
       );
     }
-
-    await connectToDatabase();
-
-    const { bio, name, username, profile_picture } = await request.json();
 
     if (!bio || !name || !username) {
       return NextResponse.json(
@@ -113,32 +112,44 @@ export async function POST(request: Request) {
       );
     }
 
-    const createdUser = await User.create({
-      id: userId, 
-      bio,
-      name, 
-      username, 
-      profile_picture,
-      onboarded: true
-    });
+    await connectToDatabase();
+
+    const updatedUser = await User.findOneAndUpdate(
+      { id: userId },
+      {
+        bio,
+        name,
+        username,
+        profile_picture,
+        onboarded: true,
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: "User created successfully",
-        data: createdUser
+        message: "User updated successfully",
+        data: updatedUser,
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
-    console.log('User creation error:', error);
+    console.error("User update error:", error);
     return NextResponse.json(
-      { success: false, message: 'Internal server error during user creation' },
+      { success: false, message: "Internal server error during user update" },
       { status: 500 }
     );
   }
 }
- 
+
 
 /*import { NextResponse } from "next/server";
 import User from "../../../lib/models/user.model";

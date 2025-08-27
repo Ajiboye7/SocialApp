@@ -18,19 +18,18 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { toast } from "sonner";
 import axios from "axios";
-import { useUser } from "@clerk/nextjs";
-
-
-const { user } = useUser();
-const userId = user?.id;
+import { useRouter } from "next/navigation";
+import { useUploadThing } from "@/lib/uploadthing";
+import { isBase64Image } from "@/lib/utils";
 
 interface Props {
   btnTitle: string;
 }
 
 const AccountProfile = ({ btnTitle }: Props) => {
+  const router = useRouter();
+  const { startUpload } = useUploadThing("imageUploader");
   const [files, setFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof profileValidation>>({
@@ -43,25 +42,34 @@ const AccountProfile = ({ btnTitle }: Props) => {
     },
   });
 
-  async function onSubmit(value: z.infer<typeof profileValidation>) {
-   try {
-  const response = await axios.put("/api/users", {
-    id: userId,
-    name: value.name,
-    bio: value.bio,
-    username: value.username,
-    profile_picture: value.profile_photo,
-  });
+  async function onSubmit(data: z.infer<typeof profileValidation>) {
+    //console.log("Form submitted with data:", data);
 
-  if (response.data.success) {
-    toast.success("Profile updated successfully!");
-  } else {
-    toast.error("Something went wrong!");
-  }
-} catch (err) {
-  console.error(err);
-  toast.error("Error updating profile.");
-}
+    const blob = data.profile_photo;
+
+    const hasImageChanged = isBase64Image(blob);
+
+    if (hasImageChanged) {
+      const imgRes = await startUpload(files);
+
+      if (imgRes && imgRes[0].ufsUrl) {
+        data.profile_photo = imgRes[0].ufsUrl;
+      }
+    }
+    try {
+      const response = await axios.put("/api/users/", {
+        bio: data.bio,
+        name: data.name,
+        username: data.username,
+        profile_picture: data.profile_photo,
+      });
+
+      router.push("/");
+
+      return response;
+    } catch (error) {
+      console.error("Profile update error:", error);
+    }
   }
 
   const handleImage = (

@@ -2,6 +2,7 @@ import * as z from 'zod'
 
 
 export const profileValidation = z.object({
+    
     profile_photo : z.url().nonempty(),
     name: z
     .string()

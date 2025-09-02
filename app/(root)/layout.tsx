@@ -8,6 +8,10 @@ import BottomBar from "@/components/shared/BottomBar";
 import LeftSideBar from "@/components/shared/LeftSideBar";
 import RightSideBar from "@/components/shared/RightSideBar";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Provider } from "react-redux";
+import { store } from "@/store/store";
+import ReduxProvider from "@/components/ReduxProvider";
+import UserLoader from "@/components/UserLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,29 +34,33 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-      }}
-    >
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <TopBar />
-          <main className="flex">
-            <LeftSideBar />
+    <ReduxProvider>
+      <ClerkProvider
+        appearance={{
+          baseTheme: dark,
+        }}
+      >
+        <html lang="en">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            <UserLoader />
 
-            <section className="bg-dark-1 flex-1 min-h-screen pt-30 px-10 lg:px-20 pb-20 ">
-              <div className="mx-auto w-full max-w-4xl">{children} </div>
-            </section>
+            <TopBar />
+            <main className="flex">
+              <LeftSideBar />
 
-            <RightSideBar />
-          </main>
+              <section className="bg-dark-1 flex-1 min-h-screen pt-30 px-10 lg:px-20 pb-20 ">
+                <div className="mx-auto w-full max-w-4xl">{children} </div>
+              </section>
 
-          <BottomBar />
-        </body>
-      </html>
-    </ClerkProvider>
+              <RightSideBar />
+            </main>
+
+            <BottomBar />
+          </body>
+        </html>
+      </ClerkProvider>
+    </ReduxProvider>
   );
 }

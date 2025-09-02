@@ -1,10 +1,14 @@
+
 import React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import {Provider} from 'react-redux'
+import { store } from "@/store/store";
 
 import "../globals.css";
+import ReduxProvider from "@/components/ReduxProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider
+    <ReduxProvider>
+       <ClerkProvider
       appearance={{
         baseTheme: dark,
       }}
@@ -28,6 +33,8 @@ export default function RootLayout({
         <body className={`${inter.className} bg-dark-1`}>{children}</body>
       </html>
     </ClerkProvider>
+    </ReduxProvider>
+   
   );
 }
 

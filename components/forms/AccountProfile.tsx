@@ -22,6 +22,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useUploadThing } from "@/lib/uploadthing";
 import { isBase64Image } from "@/lib/utils";
+import { updateUser } from "@/store/slices/userSlice";
+import { useDispatch, UseDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
 
 interface Props {
   btnTitle: string;
@@ -29,6 +32,8 @@ interface Props {
 
 const AccountProfile = ({ btnTitle }: Props) => {
   const router = useRouter();
+
+  const dispatch = useDispatch<AppDispatch>();
   const { startUpload } = useUploadThing("imageUploader");
   const [files, setFiles] = useState<File[]>([]);
 
@@ -43,8 +48,6 @@ const AccountProfile = ({ btnTitle }: Props) => {
   });
 
   async function onSubmit(data: z.infer<typeof profileValidation>) {
-    //console.log("Form submitted with data:", data);
-
     const blob = data.profile_photo;
 
     const hasImageChanged = isBase64Image(blob);
@@ -57,17 +60,18 @@ const AccountProfile = ({ btnTitle }: Props) => {
       }
     }
     try {
-      const response = await axios.put("/api/users/", {
-        bio: data.bio,
-        name: data.name,
-        username: data.username,
-        profile_picture: data.profile_photo,
-      });
+      await dispatch(
+        updateUser({
+          bio: data.bio,
+          name: data.name,
+          userName: data.username,
+          profile_picture: data.profile_photo,
+        })
+      ).unwrap();
 
       router.push("/");
-
-      return response;
-    } catch (error) {
+    } catch (error: any) {
+      alert(error.message);
       console.error("Profile update error:", error);
     }
   }

@@ -17,10 +17,12 @@ export type AppDispatch = typeof store.dispatch;*/
 // store/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from "../store/slices/userSlice";
+import threadReducer from '../store/slices/threadSlice'
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
+    thread: threadReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

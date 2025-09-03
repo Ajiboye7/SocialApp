@@ -1,15 +1,21 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const ThreadCard = () => {
+
+  const {user} = useSelector((state: RootState)=> state.user)
+
+  //const profilePicture = user?.profile_picture
   return (
     <div className="relative w-full bg-dark-2 p-7 mt-7 rounded-xl flex justify-between">
       <div className="flex flex-col gap-3 ">
         <div className="flex gap-4 ">
           <div className="">
             <Image
-              src="/assets/profile.svg"
+              src={user?.profile_picture || "/assets/profile.svg"}
               alt="profile"
               width={50}
               height={50}

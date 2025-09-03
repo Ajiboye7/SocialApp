@@ -1,5 +1,6 @@
 "use client";
-import { sidebarLinks } from "@/constants";
+
+import {useSidebarLinks}  from "@/constants";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
@@ -8,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 const LeftSideBar = () => {
   const router = useRouter();
   const pathname = usePathname();
+   const sidebarLinks = useSidebarLinks();
   return (
     <div className="bg-dark-2 px-6 sticky w-fit top-0 left-0 pt-30 pb-20 flex flex-col justify-between max-md:hidden custom-scrollbar overflow-auto h-screen">
       <div className="w-full flex flex-col gap-5">

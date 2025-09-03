@@ -14,7 +14,7 @@ interface User {
   userName: string;
   bio: string;
   profile_picture: string;
-  onboarded: string;
+  onboarded: boolean;
   //isOnboarded: boolean;
 }
 

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { Children } from "react";
-import { required } from "zod/v4-mini";
+
+
 
 const threadSchema = new mongoose.Schema({
   author: {
@@ -13,7 +13,7 @@ const threadSchema = new mongoose.Schema({
     type: String,
   },
 
-  message: {
+  thread: {
     type: String,
     required: true,
   },

@@ -71,6 +71,7 @@ export async function PUT(request: Request) {
 
 export async function GET() {
   const { userId } = await auth();
+   //console.log("API /api/users GET userId:", userId);
 
   if (!userId) {
     return NextResponse.json(

@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import {Provider} from 'react-redux'
 import { store } from "@/store/store";
+import UserLoader from "@/components/UserLoader";
 
 import "../globals.css";
 import ReduxProvider from "@/components/ReduxProvider";
@@ -29,6 +30,7 @@ export default function RootLayout({
         baseTheme: dark,
       }}
     >
+       <UserLoader />
       <html lang='en'>
         <body className={`${inter.className} bg-dark-1`}>{children}</body>
       </html>

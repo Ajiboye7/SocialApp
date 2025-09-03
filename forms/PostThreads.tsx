@@ -14,8 +14,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { createThread } from "@/store/slices/threadSlice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { useRouter } from "next/navigation";
 
 const PostThreads = () => {
+  const dispatch = useDispatch<AppDispatch>();
+   const router = useRouter();
+  
   const form = useForm<z.infer<typeof ThreadValidation>>({
     resolver: zodResolver(ThreadValidation),
     defaultValues: {
@@ -23,19 +30,35 @@ const PostThreads = () => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof ThreadValidation>) {
-    toast("You submitted the following values", {
+  async function onSubmit(data: z.infer<typeof ThreadValidation>) {
+    /*toast("You submitted the following values", {
       description: (
         <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
       ),
-    });
+    });*/
+    try {
+      await dispatch(
+        createThread({
+          thread: data.thread,
+        })
+      ).unwrap();
+
+      router.push('/')
+    } catch (error: any) {
+      console.log(error);
+      alert(error.message);
+      console.log("Error creating thread", error);
+    }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-10 w-full flex flex-col space-y-10">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="mt-10 w-full flex flex-col space-y-10"
+      >
         <FormField
           control={form.control}
           name="thread"
@@ -51,10 +74,9 @@ const PostThreads = () => {
         />
 
         <Button type="submit" className="bg-primary-500">
-        Post Thread
-      </Button>
+          Post Thread
+        </Button>
       </form>
-      
     </Form>
   );
 };

@@ -10,11 +10,6 @@ const page = () => {
   
 
   const {user} = useSelector((state: RootState)=> state.user)
-   // const { user, isOnboarded } = useSelector((state: RootState) => state.user);
-
-  //if(!user) return null
-
-//  if(isOnboarded) redirect('/')
   console.log('user fetched ', user)
 
   const userName  = user?.name

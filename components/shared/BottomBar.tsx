@@ -1,5 +1,5 @@
 'use client'
-import { sidebarLinks } from '@/constants';
+import {useSidebarLinks}  from "@/constants";
 import React from 'react';
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -7,6 +7,7 @@ import Image from 'next/image';
 
 const BottomBar = () => {
    const pathname = usePathname();
+   const sidebarLinks = useSidebarLinks();
   return (
     <section className='bg-dark-2 md:hidden p-4 rounded-xl fixed bottom-0 w-full z-10'>
      <div className='flex justify-between '>

@@ -1,25 +1,36 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-interface User {
+interface UserData {
   name: string;
   userName: string;
   bio: string;
   profile_picture: string;
 }
 
+interface User {
+  id:string;
+  name: string;
+  userName: string;
+  bio: string;
+  profile_picture: string;
+  onboarded: string;
+  //isOnboarded: boolean;
+}
+
 interface UserState {
   user: User | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  //isOnboarded: boolean;
 }
 
 const initialState: UserState = {
   user: null,
   status: "idle",
   error: null,
+  //isOnboarded: false,
 };
-
 export const fetchUser = createAsyncThunk(
   "user/fetch",
   async (_, { rejectWithValue }) => {
@@ -37,7 +48,7 @@ export const fetchUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
   "user/update",
-  async (userData: User, { rejectWithValue }) => {
+  async (userData: UserData, { rejectWithValue }) => {
     try {
       const response = await axios.put("/api/users/", userData);
       return response.data.data;
@@ -62,6 +73,7 @@ const userSlice = createSlice({
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.user = action.payload;
+
         state.error = null;
       })
       .addCase(fetchUser.rejected, (state, action) => {
@@ -75,6 +87,7 @@ const userSlice = createSlice({
 
     builder.addCase(updateUser.fulfilled, (state, action) => {
       (state.status = "succeeded"), (state.user = action.payload);
+      //state.isOnboarded = action.payload.onboarded
       state.error = null;
     });
 

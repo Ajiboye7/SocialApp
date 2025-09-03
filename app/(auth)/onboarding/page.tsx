@@ -3,8 +3,18 @@ import React from "react";
 import Image from "next/image";
 import Button from "@/components/shared/Button";
 import AccountProfile from "@/components/forms/AccountProfile";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { redirect } from "next/navigation";
 
 const page = () => {
+  const {user} = useSelector((state: RootState)=> state.user)
+  
+    if(!user?.id) return null
+  
+    if(user?.onboarded) redirect('/')
+
+    console.log('user fetched ', user)
 
   
   return (

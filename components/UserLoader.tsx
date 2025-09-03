@@ -13,5 +13,5 @@ export default function UserLoader() {
     dispatch(fetchUser());
   }, [dispatch]);
 
-  return null; // This component doesn't render anything
+  return null;
 }

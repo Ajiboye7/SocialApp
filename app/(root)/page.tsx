@@ -4,10 +4,17 @@ import React from "react";
 import { SignOutButton } from "@clerk/nextjs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { redirect } from "next/navigation";
 
 const page = () => {
+  
 
-  const user = useSelector((state: RootState)=> state.user.user)
+  const {user} = useSelector((state: RootState)=> state.user)
+   // const { user, isOnboarded } = useSelector((state: RootState) => state.user);
+
+  //if(!user) return null
+
+//  if(isOnboarded) redirect('/')
   console.log('user fetched ', user)
 
   const userName  = user?.name

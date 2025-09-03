@@ -50,6 +50,7 @@ export async function PUT(request: Request) {
         success: true,
         message: "User updated successfully",
         data: {
+          id:updatedUser.id,
           name: updatedUser.name,
           userName: updatedUser.username,
           bio: updatedUser.bio,
@@ -93,10 +94,12 @@ export async function GET() {
       {
         success: true,
         data: {
+          id:user.id,
           name: user.name,
           userName: user.username,
           bio: user.bio,
           profile_picture: user.profile_picture,
+          onboarded: user.onboarded
         },
       },
       { status: 200 }

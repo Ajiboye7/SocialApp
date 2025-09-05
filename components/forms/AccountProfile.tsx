@@ -70,10 +70,11 @@ const AccountProfile = ({ btnTitle }: Props) => {
       ).unwrap();
 
       router.push("/");
-    } catch (error: any) {
-      alert(error.message);
-      console.error("Profile update error:", error);
-    }
+   } catch (error: any) {
+  console.log("Error creating thread", error);
+  alert(typeof error === "string" ? error : error.message || "Something went wrong");
+}
+
   }
 
   const handleImage = (

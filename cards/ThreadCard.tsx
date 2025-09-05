@@ -4,18 +4,27 @@ import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
-const ThreadCard = () => {
 
-  const {user} = useSelector((state: RootState)=> state.user)
+interface props{
+    image : string
+    username: string
+    thread: string
+    
+  }
+
+const ThreadCard = ({image, username, thread}: props) => {
+  //const {user} = useSelector((state: RootState)=> state.user)
 
   //const profilePicture = user?.profile_picture
+
   return (
     <div className="relative w-full bg-dark-2 p-7 mt-7 rounded-xl flex justify-between">
       <div className="flex flex-col gap-3 ">
         <div className="flex gap-4 ">
           <div className="">
             <Image
-              src={user?.profile_picture || "/assets/profile.svg"}
+             src={image|| "/assets/profile.svg"}
+              //src="/assets/profile.svg"
               alt="profile"
               width={50}
               height={50}
@@ -26,10 +35,10 @@ const ThreadCard = () => {
 
           <div className="flex flex-col gap-2">
             <p className="text-light-1 text-[16px] leading-[140%] font-[600]">
-              Username
+              {username}
             </p>
             <p className="text-light-2 text-[14px] leading-[140%] font-[400]">
-              Lorem ipsum dolor sit amet.
+             {thread}
             </p>
             <div className="flex items-center gap-3">
               <Image

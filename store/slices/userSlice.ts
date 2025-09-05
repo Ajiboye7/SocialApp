@@ -39,7 +39,7 @@ export const fetchUser = createAsyncThunk(
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data.message || error);
+        return rejectWithValue(error.response?.data.message || error.message);
       }
       return rejectWithValue("Failed to fetch user data");
     }
@@ -54,7 +54,7 @@ export const updateUser = createAsyncThunk(
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data.message || error);
+        return rejectWithValue(error.response?.data.message || error.message);
       }
       return rejectWithValue("An unexpected error occurred. Please try again.");
     }

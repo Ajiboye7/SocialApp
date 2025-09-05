@@ -21,8 +21,8 @@ import { useRouter } from "next/navigation";
 
 const PostThreads = () => {
   const dispatch = useDispatch<AppDispatch>();
-   const router = useRouter();
-  
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof ThreadValidation>>({
     resolver: zodResolver(ThreadValidation),
     defaultValues: {
@@ -31,13 +31,6 @@ const PostThreads = () => {
   });
 
   async function onSubmit(data: z.infer<typeof ThreadValidation>) {
-    /*toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });*/
     try {
       await dispatch(
         createThread({
@@ -45,11 +38,10 @@ const PostThreads = () => {
         })
       ).unwrap();
 
-      router.push('/')
+      router.push("/");
     } catch (error: any) {
-      console.log(error);
-      alert(error.message);
       console.log("Error creating thread", error);
+      alert(error || "Something went wrong");
     }
   }
 

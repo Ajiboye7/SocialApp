@@ -1,19 +1,47 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+/*interface ThreadData {
+  thread: string;
+}*/
+
 interface ThreadData {
   thread: string;
+  parentId?: string; // Add parentId for comments
 }
 
-interface Thread {
+/*interface Thread {
   _id: string;
   author: string;
   thread: string;
   createdAt: string;
+  parentId?: string;
+  children: Thread[]; // Add children to store comments
+}*/
+interface Thread {
+  _id: string;
+  author: string; // Just user ID
+  thread: string;
+  createdAt: string;
+  parentId?: string;
+  children: Comment[]; // Use Comment interface here
+}
+interface AuthorInfo {
+  username: string;
+  profile_picture: string;
+}
+
+interface Comment {
+  _id: string;
+  author: AuthorInfo;
+  thread: string;
+  createdAt: string;
+  parentId: string; // Points to thread or another comment
+  children: Comment[]; // Nested replies
 }
 
 interface ThreadState {
-  threads: Thread[];  // store multiple
+  threads: Thread[]; // store multiple
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -39,6 +67,23 @@ export const createThread = createAsyncThunk(
   }
 );
 
+export const createComment = createAsyncThunk(
+  "thread/createComment",
+  async ({ thread, parentId }: ThreadData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`/api/threads/${parentId}/comment`, {
+        thread,
+      });
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      console.log(error);
+      return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+  }
+);
 export const getThreads = createAsyncThunk(
   "thread/get",
   async (_, { rejectWithValue }) => {
@@ -75,21 +120,42 @@ const threadSlice = createSlice({
         state.error = (action.payload as string) || "Failed to create thread";
       })
 
-      .addCase(getThreads.pending, (state, action)=>{
+      .addCase(createComment.pending, (state)=>{
         state.status = 'loading'
       })
 
-      .addCase(getThreads.fulfilled, (state, action)=>{
-        state.status = 'succeeded',
-        state.threads = action.payload.threads
+      .addCase(createComment.fulfilled,(state, action)=>{
+        state.status = 'succeeded'
+        const parentThread = state.threads.find(
+          (t) => t._id === action.payload.parentId
+        );
+        if (parentThread) {
+          parentThread.children = parentThread.children || [];
+          parentThread.children.push(action.payload);
+        } else {
+          state.threads.push(action.payload);
+        }
         state.error = null;
       })
-      
-      .addCase(getThreads.rejected, (state, action)=>{
+
+      .addCase(createComment.rejected, (state, action)=>{
         state.status = 'failed',
-        state.error = (action.payload as string ) || 'Failed to get threads'
+        state.error = (action.payload as string) || "Failed to create comment";
       })
-     
+
+      .addCase(getThreads.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(getThreads.fulfilled, (state, action) => {
+        (state.status = "succeeded"), (state.threads = action.payload.threads);
+        state.error = null;
+      })
+
+      .addCase(getThreads.rejected, (state, action) => {
+        (state.status = "failed"),
+          (state.error = (action.payload as string) || "Failed to get threads");
+      });
   },
 });
 

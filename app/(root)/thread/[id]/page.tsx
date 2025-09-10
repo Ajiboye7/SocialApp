@@ -42,16 +42,13 @@ const page = () => {
             image={user?.profile_picture || "/assets/profile.svg"}
             username={user?.name || "Unknown User"}
             thread={t.thread}
-            comments={t.children}
           />
         ))
       ) : (
         <p className="text-white text-2xl">loading post...</p>
       )}
 
-      <SignOutButton redirectUrl="/sign-in">
-        <button className="text-white mt-10">Sign Out</button>
-      </SignOutButton>
+     
     </section>
   );
 };

@@ -1,18 +1,32 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
 
 
-interface props{
-    image : string
-    username: string
-    thread: string
-    
-  }
 
-const ThreadCard = ({image, username, thread}: props) => {
+interface CommentAuthor {
+  username: string;
+  profile_picture: string;
+}
+
+interface Comment {
+  _id: string;
+  author: CommentAuthor;
+  thread: string;
+  createdAt: string;
+  parentId: string;
+  children: Comment[];
+}
+
+interface Props {
+  image: string;
+  username: string;
+  thread: string;
+  parentId: string;
+  comments: Comment[];
+}
+
+const ThreadCard = ({image, username, thread, parentId, comments}: Props) => {
   //const {user} = useSelector((state: RootState)=> state.user)
 
   //const profilePicture = user?.profile_picture
@@ -43,15 +57,15 @@ const ThreadCard = ({image, username, thread}: props) => {
             <div className="flex items-center gap-3">
               <Image
                 src="/assets/heart-gray.svg"
-                alt="heart"
+                alt="like"
                 width={24}
                 height={24}
                 className="cursor-pointer object-contain"
               />
-              <Link href={`/thread/${123}`}>
+              <Link href={`/thread/${parentId}`}>
                 <Image
                   src="/assets/reply.svg"
-                  alt="heart"
+                  alt="reply"
                   width={24}
                   height={24}
                   className="cursor-pointer object-contain"
@@ -59,14 +73,14 @@ const ThreadCard = ({image, username, thread}: props) => {
               </Link>
               <Image
                 src="/assets/repost.svg"
-                alt="heart"
+                alt="repost"
                 width={24}
                 height={24}
                 className="cursor-pointer object-contain"
               />
               <Image
                 src="/assets/share.svg"
-                alt="heart"
+                alt="share"
                 width={24}
                 height={24}
                 className="cursor-pointer object-contain"
@@ -75,20 +89,23 @@ const ThreadCard = ({image, username, thread}: props) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div>
-            <Image
-              src="/assets/profile.svg"
-              alt="profile"
-              width={30}
-              height={30}
-            />
-          </div>
+       {comments.length > 0 && (
+  <div className="flex items-center gap-2 mt-4">
+    <div>
+      <Image
+        src={comments[0].author.profile_picture || "/assets/profile.svg"}
+        alt={comments[0].author.username}
+        width={30}
+        height={30}
+        className="rounded-full"
+      />
+    </div>
 
-          <p className="text-gray-1 text-[12px] leading-[16px] font-[500]">
-            1 reply
-          </p>
-        </div>
+    <p className="text-gray-1 text-[12px] leading-[16px] font-[500]">
+      {comments.length} {comments.length === 1 ? "comment" : "comments"}
+    </p>
+  </div>
+)}
       </div>
 
       <div>

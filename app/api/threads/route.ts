@@ -51,6 +51,7 @@ export async function POST(request: Request) {
         data: {
           thread: newThread.thread,
           author: newThread.author,
+          _id: newThread._id
         },
       },
       { status: 201 }
@@ -74,23 +75,23 @@ export async function GET() {
 
   if (!userId) {
     return NextResponse.json(
-      { success: false, message: "unauthorized" },
+      { success: false, message: "unauthorized"},
       { status: 401 }
     );
   }
 
   try {
     await connectToDatabase();
-    const author = await User.findOne({ id: userId });
+    const user = await User.findOne({ id: userId });
     //console.log('author of post', author)
 
-    if (!author) {
+    if (!user) {
       return NextResponse.json(
-        { success: false, message: "no author for this thread" },
+        { success: false, message: "no user found" },
         { status: 401 }
       );
     }
-    const threads = await Thread.find({ author: author._id });
+   // const threads = await Thread.find({ author: user._id });
     //const threads = await Thread.find({ author: author._id }).populate('author');
     /*
      if (!threads || threads.length === 0) {
@@ -100,6 +101,33 @@ export async function GET() {
       });
     }
      */
+    
+    const threads = await Thread.find({author: user._id})
+    .populate({
+      path: 'children',
+      populate:{
+        path: 'author',
+        select : 'username profile_picture'
+      },
+    }).lean()
+
+    // Transform threads to include only necessary data
+
+    const transformedThreads = threads.map((thread) => ({
+      _id: thread._id,
+      thread: thread.thread,
+      author: thread.author.toString(),
+      createdAt: thread.createdAt,
+      parentId: thread.parentId || null,
+      children: thread.children.map((child: any) => ({
+        _id: child._id.toString(),
+        thread: child.thread,
+        author: child.author.username,
+        profile_picture: child.author.profile_picture,
+        createdAt: child.createdAt,
+        children: [], 
+      })),
+    }));
 
     if (!threads) {
       return NextResponse.json({
@@ -107,12 +135,13 @@ export async function GET() {
         message: "Threads not found",
       });
     }
+    
 
     return NextResponse.json(
       {
         success: true,
         data: {
-          threads,
+          threads : transformedThreads,
         },
       },
       { status: 200 }
@@ -127,31 +156,3 @@ export async function GET() {
   }
 }
 
-/*export async function POST(request: Request) {
-  const { userId } = await auth();
-
-  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
-
-  if (!userId) {
-    return NextResponse.json(
-      { success: false, message: "unauthorized" },
-      { status: 401 }
-    );
-  }
-
-  try{
-
-   const body = await request.json();
-    const { thread } = body;
-
-  }catch(error){
-      console.log("error fetching threads", error);
-
-    return NextResponse.json(
-      { success: false, message: "Internal server error" },
-      { status: 500 }
-    );
-
-  }
-
-}*/

@@ -6,51 +6,61 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { redirect } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import Comment from "@/components/forms/Comment";
 
-const page = () => {
+const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
   const { threads, status: threadStatus } = useSelector(
     (state: RootState) => state.thread
   );
+  console.log("Thread fetch", threads);
+  //console.log("user fetched ", user);
+  const { id } = React.use(params);
 
-  console.log("user fetched ", user);
-
-  const userName = user?.name;
-
-  if (userStatus === "loading" || threadStatus === "loading") {
+  if (threadStatus === "loading") {
     return (
       <div className="mx-auto flex max-w-3xl flex-col justify-center items-center px-10 py-20 min-h-[100vh]">
         <LoadingSpinner />
-        <p className="text-light-2 mt-4">Loading post</p>
+        <p className="text-light-2 mt-4">Loading thread...</p>
       </div>
     );
   }
 
+  const thread = threads.find((t) => t._id === id);
+
+  if (!thread) {
+    return <p className="text-light-2 mt-4">Thread not found</p>;
+  }
+
   return (
     <section className="">
-      <h1 className="text-[30px] leading-[140%] font-[600] text-light-1">
-        Home
-      </h1>
+      <ThreadCard
+        key={thread._id}
+        parentId={thread.parentId || ""}
+        image={user?.profile_picture || "/assets/profile.svg"}
+        username={user?.name || "Unknown User"}
+        thread={thread.thread}
+        comments={thread.children}
+        
+      />
 
-      {threads.length > 0 ? (
-        threads.map((t) => (
-          <ThreadCard
-           parentId={t._id}
-            key={t._id}
-            image={user?.profile_picture || "/assets/profile.svg"}
-            username={user?.name || "Unknown User"}
-            thread={t.thread}
-          />
-        ))
-      ) : (
-        <p className="text-white text-2xl">loading post...</p>
-      )}
+      <Comment parentId={id} user ={user?.profile_picture || "/assets/profile.svg"} />
 
-     
+      {thread.children?.map((child) => (
+        <ThreadCard
+          key={child._id}
+          parentId={child.parentId}
+          image={child.author.profile_picture || "/assets/profile.svg"}
+          username={child.author.username || "Anonymous"}
+          thread={child.thread}
+          comments={child.children}
+          isComment={true}
+        />
+      ))}
     </section>
   );
 };
 
-export default page;
+export default ThreadDetails;

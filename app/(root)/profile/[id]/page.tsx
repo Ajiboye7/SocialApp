@@ -62,7 +62,7 @@ const page = () => {
         </div>
       </div>
 
-      <ThreadCard/>
+      {/*<ThreadCard/>*/}
     </section>
   );
 };

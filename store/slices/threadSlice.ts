@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { threadId } from "worker_threads";
 
 /*interface ThreadData {
   thread: string;
@@ -44,12 +45,14 @@ interface ThreadState {
   threads: Thread[]; // store multiple
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  isComment: boolean
 }
 
 const initialState: ThreadState = {
   threads: [],
   status: "idle",
   error: null,
+  isComment: false
 };
 
 export const createThread = createAsyncThunk(
@@ -84,6 +87,20 @@ export const createComment = createAsyncThunk(
     }
   }
 );
+
+export const deleteThread = createAsyncThunk('thread/deleteThread', async(threadId: string, {rejectWithValue})=>{
+  try{
+     await axios.delete(`/api/threads/${threadId}/comment`);
+    return threadId
+
+  }catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+
+})
 export const getThreads = createAsyncThunk(
   "thread/get",
   async (_, { rejectWithValue }) => {
@@ -120,6 +137,19 @@ const threadSlice = createSlice({
         state.error = (action.payload as string) || "Failed to create thread";
       })
 
+      .addCase(deleteThread.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(deleteThread.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.threads = state.threads.filter((t) => t._id !== action.payload);
+        state.error = null;
+      })
+      .addCase(deleteThread.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "Failed to delete thread";
+      })
+
       .addCase(createComment.pending, (state)=>{
         state.status = 'loading'
       })
@@ -136,6 +166,7 @@ const threadSlice = createSlice({
           state.threads.push(action.payload);
         }
         state.error = null;
+        state.isComment= true
       })
 
       .addCase(createComment.rejected, (state, action)=>{

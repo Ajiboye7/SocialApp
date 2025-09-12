@@ -2,8 +2,6 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-
-
 interface CommentAuthor {
   username: string;
   profile_picture: string;
@@ -23,28 +21,40 @@ interface Props {
   username: string;
   thread: string;
   parentId: string;
+  isComment?: boolean;
+  showDeleteButton?: boolean;
   comments: Comment[];
 }
 
-const ThreadCard = ({image, username, thread, parentId, comments}: Props) => {
-  //const {user} = useSelector((state: RootState)=> state.user)
-
-  //const profilePicture = user?.profile_picture
-
+const ThreadCard = ({
+  image,
+  username,
+  thread,
+  parentId,
+  comments,
+  isComment,
+  showDeleteButton,
+}: Props) => {
   return (
-    <div className="relative w-full bg-dark-2 p-7 mt-7 rounded-xl flex justify-between">
+    <div
+      className={`relative w-full  mt-7 rounded-xl flex justify-between ${
+        isComment ? "px-0 xs-px-7 " : "bg-dark-2 p-7"
+      }`}
+    >
       <div className="flex flex-col gap-3 ">
         <div className="flex gap-4 ">
-          <div className="">
+          <div className="relative flex flex-col items-center">
             <Image
-             src={image|| "/assets/profile.svg"}
-              //src="/assets/profile.svg"
+              src={image || "/assets/profile.svg"}
               alt="profile"
               width={50}
               height={50}
-              className="rounded-full"
+              className="rounded-full z-10"
             />
+
+            <div className="w-px h-full bg-neutral-800 absolute top-9" />
           </div>
+
           {/*<div className="relative mt-2 w-0.5 grow rounded-full bg-neutral-800"/>*/}
 
           <div className="flex flex-col gap-2">
@@ -52,7 +62,7 @@ const ThreadCard = ({image, username, thread, parentId, comments}: Props) => {
               {username}
             </p>
             <p className="text-light-2 text-[14px] leading-[140%] font-[400]">
-             {thread}
+              {thread}
             </p>
             <div className="flex items-center gap-3">
               <Image
@@ -89,28 +99,35 @@ const ThreadCard = ({image, username, thread, parentId, comments}: Props) => {
           </div>
         </div>
 
-       {comments.length > 0 && (
-  <div className="flex items-center gap-2 mt-4">
-    <div>
-      <Image
-        src={comments[0].author.profile_picture || "/assets/profile.svg"}
-        alt={comments[0].author.username}
-        width={30}
-        height={30}
-        className="rounded-full"
-      />
-    </div>
+        {comments.length > 0 && (
+          <div className="flex items-center gap-2 mt-4">
+            <div className="flex -space-x-3 z-10">
+              {comments.slice(0, 3).map((comment) => (
+                <Image
+                  key={comment._id}
+                  src={comment.author.profile_picture || "/assets/profile.svg"}
+                  alt={comment.author.username}
+                  width={30}
+                  height={30}
+                  className="rounded-full border-2 border-dark-2"
+                />
+              ))}
+            </div>
 
-    <p className="text-gray-1 text-[12px] leading-[16px] font-[500]">
-      {comments.length} {comments.length === 1 ? "comment" : "comments"}
-    </p>
-  </div>
-)}
+            <Link href={`/thread/${parentId}`}>
+              <p className="text-gray-1 text-[12px] leading-[16px] font-[500]">
+                {comments.length} {comments.length === 1 ? "reply" : "replies"}
+              </p>
+            </Link>
+          </div>
+        )}
       </div>
 
-      <div>
-        <Image src="/assets/delete.svg" alt="delete" width={18} height={18} />
-      </div>
+      {(isComment || showDeleteButton) && (
+        <div>
+          <Image src="/assets/delete.svg" alt="delete" width={18} height={18} />
+        </div>
+      )}
     </div>
   );
 };

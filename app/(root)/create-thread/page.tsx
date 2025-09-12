@@ -1,7 +1,7 @@
 'use client'
 import Button from '@/components/shared/Button';
 import React from 'react';
-import PostThreads from '@/forms/PostThreads';
+import PostThreads from '@/components/forms/PostThreads';
 
 const page = () => {
 

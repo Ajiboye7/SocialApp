@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const mongoUser = await User.findOne({ id: userId });
     if (!mongoUser) {
       return NextResponse.json(
-        { success: false, message: "User not found in database."},
+        { success: false, message: "User not found in database." },
         { status: 404 }
       );
     }
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         data: {
           thread: newThread.thread,
           author: newThread.author,
-          _id: newThread._id
+          _id: newThread._id,
         },
       },
       { status: 201 }
@@ -75,7 +75,7 @@ export async function GET() {
 
   if (!userId) {
     return NextResponse.json(
-      { success: false, message: "unauthorized"},
+      { success: false, message: "unauthorized" },
       { status: 401 }
     );
   }
@@ -91,25 +91,16 @@ export async function GET() {
         { status: 401 }
       );
     }
-   // const threads = await Thread.find({ author: user._id });
-    //const threads = await Thread.find({ author: author._id }).populate('author');
-    /*
-     if (!threads || threads.length === 0) {
-      return NextResponse.json({
-        success: false,
-        message: "Threads not found",
-      });
-    }
-     */
-    
-    const threads = await Thread.find({author: user._id})
-    .populate({
-      path: 'children',
-      populate:{
-        path: 'author',
-        select : 'username profile_picture'
-      },
-    }).lean()
+
+    const threads = await Thread.find({ author: user._id })
+      .populate({
+        path: "children",
+        populate: {
+          path: "author",
+          select: "username profile_picture",
+        },
+      })
+      .lean();
 
     // Transform threads to include only necessary data
 
@@ -122,10 +113,12 @@ export async function GET() {
       children: thread.children.map((child: any) => ({
         _id: child._id.toString(),
         thread: child.thread,
-        author: child.author.username,
-        profile_picture: child.author.profile_picture,
+        author: {
+          username: child.author.username,
+          profile_picture: child.author.profile_picture,
+        },
         createdAt: child.createdAt,
-        children: [], 
+        children: [],
       })),
     }));
 
@@ -135,13 +128,12 @@ export async function GET() {
         message: "Threads not found",
       });
     }
-    
 
     return NextResponse.json(
       {
         success: true,
         data: {
-          threads : transformedThreads,
+          threads: transformedThreads,
         },
       },
       { status: 200 }
@@ -155,4 +147,3 @@ export async function GET() {
     );
   }
 }
-

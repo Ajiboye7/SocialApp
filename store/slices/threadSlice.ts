@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { stat } from "fs";
 import { threadId } from "worker_threads";
 
 /*interface ThreadData {
@@ -37,22 +38,22 @@ interface Comment {
   author: AuthorInfo;
   thread: string;
   createdAt: string;
-  parentId: string; // Points to thread or another comment
-  children: Comment[]; // Nested replies
+  parentId: string;
+  children: Comment[];
 }
 
 interface ThreadState {
   threads: Thread[]; // store multiple
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
-  isComment: boolean
+  isComment: boolean;
 }
 
 const initialState: ThreadState = {
   threads: [],
   status: "idle",
   error: null,
-  isComment: false
+  isComment: false,
 };
 
 export const createThread = createAsyncThunk(
@@ -88,19 +89,38 @@ export const createComment = createAsyncThunk(
   }
 );
 
-export const deleteThread = createAsyncThunk('thread/deleteThread', async(threadId: string, {rejectWithValue})=>{
-  try{
-     await axios.delete(`/api/threads/${threadId}/comment`);
-    return threadId
-
-  }catch (error) {
+export const deleteThread = createAsyncThunk(
+  "thread/deleteThread",
+  async (threadId: string, { rejectWithValue }) => {
+    try {
+      await axios.delete(`/api/threads/${threadId}/comment`);
+      return threadId;
+    } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
       }
       return rejectWithValue("An unexpected error occurred. Please try again.");
     }
+  }
+);
 
-})
+export const deleteComment = createAsyncThunk(
+  "thread/deleteComment",
+  async (
+    { parentId, commentId }: { parentId: string; commentId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      await axios.delete(`/api/threads/${parentId}/comment/${commentId}`);
+      return { parentId, commentId };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+  }
+);
 export const getThreads = createAsyncThunk(
   "thread/get",
   async (_, { rejectWithValue }) => {
@@ -150,12 +170,12 @@ const threadSlice = createSlice({
         state.error = (action.payload as string) || "Failed to delete thread";
       })
 
-      .addCase(createComment.pending, (state)=>{
-        state.status = 'loading'
+      .addCase(createComment.pending, (state) => {
+        state.status = "loading";
       })
 
-      .addCase(createComment.fulfilled,(state, action)=>{
-        state.status = 'succeeded'
+      .addCase(createComment.fulfilled, (state, action) => {
+        state.status = "succeeded";
         const parentThread = state.threads.find(
           (t) => t._id === action.payload.parentId
         );
@@ -166,12 +186,38 @@ const threadSlice = createSlice({
           state.threads.push(action.payload);
         }
         state.error = null;
-        state.isComment= true
+        state.isComment = true;
       })
 
-      .addCase(createComment.rejected, (state, action)=>{
-        state.status = 'failed',
-        state.error = (action.payload as string) || "Failed to create comment";
+      .addCase(createComment.rejected, (state, action) => {
+        (state.status = "failed"),
+          (state.error =
+            (action.payload as string) || "Failed to create comment");
+      })
+
+      .addCase(deleteComment.pending, (state, action) => {
+        state.status === "loading";
+      })
+
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Remove comment from parent's children
+        const parentThread = state.threads.find(
+          (t) => t._id === action.payload.parentId
+        );
+
+        if (parentThread) {
+          parentThread.children =
+            parentThread.children?.filter(
+              (c) => c._id !== action.payload.commentId
+            ) || [];
+        }
+        state.error = null;
+      })
+
+      .addCase(deleteComment.rejected, (state, action) => {
+        state.status === "failed";
+        state.error = (action.payload as string) || "Failed to delete comment";
       })
 
       .addCase(getThreads.pending, (state) => {

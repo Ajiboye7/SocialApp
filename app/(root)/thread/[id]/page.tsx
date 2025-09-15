@@ -5,7 +5,7 @@ import { SignOutButton } from "@clerk/nextjs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { redirect } from "next/navigation";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingSpinner from "@/components/LoadingThread";
 import Comment from "@/components/forms/Comment";
 
 const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -20,12 +20,7 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
 
   if (threadStatus === "loading") {
-    return (
-      <div className="mx-auto flex max-w-3xl flex-col justify-center items-center px-10 py-20 min-h-[100vh]">
-        <LoadingSpinner />
-        <p className="text-light-2 mt-4">Loading thread...</p>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   const thread = threads.find((t) => t._id === id);
@@ -38,19 +33,25 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
     <section className="">
       <ThreadCard
         key={thread._id}
-        parentId={thread.parentId || ""}
+         threadId={thread._id}
+         childId={thread._id}
+        //parentId={thread.parentId || ""}
         image={user?.profile_picture || "/assets/profile.svg"}
         username={user?.name || "Unknown User"}
         thread={thread.thread}
         comments={thread.children}
-        
       />
 
-      <Comment parentId={id} user ={user?.profile_picture || "/assets/profile.svg"} />
+      <Comment
+        parentId={id}
+        user={user?.profile_picture || "/assets/profile.svg"}
+      />
 
       {thread.children?.map((child) => (
         <ThreadCard
           key={child._id}
+          childId={child._id}
+          threadId={child._id}
           parentId={child.parentId}
           image={child.author.profile_picture || "/assets/profile.svg"}
           username={child.author.username || "Anonymous"}

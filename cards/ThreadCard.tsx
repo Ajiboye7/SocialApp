@@ -1,6 +1,11 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { deleteComment } from "@/store/slices/threadSlice";
+import { deleteThread } from "@/store/slices/threadSlice";
+import { useDispatch, UseDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { threadId } from "worker_threads";
 
 interface CommentAuthor {
   username: string;
@@ -20,9 +25,11 @@ interface Props {
   image: string;
   username: string;
   thread: string;
-  parentId: string;
+  parentId?: string;
   isComment?: boolean;
   showDeleteButton?: boolean;
+  childId: string;
+  threadId: string;
   comments: Comment[];
 }
 
@@ -34,7 +41,39 @@ const ThreadCard = ({
   comments,
   isComment,
   showDeleteButton,
+  childId,
+  threadId,
 }: Props) => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleDelete = async () => {
+    if (
+      !confirm(
+        `Are you sure you want to delete this ${
+          isComment ? "comment" : "thread"
+        }?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      if (isComment && parentId) {
+        // Dispatch deleteComment for comments
+        await dispatch(
+          deleteComment({ parentId, commentId: childId })
+        ).unwrap();
+        alert("Comment deleted successfully");
+      } else {
+        // Dispatch deleteThread for top-level threads
+        await dispatch(deleteThread(threadId)).unwrap();
+        alert("Thread deleted successfully");
+      }
+    } catch (error: any) {
+      alert(error || `Failed to delete ${isComment ? "comment" : "thread"}`);
+    }
+  };
+
   return (
     <div
       className={`relative w-full  mt-7 rounded-xl flex justify-between ${
@@ -124,7 +163,7 @@ const ThreadCard = ({
       </div>
 
       {(isComment || showDeleteButton) && (
-        <div>
+        <div onClick={handleDelete} className="cursor-pointer">
           <Image src="/assets/delete.svg" alt="delete" width={18} height={18} />
         </div>
       )}

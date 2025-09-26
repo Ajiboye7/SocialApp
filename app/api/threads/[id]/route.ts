@@ -93,7 +93,7 @@ export async function DELETE(
   //  const resolvedParams = await params
   if (!userId) {
     return NextResponse.json(
-      { success: false, message: "unauthorized: No user session found" },
+      { success: false, message: "unauthorized: No user session found"},
       { status: 401 }
     );
   }
@@ -149,3 +149,73 @@ export async function DELETE(
     );
   }
 }
+
+//NEXT TASK
+
+/*
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
+import connectToDatabase from "@/lib/database";
+import Thread from "@/models/Thread";
+import User from "@/models/User";
+
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    await connectToDatabase();
+
+    const thread = await Thread.findById(params.id)
+      .populate({
+        path: "children",
+        populate: {
+          path: "author",
+          select: "username profile_picture",
+        },
+      })
+      .populate({
+        path: "author",
+        select: "username profile_picture",
+      })
+      .lean();
+
+    if (!thread) {
+      return NextResponse.json({ success: false, message: "Thread not found" }, { status: 404 });
+    }
+
+    const transformedThread = {
+      _id: thread._id.toString(),
+      thread: thread.thread,
+      author: {
+        id: thread.author._id.toString(),
+        username: thread.author.username,
+        profile_picture: thread.author.profile_picture,
+      },
+      createdAt: thread.createdAt,
+      parentId: thread.parentId ? thread.parentId.toString() : null,
+      children: thread.children.map((child: any) => ({
+        _id: child._id.toString(),
+        thread: child.thread,
+        author: {
+          id: child.author._id.toString(),
+          username: child.author.username,
+          profile_picture: child.author.profile_picture,
+        },
+        createdAt: child.createdAt,
+        parentId: child.parentId ? child.parentId.toString() : null,
+        children: [], // You can make this recursive if needed
+      })),
+    };
+
+    return NextResponse.json({ success: true, data: transformedThread }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching thread", error);
+    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+*/

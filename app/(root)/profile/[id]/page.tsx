@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ThreadCard from "@/cards/ThreadCard";
 import { getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
+import { clearThreads } from "@/store/slices/threadSlice";
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -24,6 +25,7 @@ const page = () => {
   //console.log('New version of thread', threads)
 
   useEffect(() => {
+    dispatch(clearThreads());
     dispatch(getThreads({ topLevelOnly: true, userOnly: true }));
   }, [dispatch]);
 
@@ -70,8 +72,8 @@ const page = () => {
                     threadId={t._id}
                     _id={t._id}
                     key={t._id}
-                    image={user?.profile_picture || "/assets/profile.svg"}
-                    username={user?.name || "Unknown User"}
+                    image={t.author.profile_picture || "/assets/profile.svg"}
+                    username={t.author.username || "Unknown User"}
                     thread={t.thread}
                     comments={t.children}
                     showDeleteButton={true}

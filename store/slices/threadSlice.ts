@@ -127,6 +127,20 @@ export const deleteComment = createAsyncThunk(
     }
   }
 );*/}
+
+//New Task
+
+/*export const getThreadById = createAsyncThunk(
+  "thread/getById",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`/api/threads/${id}`);
+      return res.data.data;
+    } catch (error) {
+      return rejectWithValue("Failed to fetch thread");
+    }
+  }
+);*/
 export const getThreads = createAsyncThunk(
   "thread/get",
   async (
@@ -151,7 +165,12 @@ export const getThreads = createAsyncThunk(
 const threadSlice = createSlice({
   name: "thread",
   initialState,
-  reducers: {},
+  reducers: {
+     clearThreads: (state) => {
+      state.threads = [];
+    },
+  },
+ 
   extraReducers: (builder) => {
     builder
       .addCase(createThread.pending, (state) => {
@@ -250,3 +269,4 @@ const threadSlice = createSlice({
 });
 
 export default threadSlice.reducer;
+export const { clearThreads } = threadSlice.actions;

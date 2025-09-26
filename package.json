@@ -14,7 +14,10 @@
     "@hookform/resolvers": "^5.2.1",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+<<<<<<< HEAD
     "@radix-ui/react-tabs": "^1.1.13",
+=======
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
     "@reduxjs/toolkit": "^2.8.2",
     "@uploadthing/react": "^7.3.3",
     "axios": "^1.11.0",

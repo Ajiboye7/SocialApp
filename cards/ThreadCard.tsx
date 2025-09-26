@@ -25,10 +25,17 @@ interface Props {
   image: string;
   username: string;
   thread: string;
+<<<<<<< HEAD
   parentId: string;
   isComment?: boolean;
   showDeleteButton?: boolean;
   _id: string;
+=======
+  parentId?: string;
+  isComment?: boolean;
+  showDeleteButton?: boolean;
+  childId: string;
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   threadId: string;
   comments: Comment[];
 }
@@ -41,12 +48,20 @@ const ThreadCard = ({
   comments,
   isComment,
   showDeleteButton,
+<<<<<<< HEAD
   _id,
+=======
+  childId,
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   threadId,
 }: Props) => {
   const dispatch = useDispatch<AppDispatch>();
 
+<<<<<<< HEAD
    const handleDelete = async () => {
+=======
+  const handleDelete = async () => {
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
     if (
       !confirm(
         `Are you sure you want to delete this ${
@@ -61,7 +76,11 @@ const ThreadCard = ({
       if (isComment && parentId) {
         // Dispatch deleteComment for comments
         await dispatch(
+<<<<<<< HEAD
           deleteComment({ parentId, commentId: _id })
+=======
+          deleteComment({ parentId, commentId: childId })
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
         ).unwrap();
         alert("Comment deleted successfully");
       } else {
@@ -72,6 +91,7 @@ const ThreadCard = ({
     } catch (error: any) {
       alert(error || `Failed to delete ${isComment ? "comment" : "thread"}`);
     }
+<<<<<<< HEAD
   }; 
 
   {/*const handleDelete = async ()=>{
@@ -87,6 +107,9 @@ const ThreadCard = ({
   }*/}
 
 
+=======
+  };
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
 
   return (
     <div
@@ -125,7 +148,11 @@ const ThreadCard = ({
                 height={24}
                 className="cursor-pointer object-contain"
               />
+<<<<<<< HEAD
               <Link href={`/thread/${threadId}`}>
+=======
+              <Link href={`/thread/${parentId}`}>
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
                 <Image
                   src="/assets/reply.svg"
                   alt="reply"
@@ -167,7 +194,11 @@ const ThreadCard = ({
               ))}
             </div>
 
+<<<<<<< HEAD
             <Link href={`/thread/${threadId}`}>
+=======
+            <Link href={`/thread/${parentId}`}>
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
               <p className="text-gray-1 text-[12px] leading-[16px] font-[500]">
                 {comments.length} {comments.length === 1 ? "reply" : "replies"}
               </p>

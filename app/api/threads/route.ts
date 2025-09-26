@@ -68,6 +68,7 @@ export async function POST(request: Request) {
   }
 }
 
+<<<<<<< HEAD
 export async function GET(req: Request) {
   const { userId } = await auth();
   if (!userId) {
@@ -160,6 +161,9 @@ export async function GET(req: Request) {
 }
 
 {/*export async function GET() {
+=======
+export async function GET() {
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   const { userId } = await auth();
 
   //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
@@ -208,7 +212,10 @@ export async function GET(req: Request) {
           username: child.author.username,
           profile_picture: child.author.profile_picture,
         },
+<<<<<<< HEAD
         parentId: child.parentId ? child.parentId.toString() : null,
+=======
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
         createdAt: child.createdAt,
         children: [],
       })),
@@ -238,4 +245,8 @@ export async function GET(req: Request) {
       { status: 500 }
     );
   }
+<<<<<<< HEAD
 }*/}
+=======
+}
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe

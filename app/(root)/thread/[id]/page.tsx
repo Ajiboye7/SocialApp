@@ -34,10 +34,17 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
       <ThreadCard
         key={thread._id}
          threadId={thread._id}
+<<<<<<< HEAD
          _id={thread._id}
         parentId={thread.parentId || ""}
         image={thread.author.profile_picture || "/assets/profile.svg"}
         username={thread.author.username || "Unknown User"}
+=======
+         childId={thread._id}
+        //parentId={thread.parentId || ""}
+        image={user?.profile_picture || "/assets/profile.svg"}
+        username={user?.name || "Unknown User"}
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
         thread={thread.thread}
         comments={thread.children}
       />
@@ -50,7 +57,11 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
       {thread.children?.map((child) => (
         <ThreadCard
           key={child._id}
+<<<<<<< HEAD
           _id={child._id}
+=======
+          childId={child._id}
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
           threadId={child._id}
           parentId={child.parentId}
           image={child.author.profile_picture || "/assets/profile.svg"}

@@ -4,8 +4,13 @@ import User from "@/lib/models/user.model";
 import { NextResponse } from "next/server";
 import Thread from "@/lib/models/thread.model";
 
+<<<<<<< HEAD
 {
   /*export async function PUT(request: Request, {params} :{params: {id: string}}) {
+=======
+
+export async function PUT(request: Request, {params} :{params: {id: string}}) {
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   const { userId } = await auth();
 
   if (!userId) {
@@ -80,17 +85,28 @@ import Thread from "@/lib/models/thread.model";
       { status: 500 }
     );
   }
+<<<<<<< HEAD
 }*/
 }
 
 export async function DELETE(
   req: Request,
 
+=======
+}
+
+
+export async function DELETE(
+  
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   { params }: { params: { id: string } }
 ) {
   const { userId } = await auth();
   //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv"
+<<<<<<< HEAD
   //  const resolvedParams = await params
+=======
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   if (!userId) {
     return NextResponse.json(
       { success: false, message: "unauthorized: No user session found" },
@@ -103,7 +119,11 @@ export async function DELETE(
     const mongoUser = await User.findOne({ id: userId });
     if (!mongoUser) {
       return NextResponse.json(
+<<<<<<< HEAD
         { success: false, message: "User not found in database." },
+=======
+        { success: false, message: "User not found in database."}, 
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
         { status: 404 }
       );
     }
@@ -128,7 +148,11 @@ export async function DELETE(
 
     // Delete the thread and its children (comments)
     await Thread.deleteMany({
+<<<<<<< HEAD
       _id: { $in: [params.id, ...existingThread.children] },
+=======
+      _id: { $in: [params.id, ...existingThread.children]},
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
     });
 
     return NextResponse.json(

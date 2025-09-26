@@ -11,7 +11,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Provider } from "react-redux";
 import { store } from "@/store/store";
 import ReduxProvider from "@/components/ReduxProvider";
+<<<<<<< HEAD
 import Loader from "@/components/Loader";
+=======
+import UserLoader from "@/components/UserLoader";
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +48,11 @@ export default function RootLayout({
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
+<<<<<<< HEAD
             <Loader />
+=======
+            <UserLoader />
+>>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
 
             <TopBar />
             <main className="flex">

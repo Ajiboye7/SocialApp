@@ -1,11 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-<<<<<<< HEAD
-
-=======
-import { stat } from "fs";
-import { threadId } from "worker_threads";
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
 
 /*interface ThreadData {
   thread: string;
@@ -16,7 +10,6 @@ interface ThreadData {
   parentId?: string; // Add parentId for comments
 }
 
-<<<<<<< HEAD
 interface Thread {
   _id: string;
   author: AuthorInfo;
@@ -27,25 +20,6 @@ interface Thread {
 }
 interface AuthorInfo {
   id: string;
-=======
-/*interface Thread {
-  _id: string;
-  author: string;
-  thread: string;
-  createdAt: string;
-  parentId?: string;
-  children: Thread[]; // Add children to store comments
-}*/
-interface Thread {
-  _id: string;
-  author: string; // Just user ID
-  thread: string;
-  createdAt: string;
-  parentId?: string;
-  children: Comment[]; // Use Comment interface here
-}
-interface AuthorInfo {
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   username: string;
   profile_picture: string;
 }
@@ -60,11 +34,7 @@ interface Comment {
 }
 
 interface ThreadState {
-<<<<<<< HEAD
   threads: Thread[];
-=======
-  threads: Thread[]; // store multiple
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   isComment: boolean;
@@ -114,11 +84,7 @@ export const deleteThread = createAsyncThunk(
   "thread/deleteThread",
   async (threadId: string, { rejectWithValue }) => {
     try {
-<<<<<<< HEAD
       await axios.delete(`/api/threads/${threadId}`);
-=======
-      await axios.delete(`/api/threads/${threadId}/comment`);
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
       return threadId;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -146,12 +112,8 @@ export const deleteComment = createAsyncThunk(
     }
   }
 );
-<<<<<<< HEAD
 
 {/*export const getThreads = createAsyncThunk(
-=======
-export const getThreads = createAsyncThunk(
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   "thread/get",
   async (_, { rejectWithValue }) => {
     try {
@@ -164,7 +126,6 @@ export const getThreads = createAsyncThunk(
       return rejectWithValue("An unexpected error occurred. Please try again.");
     }
   }
-<<<<<<< HEAD
 );*/}
 export const getThreads = createAsyncThunk(
   "thread/get",
@@ -185,8 +146,6 @@ export const getThreads = createAsyncThunk(
       return rejectWithValue("An unexpected error occurred. Please try again.");
     }
   }
-=======
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
 );
 
 const threadSlice = createSlice({
@@ -240,10 +199,7 @@ const threadSlice = createSlice({
         }
         state.error = null;
         state.isComment = true;
-<<<<<<< HEAD
         //console.log('Thread payload',action.payload )
-=======
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
       })
 
       .addCase(createComment.rejected, (state, action) => {
@@ -258,11 +214,7 @@ const threadSlice = createSlice({
 
       .addCase(deleteComment.fulfilled, (state, action) => {
         state.status = "succeeded";
-<<<<<<< HEAD
          
-=======
-        // Remove comment from parent's children
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
         const parentThread = state.threads.find(
           (t) => t._id === action.payload.parentId
         );

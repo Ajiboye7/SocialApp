@@ -2,7 +2,6 @@
 import ThreadCard from "@/cards/ThreadCard";
 import React, { useState, useEffect } from "react";
 import { SignOutButton } from "@clerk/nextjs";
-<<<<<<< HEAD
 import { useSelector, useDispatch } from "react-redux";
 import { redirect } from "next/navigation";
 import LoadingThread from "@/components/LoadingThread";
@@ -10,13 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
  
-=======
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { redirect } from "next/navigation";
-import LoadingThread from "@/components/LoadingThread";
-import { Skeleton } from "@/components/ui/skeleton";
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
 
 const page = () => {
   const { user, status: userStatus } = useSelector(
@@ -26,11 +18,8 @@ const page = () => {
     (state: RootState) => state.thread
   );
 
-<<<<<<< HEAD
   const dispatch = useDispatch<AppDispatch>();
 
-=======
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   console.log("user fetched ", user);
 
   const userName = user?.name;
@@ -44,13 +33,10 @@ const page = () => {
     );
   }*/}
 
-<<<<<<< HEAD
   useEffect(() => {
     dispatch(getThreads({ topLevelOnly: true }));
   }, [dispatch]);
 
-=======
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
   if (userStatus === "loading" || threadStatus === "loading") {
   return (
     <LoadingThread/>
@@ -67,21 +53,12 @@ const page = () => {
       {threads.length > 0 ? (
         threads.map((t) => (
           <ThreadCard
-<<<<<<< HEAD
            parentId={t._id}
            threadId={t._id}
            _id={t._id}
             key={t._id}
             image={t.author.profile_picture || "/assets/profile.svg"}
             username={t.author.username || "Unknown User"}
-=======
-           //parentId={t._id}
-           threadId={t._id}
-           childId={t._id}
-            key={t._id}
-            image={user?.profile_picture || "/assets/profile.svg"}
-            username={user?.name || "Unknown User"}
->>>>>>> 6914f654efe59dfef0a22ab0e1bf2c2e604114fe
             thread={t.thread}
             comments={t.children}
           />

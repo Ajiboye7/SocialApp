@@ -215,7 +215,7 @@ const threadSlice = createSlice({
 
       .addCase(deleteComment.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // Remove comment from parent's children
+         
         const parentThread = state.threads.find(
           (t) => t._id === action.payload.parentId
         );

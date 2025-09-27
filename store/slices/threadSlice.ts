@@ -113,6 +113,21 @@ export const deleteComment = createAsyncThunk(
   }
 );
 
+export const getThreadById = createAsyncThunk(
+  "thread/getThreadById",
+  async (threadId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/api/threads/${threadId}`);
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+  }
+);
+
 {/*export const getThreads = createAsyncThunk(
   "thread/get",
   async (_, { rejectWithValue }) => {
@@ -264,6 +279,25 @@ const threadSlice = createSlice({
       .addCase(getThreads.rejected, (state, action) => {
         (state.status = "failed"),
           (state.error = (action.payload as string) || "Failed to get threads");
+      })
+      .addCase(getThreadById.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getThreadById.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const existingThreadIndex = state.threads.findIndex(
+          (t) => t._id === action.payload._id
+        );
+        if (existingThreadIndex !== -1) {
+          state.threads[existingThreadIndex] = action.payload;
+        } else {
+          state.threads.push(action.payload);
+        }
+        state.error = null;
+      })
+      .addCase(getThreadById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "Failed to get thread";
       });
   },
 });

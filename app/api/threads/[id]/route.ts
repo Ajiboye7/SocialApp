@@ -150,6 +150,90 @@ export async function DELETE(
   }
 }
 
+export async function GET(
+  req: Request,
+  { params }: { params:{ id: string } }
+) {
+  const { userId } = await auth();
+  //const resolvedParams = await params;
+
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, message: "unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "no user found" },
+        { status: 401 }
+      );
+    }
+
+    const thread = await Thread.findById(params.id)
+      .populate({
+        path: "children",
+        populate: {
+          path: "author",
+          select: "username profile_picture",
+        },
+      })
+      .populate({
+        path: "author",
+        select: "username profile_picture",
+      });
+
+    if (!thread) {
+      return NextResponse.json(
+        { success: false, message: "Thread not found" },
+        { status: 404 }
+      );
+    }
+
+    const transformedThread = {
+      _id: thread._id,
+      thread: thread.thread,
+      author: {
+        id: thread.author._id.toString(),
+        username: thread.author.username,
+        profile_picture: thread.author.profile_picture,
+      },
+      createdAt: thread.createdAt,
+      parentId: thread.parentId ? thread.parentId.toString() : null,
+      children: thread.children.map((child: any) => ({
+        _id: child._id.toString(),
+        thread: child.thread,
+        author: {
+          id: child.author._id.toString(),
+          username: child.author.username,
+          profile_picture: child.author.profile_picture,
+        },
+        createdAt: child.createdAt,
+        parentId: child.parentId ? child.parentId.toString() : null,
+        children: [],
+      })),
+    };
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: transformedThread,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.log("error fetching thread", error);
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 //NEXT TASK
 
 /*

@@ -2,14 +2,16 @@
 import ThreadCard from "@/cards/ThreadCard";
 import React, { useState, useEffect } from "react";
 import { SignOutButton } from "@clerk/nextjs";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
 import { redirect } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingThread";
 import Comment from "@/components/forms/Comment";
+import { getThreadById } from "@/store/slices/threadSlice";
+
 
 const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
-  const { user, status: userStatus } = useSelector(
+  /*const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
   const { threads, status: threadStatus } = useSelector(
@@ -20,6 +22,29 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = React.use(params);
 
   if (threadStatus === "loading") {
+    return <LoadingSpinner />;
+  }
+
+  const thread = threads.find((t) => t._id === id);
+
+  if (!thread) {
+    return <p className="text-light-2 mt-4">Thread not found</p>;
+  }*/
+ const dispatch = useDispatch<AppDispatch>();
+  const { user, status: userStatus } = useSelector(
+    (state: RootState) => state.user
+  );
+  const { threads, status: threadStatus } = useSelector(
+    (state: RootState) => state.thread
+  );
+
+  const { id } = React.use(params);
+
+  useEffect(() => {
+    dispatch(getThreadById(id));
+  }, [dispatch, id]);
+
+  if (userStatus === 'loading' || threadStatus === 'loading') {
     return <LoadingSpinner />;
   }
 

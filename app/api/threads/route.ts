@@ -45,6 +45,9 @@ export async function POST(request: Request) {
       author: mongoUser._id,
     });
 
+    mongoUser.threads.push(newThread._id);
+    await mongoUser.save();
+
     return NextResponse.json(
       {
         success: true,
@@ -131,7 +134,7 @@ export async function GET(req: Request) {
         _id: child._id.toString(),
         thread: child.thread,
         author: {
-          id:child._id.toString(),
+          id: child._id.toString(),
           username: child.author.username,
           profile_picture: child.author.profile_picture,
         },
@@ -159,7 +162,8 @@ export async function GET(req: Request) {
   }
 }
 
-{/*export async function GET() {
+{
+  /*export async function GET() {
   const { userId } = await auth();
 
   //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
@@ -238,4 +242,5 @@ export async function GET(req: Request) {
       { status: 500 }
     );
   }
-}*/}
+}*/
+}

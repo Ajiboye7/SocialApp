@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { stat } from "fs";
+
 
 interface UserData {
   name: string;
@@ -9,33 +11,45 @@ interface UserData {
 }
 
 interface User {
-  id:string;
+  id: string;
   name: string;
   userName: string;
   bio: string;
   profile_picture: string;
   onboarded: boolean;
-  //isOnboarded: boolean;
 }
 
 interface UserState {
   user: User | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
-  //isOnboarded: boolean;
 }
 
 const initialState: UserState = {
   user: null,
   status: "idle",
   error: null,
-  //isOnboarded: false,
 };
-export const fetchUser = createAsyncThunk(
-  "user/fetch",
+export const fetchUsers = createAsyncThunk(
+  "users/fetch",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/api/users/");
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("Failed to fetch user data");
+    }
+  }
+);
+
+export const fetchUser = createAsyncThunk(
+  "user/fetch",
+  async (username: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/api/users/${username}`);
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -67,35 +81,50 @@ const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUser.pending, (state) => {
+      .addCase(fetchUsers.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(fetchUser.fulfilled, (state, action) => {
+      .addCase(fetchUsers.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.user = action.payload;
 
         state.error = null;
       })
-      .addCase(fetchUser.rejected, (state, action) => {
+      .addCase(fetchUsers.rejected, (state, action) => {
         state.status = "failed";
-        state.error = (action.payload as string) || "Failed to fetch user";
+        state.error = (action.payload as string) || "Failed to fetch users";
+      })
+
+      .addCase(fetchUser.pending, (state)=>{
+        state.status = 'loading'
+      })
+
+      .addCase(fetchUser.fulfilled, (state, action)=>{
+        state.status = 'succeeded',
+        state.user = action.payload.user
+        state.error = null
+      })
+
+      .addCase(fetchUser.rejected, (state, action)=>{
+        state.status = 'failed',
+        state.user = null,
+        state.error = (action.payload as string) || "Failed to get user";
+      })
+
+      .addCase(updateUser.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(updateUser.fulfilled, (state, action) => {
+        (state.status = "succeeded"), (state.user = action.payload);
+        state.error = null;
+      })
+
+      .addCase(updateUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.user = null;
+        state.error = (action.payload as string) || "Failed to update user";
       });
-
-    builder.addCase(updateUser.pending, (state) => {
-      state.status = "loading";
-    });
-
-    builder.addCase(updateUser.fulfilled, (state, action) => {
-      (state.status = "succeeded"), (state.user = action.payload);
-      //state.isOnboarded = action.payload.onboarded
-      state.error = null;
-    });
-
-    builder.addCase(updateUser.rejected, (state, action) => {
-      state.status = "failed";
-      state.user = null;
-      state.error = (action.payload as string) || "Failed to update user";
-    });
   },
 });
 

@@ -56,7 +56,7 @@ export async function POST(
     const populatedComment = await Thread.findById(comment._id)
   .populate({
     path: "author",
-    select: "username profile_picture" // only what you need
+    select: "username profile_picture" 
   })
   
 

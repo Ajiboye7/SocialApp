@@ -1,16 +1,14 @@
-
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
 
-
 const ProfileHeader = () => {
-
-      const { user, status: userStatus } = useSelector(
+  const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
+  console.log('User data', user)
 
   return (
     <>
@@ -43,9 +41,9 @@ const ProfileHeader = () => {
       </div>
       <p className="text-white mt-8">{user?.bio}</p>
 
-      <div className='mt-10 h-0.5 w-full bg-dark-3' />
+      <div className="mt-10 h-0.5 w-full bg-dark-3" />
     </>
   );
-}
+};
 
 export default ProfileHeader;

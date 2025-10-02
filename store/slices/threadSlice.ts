@@ -16,7 +16,7 @@ interface Thread {
   thread: string;
   createdAt: string;
   parentId?: string;
-  children: Comment[]; 
+  children: Comment[];
 }
 interface AuthorInfo {
   id: string;
@@ -38,6 +38,9 @@ interface ThreadState {
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   isComment: boolean;
+  totalPages: number;
+  totalThreads: number
+  currentPage: number;
 }
 
 const initialState: ThreadState = {
@@ -45,6 +48,9 @@ const initialState: ThreadState = {
   status: "idle",
   error: null,
   isComment: false,
+  totalThreads: 0,
+  totalPages: 0,
+  currentPage: 1,
 };
 
 export const createThread = createAsyncThunk(
@@ -128,7 +134,8 @@ export const getThreadById = createAsyncThunk(
   }
 );
 
-{/*export const getThreads = createAsyncThunk(
+{
+  /*export const getThreads = createAsyncThunk(
   "thread/get",
   async (_, { rejectWithValue }) => {
     try {
@@ -141,7 +148,8 @@ export const getThreadById = createAsyncThunk(
       return rejectWithValue("An unexpected error occurred. Please try again.");
     }
   }
-);*/}
+);*/
+}
 
 //New Task
 
@@ -159,13 +167,25 @@ export const getThreadById = createAsyncThunk(
 export const getThreads = createAsyncThunk(
   "thread/get",
   async (
-    { topLevelOnly, userOnly }: { topLevelOnly?: boolean; userOnly?: boolean } = {},
+    {
+      topLevelOnly,
+      userOnly,
+      page = 1,
+      limit = 10,
+    }: {
+      topLevelOnly?: boolean;
+      userOnly?: boolean;
+      page?: number;
+      limit?: number;
+    } = {},
     { rejectWithValue }
   ) => {
     try {
       const params = new URLSearchParams();
       if (topLevelOnly) params.append("topLevelOnly", "true");
       if (userOnly) params.append("userOnly", "true");
+      params.append("page", page.toString());
+      params.append("limit", limit.toString());
       const response = await axios.get(`/api/threads?${params.toString()}`);
       return response.data.data;
     } catch (error) {
@@ -181,11 +201,11 @@ const threadSlice = createSlice({
   name: "thread",
   initialState,
   reducers: {
-     clearThreads: (state) => {
+    clearThreads: (state) => {
       state.threads = [];
     },
   },
- 
+
   extraReducers: (builder) => {
     builder
       .addCase(createThread.pending, (state) => {
@@ -248,7 +268,7 @@ const threadSlice = createSlice({
 
       .addCase(deleteComment.fulfilled, (state, action) => {
         state.status = "succeeded";
-         
+
         const parentThread = state.threads.find(
           (t) => t._id === action.payload.parentId
         );
@@ -272,7 +292,11 @@ const threadSlice = createSlice({
       })
 
       .addCase(getThreads.fulfilled, (state, action) => {
-        (state.status = "succeeded"), (state.threads = action.payload.threads);
+        state.status = "succeeded";
+        state.threads = action.payload.threads;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
+        state.totalThreads = action.payload.totalThreads
         state.error = null;
       })
 

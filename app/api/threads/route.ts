@@ -94,6 +94,9 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const topLevelOnly = searchParams.get("topLevelOnly") === "true";
     const userOnly = searchParams.get("userOnly") === "true";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const skip = (page - 1) * limit;
 
     // Build query
     const query: any = {};
@@ -107,6 +110,9 @@ export async function GET(req: Request) {
     }
 
     const threads = await Thread.find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
       .populate({
         path: "children",
         populate: {
@@ -119,6 +125,8 @@ export async function GET(req: Request) {
         select: "username profile_picture",
       })
       .lean();
+
+    const totalThreads = await Thread.countDocuments();
 
     const transformedThreads = threads.map((thread) => ({
       _id: thread._id,
@@ -149,6 +157,9 @@ export async function GET(req: Request) {
         success: true,
         data: {
           threads: transformedThreads,
+          totalThreads,
+          totalPages: Math.ceil(totalThreads / limit),
+          currentPage: page,
         },
       },
       { status: 200 }

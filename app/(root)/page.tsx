@@ -14,7 +14,7 @@ const page = () => {
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
-  const { threads, status: threadStatus } = useSelector(
+  const { threads, status: threadStatus, currentPage, totalPages } = useSelector(
     (state: RootState) => state.thread
   );
 
@@ -23,6 +23,7 @@ const page = () => {
   console.log("user fetched ", user);
 
   const userName = user?.name;
+ 
 
   {/*if (userStatus === "loading" || threadStatus === "loading") {
     return (
@@ -34,7 +35,7 @@ const page = () => {
   }*/}
 
   useEffect(() => {
-    dispatch(getThreads({ topLevelOnly: true }));
+    dispatch(getThreads({ topLevelOnly: true, page: currentPage, limit: 5 }));
   }, [dispatch]);
 
   if (userStatus === "loading" || threadStatus === "loading") {
@@ -49,6 +50,7 @@ const page = () => {
       <h1 className="text-[30px] leading-[140%] font-[600] text-light-1">
         Home
       </h1>
+     
 
       {threads.length > 0 ? (
         threads.map((t) => (
@@ -66,6 +68,27 @@ const page = () => {
       ) : (
         <p className="text-white text-2xl">No posts yet</p>
       )}
+
+       {/* Pagination */}
+    <div className="flex justify-center gap-4 mt-6">
+      <button
+        disabled={currentPage <= 1}
+        onClick={() => dispatch(getThreads({ topLevelOnly: true, page: currentPage - 1, limit: 5 }))}
+        className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+      >
+        Prev
+      </button>
+      <span className="text-white">
+        Page {currentPage} of {totalPages}
+      </span>
+      <button
+        disabled={currentPage >= totalPages}
+        onClick={() => dispatch(getThreads({ topLevelOnly: true, page: currentPage + 1, limit: 5 }))}
+        className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+      >
+        Next
+      </button>
+    </div>
 
       <SignOutButton redirectUrl="/sign-in">
         <button className="text-white mt-10">Sign Out</button>

@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { stat } from "fs";
-
+import { act } from "react";
 
 interface UserData {
   name: string;
@@ -13,7 +12,7 @@ interface UserData {
 interface User {
   id: string;
   name: string;
-  userName: string;
+  username: string;
   bio: string;
   profile_picture: string;
   onboarded: boolean;
@@ -21,20 +20,31 @@ interface User {
 
 interface UserState {
   user: User | null;
+  users: User[];
+  totalPages: number;
+  currentPage: number;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
 const initialState: UserState = {
   user: null,
+  users: [],
+  totalPages: 0,
+  currentPage: 1,
   status: "idle",
   error: null,
 };
 export const fetchUsers = createAsyncThunk(
   "users/fetch",
-  async (_, { rejectWithValue }) => {
+  async (
+    { page = 1, limit = 10 }: { page?: number; limit?: number },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await axios.get("/api/users/");
+      const response = await axios.get(
+        `/api/users?page=${page}&limit=${limit}`
+      );
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -86,8 +96,9 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.user = action.payload;
-
+        state.users = action.payload.users;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
         state.error = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
@@ -95,19 +106,19 @@ const userSlice = createSlice({
         state.error = (action.payload as string) || "Failed to fetch users";
       })
 
-      .addCase(fetchUser.pending, (state)=>{
-        state.status = 'loading'
+      .addCase(fetchUser.pending, (state) => {
+        state.status = "loading";
       })
 
-      .addCase(fetchUser.fulfilled, (state, action)=>{
-        state.status = 'succeeded',
-        state.user = action.payload.user
-        state.error = null
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload.user;
+        state.error = null;
       })
 
-      .addCase(fetchUser.rejected, (state, action)=>{
-        state.status = 'failed',
-        state.user = null,
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.user = null;
         state.error = (action.payload as string) || "Failed to get user";
       })
 

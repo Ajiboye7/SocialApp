@@ -19,14 +19,14 @@ const page = () => {
     (state: RootState) => state.user
   );
 
-  const { threads, status: threadStatus } = useSelector(
+  const { threads, status: threadStatus, currentPage, totalPages, totalThreads } = useSelector(
     (state: RootState) => state.thread
   );
   //console.log('New version of thread', threads)
 
   useEffect(() => {
     dispatch(clearThreads());
-    dispatch(getThreads({ topLevelOnly: true, userOnly: true }));
+    dispatch(getThreads({ topLevelOnly: true, userOnly: true , page: currentPage, limit: 5}));
   }, [dispatch]);
 
   return (
@@ -53,7 +53,7 @@ const page = () => {
 
                 {tab.label === "Threads" && (
                   <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
-                     {threads.length}
+                     {totalThreads}
                   </p>
                 )}
               </TabsTrigger>
@@ -115,6 +115,27 @@ const page = () => {
       </div>
 
       {/*<ThreadCard/>*/}
+
+        {/* Pagination */}
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              disabled={currentPage <= 1}
+              onClick={() => dispatch(getThreads({ topLevelOnly: true, page: currentPage - 1, limit: 5 }))}
+              className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span className="text-white">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              disabled={currentPage >= totalPages}
+              onClick={() => dispatch(getThreads({ topLevelOnly: true, page: currentPage + 1, limit: 5 }))}
+              className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
     </section>
   );
 };

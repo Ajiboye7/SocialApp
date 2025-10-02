@@ -11,7 +11,7 @@ export default function Loader() {
  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    dispatch(fetchUsers());
+    //dispatch(fetchUsers());
     //dispatch(getThreads())
   }, [dispatch]);
 

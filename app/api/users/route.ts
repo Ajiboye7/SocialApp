@@ -2,9 +2,18 @@ import { NextResponse } from "next/server";
 import User from "../../../lib/models/user.model";
 import connectToDatabase from "@/lib/mongoose";
 import { auth } from "@clerk/nextjs/server";
+import { success } from "zod";
+import { parse } from "path";
 
 export async function PUT(request: Request) {
   const { userId } = await auth();
+
+  //Ajiibs
+  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+
+  //Imam
+
+  //const userId = "user_31uxzj4iC5fXhBxWeNhmTAi6IjL"
 
   if (!userId) {
     return NextResponse.json(
@@ -19,7 +28,7 @@ export async function PUT(request: Request) {
 
     if (!bio || !name || !userName) {
       return NextResponse.json(
-        { success: false, message: "Bio, name, and username are required"},
+        { success: false, message: "Bio, name, and username are required" },
         { status: 400 }
       );
     }
@@ -50,7 +59,7 @@ export async function PUT(request: Request) {
         success: true,
         message: "User updated successfully",
         data: {
-          id:updatedUser.id,
+          id: updatedUser.id,
           name: updatedUser.name,
           userName: updatedUser.username,
           bio: updatedUser.bio,
@@ -69,9 +78,12 @@ export async function PUT(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const { userId } = await auth();
-   //console.log("API /api/users GET userId:", userId);
+
+  //const userId = "user_31uxzj4iC5fXhBxWeNhmTAi6IjL";
+
+  //console.log("API /api/users GET userId:", userId);
 
   if (!userId) {
     return NextResponse.json(
@@ -82,9 +94,20 @@ export async function GET() {
 
   try {
     await connectToDatabase();
-    const user = await User.findOne({ id: userId });
 
-    if (!user) {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
+
+    const users = await User.find({})
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const totalUsers = await User.countDocuments();
+
+    if (!users) {
       return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
@@ -95,12 +118,10 @@ export async function GET() {
       {
         success: true,
         data: {
-          id:user.id,
-          name: user.name,
-          userName: user.username,
-          bio: user.bio,
-          profile_picture: user.profile_picture,
-          onboarded: user.onboarded
+          users,
+          totalUsers,
+          totalPages: Math.ceil(totalUsers / limit),
+          currentPage: page,
         },
       },
       { status: 200 }

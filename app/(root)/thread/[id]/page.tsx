@@ -9,7 +9,6 @@ import LoadingSpinner from "@/components/LoadingThread";
 import Comment from "@/components/forms/Comment";
 import { getThreadById } from "@/store/slices/threadSlice";
 
-
 const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   /*const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
@@ -30,21 +29,21 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   if (!thread) {
     return <p className="text-light-2 mt-4">Thread not found</p>;
   }*/
- const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
-  const { threads, status: threadStatus } = useSelector(
+  const { threads, status: threadStatus, pagination, thread: singleThread } = useSelector(
     (state: RootState) => state.thread
   );
 
   const { id } = React.use(params);
 
   useEffect(() => {
-    dispatch(getThreadById(id));
+    dispatch(getThreadById({ threadId: id, page: pagination.currentPage , limit: 5 }));
   }, [dispatch, id]);
 
-  if (userStatus === 'loading' || threadStatus === 'loading') {
+  if (userStatus === "loading" || threadStatus === "loading") {
     return <LoadingSpinner />;
   }
 
@@ -58,8 +57,8 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
     <section className="">
       <ThreadCard
         key={thread._id}
-         threadId={thread._id}
-         _id={thread._id}
+        threadId={thread._id}
+        _id={thread._id}
         parentId={thread.parentId || ""}
         image={thread.author.profile_picture || "/assets/profile.svg"}
         username={thread.author.username || "Unknown User"}

@@ -93,7 +93,7 @@ export async function DELETE(
   //  const resolvedParams = await params
   if (!userId) {
     return NextResponse.json(
-      { success: false, message: "unauthorized: No user session found"},
+      { success: false, message: "unauthorized: No user session found" },
       { status: 401 }
     );
   }
@@ -152,7 +152,7 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  { params }: { params:{ id: string } }
+  { params }: { params: { id: string } }
 ) {
   const { userId } = await auth();
   //const resolvedParams = await params;
@@ -174,7 +174,8 @@ export async function GET(
       );
     }
 
-    const thread = await Thread.findById(params.id)
+    {
+      /*const thread = await Thread.findById(params.id)
       .populate({
         path: "children",
         populate: {
@@ -216,6 +217,70 @@ export async function GET(
         parentId: child.parentId ? child.parentId.toString() : null,
         children: [],
       })),
+    };*/
+    }
+
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "5", 10);
+    const skip = (page - 1) * limit;
+
+    const thread = await Thread.findById(params.id).populate({
+      path: "author",
+      select: "username profile_picture",
+    });
+
+    if (!thread) {
+      return NextResponse.json(
+        { success: false, message: "Thread not found" },
+        { status: 404 }
+      );
+    }
+
+    const comments = await Thread.find({ parentId: thread._id })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: "author",
+        select: "username profile_picture",
+      });
+
+    const totalComment = await Thread.countDocuments({ parentId: thread._id });
+    const totalPages = Math.ceil(totalComment / limit);
+
+    const transformedThread = {
+      thread: {
+        _id: thread._id,
+        thread: thread.thread,
+        author: {
+          id: thread.author._id.toString(),
+          username: thread.author.username,
+          profile_picture: thread.author.profile_picture,
+        },
+        createdAt: thread.createdAt,
+        parentId: thread.parentId ? thread.parentId.toString() : null,
+      },
+
+      children: comments.map((comment) => ({
+        _id: comment._id.toString(),
+        thread: comment.thread,
+        author: {
+          id: comment.author._id.toString(),
+          username: comment.author.username,
+          profile_picture: comment.author.profile_picture,
+        },
+        createdAt: comment.createdAt,
+        parentId: comment.parentId ? comment.parentId.toString() : null,
+        children: [],
+      })),
+
+      pagination: {
+        totalComment,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
     };
 
     return NextResponse.json(

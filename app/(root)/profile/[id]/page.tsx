@@ -19,7 +19,7 @@ const page = () => {
     (state: RootState) => state.user
   );
 
-  const { threads, status: threadStatus, currentPage, totalPages, totalThreads } = useSelector(
+  const { threads, status: threadStatus, currentPage, totalPages, totalUserThread: totalPost } = useSelector(
     (state: RootState) => state.thread
   );
   //console.log('New version of thread', threads)
@@ -53,7 +53,7 @@ const page = () => {
 
                 {tab.label === "Threads" && (
                   <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
-                     {totalThreads}
+                     {totalPost}
                   </p>
                 )}
               </TabsTrigger>

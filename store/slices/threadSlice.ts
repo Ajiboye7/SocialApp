@@ -1,13 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-
-/*interface ThreadData {
-  thread: string;
-}*/
+import { stat } from "fs";
+import { act } from "react";
 
 interface ThreadData {
   thread: string;
-  parentId?: string; // Add parentId for comments
+  parentId?: string;
 }
 
 interface Thread {
@@ -35,22 +33,40 @@ interface Comment {
 
 interface ThreadState {
   threads: Thread[];
+  thread: Thread | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   isComment: boolean;
   totalPages: number;
-  totalThreads: number
+  totalUserThread: number;
+  //totalThreads: number
   currentPage: number;
+  comments: Comment[]; // paginated comments
+  pagination: {
+    totalComment: number;
+    totalPages: number;
+    currentPage: number;
+    limit: number;
+  };
 }
 
 const initialState: ThreadState = {
   threads: [],
+  thread: null,
   status: "idle",
   error: null,
   isComment: false,
-  totalThreads: 0,
+  //totalThreads: 0,
+  totalUserThread: 0,
   totalPages: 0,
   currentPage: 1,
+  comments: [],
+  pagination: {
+    totalComment: 0,
+    totalPages: 0,
+    currentPage: 1,
+    limit: 5,
+  },
 };
 
 export const createThread = createAsyncThunk(
@@ -121,9 +137,21 @@ export const deleteComment = createAsyncThunk(
 
 export const getThreadById = createAsyncThunk(
   "thread/getThreadById",
-  async (threadId: string, { rejectWithValue }) => {
+  async (
+    {
+      threadId,
+      page = 1,
+      limit = 5,
+    }: { threadId: string; page: number; limit: number },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await axios.get(`/api/threads/${threadId}`);
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("limit", limit.toString());
+      const response = await axios.get(
+        `/api/threads/${threadId}?${params.toString()}`
+      );
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -296,7 +324,8 @@ const threadSlice = createSlice({
         state.threads = action.payload.threads;
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;
-        state.totalThreads = action.payload.totalThreads
+        state.totalUserThread = action.payload.totalUserThread;
+        //state.totalThreads = action.payload.totalThreads
         state.error = null;
       })
 
@@ -307,7 +336,7 @@ const threadSlice = createSlice({
       .addCase(getThreadById.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(getThreadById.fulfilled, (state, action) => {
+      /*.addCase(getThreadById.fulfilled, (state, action) => {
         state.status = "succeeded";
         const existingThreadIndex = state.threads.findIndex(
           (t) => t._id === action.payload._id
@@ -318,10 +347,16 @@ const threadSlice = createSlice({
           state.threads.push(action.payload);
         }
         state.error = null;
+      })*/
+      .addCase(getThreadById.fulfilled, (state, action) => {
+        state.thread = action.payload.thread;
+        state.comments = action.payload.children
+        state.pagination = action.payload.pagination
+        state.error = null
       })
       .addCase(getThreadById.rejected, (state, action) => {
         state.status = "failed";
-        state.error = (action.payload as string) || "Failed to get thread";
+        state.error = (action.payload as string) || "Failed to get a thread";
       });
   },
 });

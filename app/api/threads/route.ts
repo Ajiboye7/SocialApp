@@ -98,7 +98,7 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const skip = (page - 1) * limit;
 
-    // Build query
+    // query
     const query: any = {};
     if (topLevelOnly) {
       query.parentId = null; // Only top-level threads
@@ -106,7 +106,7 @@ export async function GET(req: Request) {
     if (userOnly) {
       query.author = user._id; // Only threads by the current user
     } else {
-      // Fetch threads from all users (remove author filter)
+      
     }
 
     const threads = await Thread.find(query)
@@ -127,6 +127,17 @@ export async function GET(req: Request) {
       .lean();
 
     const totalThreads = await Thread.countDocuments();
+    const totalUserThreadQuery: any = {};
+
+    if (topLevelOnly) {
+      totalUserThreadQuery.parentId = null;
+    }
+
+    if (userOnly) {
+      totalUserThreadQuery.author = user._id;
+    }
+
+    const totalUserThread = await Thread.countDocuments(totalUserThreadQuery);
 
     const transformedThreads = threads.map((thread) => ({
       _id: thread._id,
@@ -158,6 +169,7 @@ export async function GET(req: Request) {
         data: {
           threads: transformedThreads,
           totalThreads,
+          totalUserThread,
           totalPages: Math.ceil(totalThreads / limit),
           currentPage: page,
         },

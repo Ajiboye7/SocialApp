@@ -349,6 +349,7 @@ const threadSlice = createSlice({
         state.error = null;
       })*/
       .addCase(getThreadById.fulfilled, (state, action) => {
+        state.status = 'succeeded';
         state.thread = action.payload.thread;
         state.comments = action.payload.children
         state.pagination = action.payload.pagination

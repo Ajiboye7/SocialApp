@@ -30,7 +30,7 @@ interface Props {
   showDeleteButton?: boolean;
   _id: string;
   threadId: string;
-  comments: Comment[];
+  comments?: Comment[];
 }
 
 const ThreadCard = ({
@@ -38,7 +38,7 @@ const ThreadCard = ({
   username,
   thread,
   parentId,
-  comments,
+  comments = [],
   isComment,
   showDeleteButton,
   _id,

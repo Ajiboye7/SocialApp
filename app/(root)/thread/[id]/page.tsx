@@ -1,4 +1,4 @@
-"use client";
+{/*"use client";
 import ThreadCard from "@/cards/ThreadCard";
 import React, { useState, useEffect } from "react";
 import { SignOutButton } from "@clerk/nextjs";
@@ -10,33 +10,17 @@ import Comment from "@/components/forms/Comment";
 import { getThreadById } from "@/store/slices/threadSlice";
 
 const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
-  /*const { user, status: userStatus } = useSelector(
-    (state: RootState) => state.user
-  );
-  const { threads, status: threadStatus } = useSelector(
-    (state: RootState) => state.thread
-  );
-  console.log("Thread fetch", threads);
-  //console.log("user fetched ", user);
-  const { id } = React.use(params);
-
-  if (threadStatus === "loading") {
-    return <LoadingSpinner />;
-  }
-
-  const thread = threads.find((t) => t._id === id);
-
-  if (!thread) {
-    return <p className="text-light-2 mt-4">Thread not found</p>;
-  }*/
+  
   const dispatch = useDispatch<AppDispatch>();
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
-  const { threads, status: threadStatus, pagination, thread: singleThread } = useSelector(
+  const { threads, status: threadStatus, pagination, thread: singleThread, comments} = useSelector(
     (state: RootState) => state.thread
   );
 
+  console.log('This is one thread data', singleThread)
+  console.log('This is thread data', threads)
   const { id } = React.use(params);
 
   useEffect(() => {
@@ -47,23 +31,23 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
     return <LoadingSpinner />;
   }
 
-  const thread = threads.find((t) => t._id === id);
+  //const thread = threads.find((t) => t._id === id);
 
-  if (!thread) {
+  if (!singleThread) {
     return <p className="text-light-2 mt-4">Thread not found</p>;
   }
 
   return (
     <section className="">
       <ThreadCard
-        key={thread._id}
-        threadId={thread._id}
-        _id={thread._id}
-        parentId={thread.parentId || ""}
-        image={thread.author.profile_picture || "/assets/profile.svg"}
-        username={thread.author.username || "Unknown User"}
-        thread={thread.thread}
-        comments={thread.children}
+        key={singleThread._id}
+        threadId={singleThread._id}
+        _id={singleThread._id}
+        parentId={singleThread.parentId || ""}
+        image={singleThread.author.profile_picture || "/assets/profile.svg"}
+        username={singleThread.author.username || "Unknown User"}
+        thread={singleThread.thread}
+        comments={singleThread.children}
       />
 
       <Comment
@@ -71,7 +55,7 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
         user={user?.profile_picture || "/assets/profile.svg"}
       />
 
-      {thread.children?.map((child) => (
+      {comments?.map((child) => (
         <ThreadCard
           key={child._id}
           _id={child._id}
@@ -88,7 +72,7 @@ const ThreadDetails = ({ params }: { params: Promise<{ id: string }> }) => {
   );
 };
 
-export default ThreadDetails;
+export default ThreadDetails;*/}
 
 /**
  
@@ -163,3 +147,16 @@ const ThreadDetails = ({ params }: { params: { id: string } }) => {
 export default ThreadDetails;
 
  */
+
+// app/threads/[id]/page.tsx
+//import ThreadDetailsClient from "@/components/ThreadDetailsClient";
+import ThreadDetailsClient from "@/components/ThreadDetailsClient";
+export default async function ThreadDetails({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params; // Resolve params in the server component
+
+  return <ThreadDetailsClient id={id} />;
+}

@@ -17,11 +17,9 @@ const ThreadDetailsClient = ({ id }:Props) => {
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
-  const { threads, status: threadStatus, pagination, thread: singleThread, comments } = useSelector(
+  const { status: threadStatus, pagination, thread, comments } = useSelector(
     (state: RootState) => state.thread
   );
-
-  console.log("Thread ID:", id);
 
   useEffect(() => {
     dispatch(getThreadById({ threadId: id, page: pagination.currentPage, limit: 5 }));
@@ -31,21 +29,21 @@ const ThreadDetailsClient = ({ id }:Props) => {
     return <LoadingSpinner />;
   }
 
-  if (!singleThread) {
+  if (!thread) {
     return <p className="text-light-2 mt-4">Thread not found</p>;
   }
 
   return (
     <section className="">
       <ThreadCard
-        key={singleThread._id}
-        threadId={singleThread._id}
-        _id={singleThread._id}
-        parentId={singleThread.parentId || ""}
-        image={singleThread.author.profile_picture || "/assets/profile.svg"}
-        username={singleThread.author.username || "Unknown User"}
-        thread={singleThread.thread}
-        comments={singleThread.children}
+        key={thread._id}
+        threadId={thread._id}
+        _id={thread._id}
+        parentId={thread.parentId || ""}
+        image={thread.author.profile_picture || "/assets/profile.svg"}
+        username={thread.author.username || "Unknown User"}
+        thread={thread.thread}
+        comments={thread.children}
       />
 
       <Comment
@@ -53,16 +51,16 @@ const ThreadDetailsClient = ({ id }:Props) => {
         user={user?.profile_picture || "/assets/profile.svg"}
       />
 
-      {comments?.map((child) => (
+      {comments?.map((comment) => (
         <ThreadCard
-          key={child._id}
-          _id={child._id}
-          threadId={child._id}
-          parentId={child.parentId}
-          image={child.author.profile_picture || "/assets/profile.svg"}
-          username={child.author.username || "Anonymous"}
-          thread={child.thread}
-          comments={child.children}
+          key={comment._id}
+          _id={comment._id}
+          threadId={comment._id}
+          parentId={comment.parentId}
+          image={comment.author.profile_picture || "/assets/profile"}
+          username={comment.author.username || "Anonymous"}
+          thread={comment.thread}
+          comments={comment.children}
           isComment={true}
         />
       ))}

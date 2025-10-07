@@ -18,7 +18,7 @@ export const communityTabs = [
 // ✅ sidebarLinks must be defined inside a component
 export const useSidebarLinks = () => {
   const { user } = useSelector((state: RootState) => state.user);
-  const userId = user?.id;
+  const username = user?.username;
 
   return [
     {
@@ -48,7 +48,7 @@ export const useSidebarLinks = () => {
     },
     {
       imgURL: "/assets/user.svg",
-      route: `/profile/${userId || ""}`,
+      route: `/profile/${username || ""}`,
       label: "Profile",
     },
   ];

@@ -1,14 +1,25 @@
-import React from "react";
+'use client'
+import React, {useEffect} from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { RootState } from "@/store/store";
-import { useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUser } from "@/store/slices/userSlice";
 
 const ProfileHeader = () => {
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
-  console.log('User data', user)
+ 
+  const dispatch = useDispatch<AppDispatch>();
+  const username = user?.username
+useEffect(() => {
+  if (username && typeof username === "string") {
+    dispatch(fetchUser(username));
+  }
+}, [dispatch, username]);
+
+ console.log('User data', user)
 
   return (
     <>
@@ -28,7 +39,7 @@ const ProfileHeader = () => {
               {user?.name}
             </h2>
             <p className="text-gray-1 text-[16px] leading-[140%] font-[500]">
-              {user?.userName}
+              {user?.username}
             </p>
           </div>
         </div>

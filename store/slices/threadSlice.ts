@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { stat } from "fs";
-import { act } from "react";
 
 interface ThreadData {
   thread: string;
@@ -41,7 +39,7 @@ interface ThreadState {
   totalUserThread: number;
   //totalThreads: number
   currentPage: number;
-  comments: Comment[]; // paginated comments
+  comments: Comment[];
   pagination: {
     totalComment: number;
     totalPages: number;
@@ -162,36 +160,6 @@ export const getThreadById = createAsyncThunk(
   }
 );
 
-{
-  /*export const getThreads = createAsyncThunk(
-  "thread/get",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axios.get("/api/threads");
-      return response.data.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data.message || error.message);
-      }
-      return rejectWithValue("An unexpected error occurred. Please try again.");
-    }
-  }
-);*/
-}
-
-//New Task
-
-/*export const getThreadById = createAsyncThunk(
-  "thread/getById",
-  async (id: string, { rejectWithValue }) => {
-    try {
-      const res = await axios.get(`/api/threads/${id}`);
-      return res.data.data;
-    } catch (error) {
-      return rejectWithValue("Failed to fetch thread");
-    }
-  }
-);*/
 export const getThreads = createAsyncThunk(
   "thread/get",
   async (
@@ -290,7 +258,7 @@ const threadSlice = createSlice({
             (action.payload as string) || "Failed to create comment");
       })
 
-      .addCase(deleteComment.pending, (state, action) => {
+      .addCase(deleteComment.pending, (state) => {
         state.status === "loading";
       })
 
@@ -336,24 +304,13 @@ const threadSlice = createSlice({
       .addCase(getThreadById.pending, (state) => {
         state.status = "loading";
       })
-      /*.addCase(getThreadById.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        const existingThreadIndex = state.threads.findIndex(
-          (t) => t._id === action.payload._id
-        );
-        if (existingThreadIndex !== -1) {
-          state.threads[existingThreadIndex] = action.payload;
-        } else {
-          state.threads.push(action.payload);
-        }
-        state.error = null;
-      })*/
+
       .addCase(getThreadById.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = "succeeded";
         state.thread = action.payload.thread;
-        state.comments = action.payload.children
-        state.pagination = action.payload.pagination
-        state.error = null
+        state.comments = action.payload.children;
+        state.pagination = action.payload.pagination;
+        state.error = null;
       })
       .addCase(getThreadById.rejected, (state, action) => {
         state.status = "failed";

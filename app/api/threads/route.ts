@@ -72,7 +72,8 @@ export async function POST(request: Request) {
 }
 
 export async function GET(req: Request) {
-  const { userId } = await auth();
+  //const { userId } = await auth();
+  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   if (!userId) {
     return NextResponse.json(
       { success: false, message: "unauthorized" },

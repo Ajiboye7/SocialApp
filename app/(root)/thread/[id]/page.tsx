@@ -156,7 +156,7 @@ export default async function ThreadDetails({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // Resolve params in the server component
+  const { id } = await params;
 
   return <ThreadDetailsClient id={id} />;
 }

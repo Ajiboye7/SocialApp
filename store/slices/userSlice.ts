@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { act } from "react";
 
 interface UserData {
   name: string;
@@ -114,6 +113,11 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.error = null;
+        console.log("Redux - User data received:", action.payload.user);
+        console.log(
+          "Redux - Profile picture:",
+          action.payload.user?.profile_picture
+        );
       })
 
       .addCase(fetchUser.rejected, (state, action) => {

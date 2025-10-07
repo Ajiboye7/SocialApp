@@ -152,16 +152,14 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> } // params is a Promise
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  //const { userId } = await auth();
+  const { userId } = await auth();
   const resolvedParams = await params;
-  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
-  
 
   if (!userId) {
     return NextResponse.json(
-      { success: false, message: "unauthorized"},
+      { success: false, message: "unauthorized" },
       { status: 401 }
     );
   }

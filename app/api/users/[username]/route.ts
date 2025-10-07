@@ -8,13 +8,13 @@ export async function GET(
   req: Request,
   { params }: { params: { username: string } }
 ) {
-  //const { userId } = await auth();
-  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  const { userId } = await auth();
+  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   //const { username } = params;
 
   if (!userId) {
     return NextResponse.json(
-      { success: false, message: "Unauthorized" },
+      { success: false, message: "Unauthorized"},
       { status: 401 }
     );
   }

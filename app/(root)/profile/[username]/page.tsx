@@ -12,12 +12,14 @@ import ThreadCard from "@/cards/ThreadCard";
 import { getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
 import { clearThreads } from "@/store/slices/threadSlice";
+import { fetchUser } from "@/store/slices/userSlice";
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
+  
 
   const { threads, status: threadStatus, currentPage, totalPages, totalUserThread: totalPost } = useSelector(
     (state: RootState) => state.thread

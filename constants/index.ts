@@ -48,7 +48,7 @@ export const useSidebarLinks = () => {
     },
     {
       imgURL: "/assets/user.svg",
-      route: `/profile/${username || ""}`,
+      route: "/profile",
       label: "Profile",
     },
   ];

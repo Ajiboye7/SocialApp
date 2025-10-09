@@ -13,22 +13,55 @@ import { getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
 import { clearThreads } from "@/store/slices/threadSlice";
 import { fetchUser } from "@/store/slices/userSlice";
+import { useParams } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
+    const { user, isLoaded, isSignedIn } = useUser();
 
-  const { user, status: userStatus } = useSelector(
+    const { user: singleUser, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
+
+
+  const userId = user?.id
   
 
-  const { threads, status: threadStatus, currentPage, totalPages, totalUserThread: totalPost } = useSelector(
-    (state: RootState) => state.thread
-  );
-  //console.log('New version of thread', threads)
+  //console.log('User id', userId, isLoaded, isSignedIn)
+
+  
+
+  const {
+    threads,
+    status: threadStatus,
+    currentPage,
+    totalPages,
+    totalUserThread: totalPost,
+  } = useSelector((state: RootState) => state.thread);
+
+  const params = useParams();
+   const username = params.username as string;
+
+  useEffect(() => {
+    if (userId) {
+     
+      dispatch(fetchUser(userId));
+       console.log('userData', singleUser)
+       console.log('User id', userId)
+       
+    }
+  }, [userId, dispatch]);
 
   useEffect(() => {
     dispatch(clearThreads());
-    dispatch(getThreads({ topLevelOnly: true, userOnly: true , page: currentPage, limit: 5}));
+    dispatch(
+      getThreads({
+        topLevelOnly: true,
+        userOnly: true,
+        page: currentPage,
+        limit: 5,
+      })
+    );
   }, [dispatch]);
 
   return (
@@ -55,7 +88,7 @@ const page = () => {
 
                 {tab.label === "Threads" && (
                   <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
-                     {totalPost}
+                    {totalPost}
                   </p>
                 )}
               </TabsTrigger>
@@ -95,49 +128,42 @@ const page = () => {
         </Tabs>
       </div>
 
-      {/*<div className="w-full">
-        <div className="flex  items-center justify-around w-full  bg-dark-2 h-[50px] rounded-lg">
-          {profileTabs.map((tab) => {
-            const isTabActive = isActive === tab.value;
-            return (
-              <div
-                key={tab.value}
-                className={`flex items-center gap-3 px-5 cursor-pointer rounded-lg h-[50px] ${
-                  isTabActive && "bg-[#0e0e12]   "
-                }`}
-                onClick={() => setIsActive(tab.value)}
-              >
-                <Image src={tab.icon} alt={tab.value} width={25} height={25} />
-                <p className="text-white">{tab.label}</p>
-                <p className="text-white bg-dark-4">1</p>
-              </div>
-            );
-          })}
-        </div>
+      {/* Pagination */}
+      <div className="flex justify-center gap-4 mt-6">
+        <button
+          disabled={currentPage <= 1}
+          onClick={() =>
+            dispatch(
+              getThreads({
+                topLevelOnly: true,
+                page: currentPage - 1,
+                limit: 5,
+              })
+            )
+          }
+          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span className="text-white">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          disabled={currentPage >= totalPages}
+          onClick={() =>
+            dispatch(
+              getThreads({
+                topLevelOnly: true,
+                page: currentPage + 1,
+                limit: 5,
+              })
+            )
+          }
+          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
-
-      {/*<ThreadCard/>*/}
-
-        {/* Pagination */}
-          <div className="flex justify-center gap-4 mt-6">
-            <button
-              disabled={currentPage <= 1}
-              onClick={() => dispatch(getThreads({ topLevelOnly: true, page: currentPage - 1, limit: 5 }))}
-              className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
-            >
-              Prev
-            </button>
-            <span className="text-white">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              disabled={currentPage >= totalPages}
-              onClick={() => dispatch(getThreads({ topLevelOnly: true, page: currentPage + 1, limit: 5 }))}
-              className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
     </section>
   );
 };

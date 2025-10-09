@@ -19,6 +19,7 @@ interface User {
 
 interface UserState {
   user: User | null;
+  currentUser : User| null;
   users: User[];
   totalPages: number;
   currentPage: number;
@@ -28,6 +29,7 @@ interface UserState {
 
 const initialState: UserState = {
   user: null,
+  currentUser: null,
   users: [],
   totalPages: 0,
   currentPage: 1,
@@ -56,9 +58,9 @@ export const fetchUsers = createAsyncThunk(
 
 export const fetchUser = createAsyncThunk(
   "user/fetch",
-  async (username: string, { rejectWithValue }) => {
+  async (userId: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/users/${username}`);
+      const response = await axios.get(`/api/users/${userId}`);
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -113,11 +115,11 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.error = null;
-        console.log("Redux - User data received:", action.payload.user);
-        console.log(
+        //console.log("Redux - User data received:", action.payload.user);
+       /* console.log(
           "Redux - Profile picture:",
-          action.payload.user?.profile_picture
-        );
+          action.payload.user
+        );*/
       })
 
       .addCase(fetchUser.rejected, (state, action) => {

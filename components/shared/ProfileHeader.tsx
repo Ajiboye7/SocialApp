@@ -10,16 +10,11 @@ const ProfileHeader = () => {
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
+
  
   const dispatch = useDispatch<AppDispatch>();
-  const username = user?.username
-useEffect(() => {
-  if (username && typeof username === "string") {
-    dispatch(fetchUser(username));
-  }
-}, [dispatch, username]);
 
- console.log('User data', user)
+  console.log('user data', user)
 
   return (
     <>
@@ -36,7 +31,7 @@ useEffect(() => {
 
           <div className="flex flex-col gap-2">
             <h2 className="text-light-1 text-[24px] leading-[140%] font-[700]">
-              {user?.name}
+              {user?.username}
             </h2>
             <p className="text-gray-1 text-[16px] leading-[140%] font-[500]">
               {user?.username}

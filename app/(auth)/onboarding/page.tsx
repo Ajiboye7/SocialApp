@@ -39,8 +39,6 @@ const page = () => {
     );
   }
 
-  //console.log('user fetched ', user)
-
   return (
     <div className="mx-auto flex max-w-3xl flex-col justify-start px-10 py-20">
       <h1 className="text-light-1 text-[30px] leading-[140%] font-[600] mb-5">

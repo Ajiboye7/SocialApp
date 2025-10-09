@@ -24,7 +24,7 @@ const page = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   //console.log("user fetched ", user);
-  console.log("top level threads", threads);
+ // console.log("top level threads", threads);
 
   {
     /*if (userStatus === "loading" || threadStatus === "loading") {

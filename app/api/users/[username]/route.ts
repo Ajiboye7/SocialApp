@@ -6,11 +6,12 @@ import Thread from "@/lib/models/thread.model";
 
 export async function GET(
   req: Request,
-  { params }: { params: { username: string } }
+  
 ) {
-  const { userId } = await auth();
-  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  //const { userId } = await auth();
+  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   //const { username } = params;
+    
 
   if (!userId) {
     return NextResponse.json(
@@ -22,7 +23,7 @@ export async function GET(
   try {
     await connectToDatabase();
 
-    const userData = await User.findOne({ username: params.username }).populate({
+    const userData = await User.findOne({ id : userId }).populate({
       path: "threads",
       model: Thread,
       populate: [

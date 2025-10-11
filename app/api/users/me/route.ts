@@ -6,14 +6,13 @@ import Thread from "@/lib/models/thread.model";
 
 export async function GET(
   req: Request,
-  { params }: { params: { username: string } }
+  
 ) {
   const { userId } = await auth();
   //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   //user_31uxzj4iC5fXhBxWeNhmTAi6IjL
   //const { username } = params;
-  const resolvedParams = await params;
-
+    
 
   if (!userId) {
     return NextResponse.json(
@@ -25,19 +24,18 @@ export async function GET(
   try {
     await connectToDatabase();
 
-    const userData = await User.findOne({
-      username: resolvedParams.username,
-    }).populate({
+    const userData = await User.findOne({ id : userId }).populate({
       path: "threads",
       model: Thread,
       populate: [
+        
         {
           path: "children",
           model: Thread,
           populate: {
             path: "author",
             model: User,
-            select: "name image id",
+            select: "name image id",  
           },
         },
       ],
@@ -86,7 +84,7 @@ export async function GET(
       {
         success: true,
         data: {
-          user: populatedUser,
+          currentUser: populatedUser,
         },
       },
       { status: 200 }

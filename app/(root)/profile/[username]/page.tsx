@@ -12,24 +12,20 @@ import ThreadCard from "@/cards/ThreadCard";
 import { getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
 import { clearThreads } from "@/store/slices/threadSlice";
-import { fetchUser } from "@/store/slices/userSlice";
+import { currentUser, fetchUser } from "@/store/slices/userSlice";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { clearCurrentUser } from "@/store/slices/userSlice";
+
+
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
-    const { user, isLoaded, isSignedIn } = useUser();
 
-    const { user: singleUser, status: userStatus } = useSelector(
+
+  const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
-
-
-  const userId = user?.id
-  
-
   //console.log('User id', userId, isLoaded, isSignedIn)
-
-  
 
   const {
     threads,
@@ -38,19 +34,17 @@ const page = () => {
     totalPages,
     totalUserThread: totalPost,
   } = useSelector((state: RootState) => state.thread);
-
   const params = useParams();
-   const username = params.username as string;
+  const username = params.username as string;
+
+ 
 
   useEffect(() => {
-    if (userId) {
      
-      dispatch(fetchUser(userId));
-       console.log('userData', singleUser)
-       console.log('User id', userId)
-       
-    }
-  }, [userId, dispatch]);
+    if (username) dispatch(fetchUser(username as string));
+  }, [dispatch, username]);
+
+
 
   useEffect(() => {
     dispatch(clearThreads());
@@ -154,6 +148,7 @@ const page = () => {
             dispatch(
               getThreads({
                 topLevelOnly: true,
+                userOnly: true,
                 page: currentPage + 1,
                 limit: 5,
               })

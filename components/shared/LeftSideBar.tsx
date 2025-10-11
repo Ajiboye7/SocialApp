@@ -13,10 +13,10 @@ const LeftSideBar = () => {
   const pathname = usePathname();
    const sidebarLinks = useSidebarLinks();
    const dispatch = useDispatch<AppDispatch>();
-    const { user, status: userStatus } = useSelector(
+    const { currentUser: user, status: userStatus } = useSelector(
        (state: RootState) => state.user
      );
-      console.log('side bar ', user)
+      //console.log('side bar ', user)
 
       const username = user?.username
   return (

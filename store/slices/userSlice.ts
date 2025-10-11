@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { stat } from "fs";
 
 interface UserData {
   name: string;
@@ -19,7 +20,7 @@ interface User {
 
 interface UserState {
   user: User | null;
-  currentUser : User| null;
+  currentUser: User | null;
   users: User[];
   totalPages: number;
   currentPage: number;
@@ -36,6 +37,22 @@ const initialState: UserState = {
   status: "idle",
   error: null,
 };
+
+export const currentUser = createAsyncThunk(
+  "currentUser/fetch",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get("/api/users/me");
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("Failed to fetch current user data");
+    }
+  }
+);
+
 export const fetchUsers = createAsyncThunk(
   "users/fetch",
   async (
@@ -58,9 +75,9 @@ export const fetchUsers = createAsyncThunk(
 
 export const fetchUser = createAsyncThunk(
   "user/fetch",
-  async (userId: string, { rejectWithValue }) => {
+  async (username: string, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/users/${userId}`);
+      const response = await axios.get(`/api/users/${username}`);
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -89,9 +106,29 @@ export const updateUser = createAsyncThunk(
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    clearCurrentUser : (state)=>{
+      state.currentUser = null
+    }
+  },
   extraReducers: (builder) => {
     builder
+
+      .addCase(currentUser.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(currentUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.currentUser = action.payload.currentUser;
+        state.error = null;
+      })
+
+      .addCase(currentUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          (action.payload as string) || "Failed to fetch current user";
+      })
       .addCase(fetchUsers.pending, (state) => {
         state.status = "loading";
       })
@@ -116,7 +153,7 @@ const userSlice = createSlice({
         state.user = action.payload.user;
         state.error = null;
         //console.log("Redux - User data received:", action.payload.user);
-       /* console.log(
+        /* console.log(
           "Redux - Profile picture:",
           action.payload.user
         );*/
@@ -146,3 +183,4 @@ const userSlice = createSlice({
 });
 
 export default userSlice.reducer;
+export const {clearCurrentUser} = userSlice.actions

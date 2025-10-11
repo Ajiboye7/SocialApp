@@ -3,7 +3,6 @@ import connectToDatabase from "@/lib/mongoose";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import User from "@/lib/models/user.model";
-import { success } from "zod";
 
 export async function POST(request: Request) {
   const { userId } = await auth();

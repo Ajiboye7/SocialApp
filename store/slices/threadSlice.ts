@@ -6,6 +6,14 @@ interface ThreadData {
   parentId?: string;
 }
 
+interface ThreadParams {
+  topLevelOnly: boolean;
+  userOnly?: boolean;
+  authorId?: string;
+  page: number;
+  limit: number;
+}
+
 interface Thread {
   _id: string;
   author: AuthorInfo;
@@ -160,7 +168,8 @@ export const getThreadById = createAsyncThunk(
   }
 );
 
-export const getThreads = createAsyncThunk(
+{
+  /*export const getThreads = createAsyncThunk(
   "thread/get",
   async (
     {
@@ -191,8 +200,29 @@ export const getThreads = createAsyncThunk(
       return rejectWithValue("An unexpected error occurred. Please try again.");
     }
   }
-);
+);*/
+}
 
+export const getThreads = createAsyncThunk(
+  "threads/get",
+  async (params: ThreadParams, { rejectWithValue }) => {
+    try {
+      let url = `/api/threads?topLevelOnly=${params.topLevelOnly}&page=${params.page}&limit=${params.limit}`;
+
+      if (params.userOnly) url += `&userOnly=true`;
+      if (params.authorId) url += `&authorId=${params.authorId}`;
+
+      const response = await axios.get(url);
+      return response.data.data
+
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("Failed to fetch threads");
+    }
+  }
+);
 const threadSlice = createSlice({
   name: "thread",
   initialState,

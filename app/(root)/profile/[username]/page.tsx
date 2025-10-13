@@ -17,15 +17,17 @@ import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
 
-
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-
-  const { user, status: userStatus } = useSelector(
+  const { user, status: userStatus , currentUser: loggedInUser} = useSelector(
     (state: RootState) => state.user
   );
+
+  const  {isSignedIn} = useUser()
+  const viewedUserId = user?._id
   //console.log('User id', userId, isLoaded, isSignedIn)
+  //console.log('user data', user)
 
   const {
     threads,
@@ -37,26 +39,57 @@ const page = () => {
   const params = useParams();
   const username = params.username as string;
 
- 
-
   useEffect(() => {
-     
     if (username) dispatch(fetchUser(username as string));
   }, [dispatch, username]);
-
-
 
   useEffect(() => {
     dispatch(clearThreads());
     dispatch(
       getThreads({
         topLevelOnly: true,
-        userOnly: true,
+        //userOnly: true,
+        authorId: viewedUserId,
         page: currentPage,
         limit: 5,
       })
     );
-  }, [dispatch]);
+  }, [dispatch, viewedUserId]);
+
+  const isOwnProfile = loggedInUser?.id === user?.id
+
+  // Pagination click handlers (update to reset to page 1 on profile change if needed)
+  const handlePrev = () => {
+    if (currentPage > 1) {
+      dispatch(
+        getThreads({
+          topLevelOnly: true,
+          authorId: viewedUserId,
+          page: currentPage - 1,
+          limit: 5,
+        })
+      );
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      dispatch(
+        getThreads({
+          topLevelOnly: true,
+          authorId: viewedUserId,
+          page: currentPage + 1,
+          limit: 5,
+        })
+      );
+    }
+  };
+
+   {/*threads.map((t) => (
+    console.log('author id',t.author.id)
+   ))
+
+  console.log('show button',isOwnProfile, loggedInUser?.id  )*/}
 
   return (
     <section className="w-full">
@@ -105,7 +138,8 @@ const page = () => {
                     username={t.author.username || "Unknown User"}
                     thread={t.thread}
                     comments={t.children}
-                    showDeleteButton={true}
+                    showDeleteButton={isOwnProfile && t.author.id === loggedInUser?._id}
+
                   />
                 ))
               ) : (
@@ -122,19 +156,11 @@ const page = () => {
         </Tabs>
       </div>
 
-      {/* Pagination */}
+     {/* Pagination */}
       <div className="flex justify-center gap-4 mt-6">
         <button
           disabled={currentPage <= 1}
-          onClick={() =>
-            dispatch(
-              getThreads({
-                topLevelOnly: true,
-                page: currentPage - 1,
-                limit: 5,
-              })
-            )
-          }
+          onClick={handlePrev}
           className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
         >
           Prev
@@ -144,23 +170,16 @@ const page = () => {
         </span>
         <button
           disabled={currentPage >= totalPages}
-          onClick={() =>
-            dispatch(
-              getThreads({
-                topLevelOnly: true,
-                userOnly: true,
-                page: currentPage + 1,
-                limit: 5,
-              })
-            )
-          }
+          onClick={handleNext}
           className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
         >
           Next
         </button>
       </div>
     </section>
+    
   );
+ 
 };
 
 export default page;

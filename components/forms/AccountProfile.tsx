@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useState, ChangeEvent } from "react";
@@ -27,10 +27,18 @@ import { useDispatch, UseDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 
 interface Props {
+  user: {
+    id: string;
+    //objectId: string;
+    username: string;
+    name: string;
+    bio: string;
+    image: string;
+  };
   btnTitle: string;
 }
 
-const AccountProfile = ({ btnTitle }: Props) => {
+const AccountProfile = ({ user, btnTitle }: Props) => {
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
@@ -40,12 +48,23 @@ const AccountProfile = ({ btnTitle }: Props) => {
   const form = useForm<z.infer<typeof profileValidation>>({
     resolver: zodResolver(profileValidation),
     defaultValues: {
-      profile_photo: "",
-      name: "",
-      username: "",
-      bio: "",
+      profile_photo: user?.image || "",
+      name: user?.name || "",
+      username: user?.username || "",
+      bio: user?.bio || "",
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        profile_photo: user.image || "",
+        name: user.name || "",
+        username: user.username || "",
+        bio: user.bio || "",
+      });
+    }
+  }, [user, form]);
 
   async function onSubmit(data: z.infer<typeof profileValidation>) {
     const blob = data.profile_photo;
@@ -70,11 +89,14 @@ const AccountProfile = ({ btnTitle }: Props) => {
       ).unwrap();
 
       router.push("/");
-   } catch (error: any) {
-  console.log("Error creating thread", error);
-  alert(typeof error === "string" ? error : error.message || "Something went wrong");
-}
-
+    } catch (error: any) {
+      console.log("Error creating thread", error);
+      alert(
+        typeof error === "string"
+          ? error
+          : error.message || "Something went wrong"
+      );
+    }
   }
 
   const handleImage = (

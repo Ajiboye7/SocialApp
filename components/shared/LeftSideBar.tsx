@@ -1,8 +1,8 @@
 "use client";
 
-import {useSidebarLinks}  from "@/constants";
+import { useSidebarLinks } from "@/constants";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "@/store/store";
@@ -11,14 +11,12 @@ import { useSelector, useDispatch } from "react-redux";
 const LeftSideBar = () => {
   const router = useRouter();
   const pathname = usePathname();
-   const sidebarLinks = useSidebarLinks();
-   const dispatch = useDispatch<AppDispatch>();
-    const { currentUser: user, status: userStatus } = useSelector(
-       (state: RootState) => state.user
-     );
-      //console.log('side bar ', user)
+  const sidebarLinks = useSidebarLinks();
+  const { currentUser: user, status: userStatus } = useSelector(
+    (state: RootState) => state.user
+  );
 
-      const username = user?.username
+  const username = user?.username;
   return (
     <div className="bg-dark-2 px-6 sticky w-fit top-0 left-0 pt-30 pb-20 flex flex-col justify-between max-md:hidden custom-scrollbar overflow-auto h-screen">
       <div className="w-full flex flex-col gap-5">
@@ -26,11 +24,15 @@ const LeftSideBar = () => {
           const isActive =
             (pathname.includes(link.route) && link.route.length > 1) ||
             pathname === link.route;
-            if (link.route === "/profile") link.route = `${link.route}/${username}`;
+          //if (link.route === "/profile")
+            //link.route = `${link.route}/${username}`;
+          const href = link.route === "/profile" ? `/profile/${username}` : link.route;
+
           return (
-            <div  key={link.label}>
+            <div key={link.label}>
               <Link
-                href={link.route}
+                //href={link.route}
+                href={href}
                 className={`flex items-center gap-3 rounded-lg p-2 lg:p-4 ${
                   isActive && "bg-primary-500"
                 } `}
@@ -40,7 +42,6 @@ const LeftSideBar = () => {
                   alt={link.label}
                   width={24}
                   height={24}
-                  
                 />
                 <p className="text-light-1 hidden lg:block"> {link.label}</p>
               </Link>
@@ -49,7 +50,10 @@ const LeftSideBar = () => {
         })}
       </div>
 
-      <Link href="/app/(auth)/sign-in" className="flex items-center gap-3 p-2 lg:p-4 ">
+      <Link
+        href="/app/(auth)/sign-in"
+        className="flex items-center gap-3 p-2 lg:p-4 "
+      >
         <Image src="/assets/logout.svg" alt="logout" width={24} height={24} />
         <p className="text-[#FFFFFF] hidden lg:block ">Logout</p>
       </Link>

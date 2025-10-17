@@ -229,6 +229,10 @@ const threadSlice = createSlice({
   reducers: {
     clearThreads: (state) => {
       state.threads = [];
+      state.currentPage = 1;
+      state.totalPages = 0;
+      state.totalUserThread = 0;
+      state.error = null; 
     },
   },
 

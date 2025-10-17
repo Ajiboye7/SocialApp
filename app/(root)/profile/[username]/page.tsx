@@ -16,18 +16,16 @@ import { currentUser, fetchUser } from "@/store/slices/userSlice";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
+import Loader from "@/components/Loader";
 
 const page = () => {
+  const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
 
   const { user, status: userStatus , currentUser: loggedInUser} = useSelector(
     (state: RootState) => state.user
   );
-
-  const  {isSignedIn} = useUser()
   const viewedUserId = user?._id
-  //console.log('User id', userId, isLoaded, isSignedIn)
-  //console.log('user data', user)
 
   const {
     threads,
@@ -40,25 +38,25 @@ const page = () => {
   const username = params.username as string;
 
   useEffect(() => {
+    dispatch(clearThreads());
     if (username) dispatch(fetchUser(username as string));
+    setLastFetchedUsername(username);
   }, [dispatch, username]);
 
   useEffect(() => {
-    dispatch(clearThreads());
-    dispatch(
-      getThreads({
-        topLevelOnly: true,
-        //userOnly: true,
-        authorId: viewedUserId,
-        page: currentPage,
-        limit: 5,
-      })
-    );
-  }, [dispatch, viewedUserId]);
-
+    if (userStatus === 'succeeded' && viewedUserId && username === lastFetchedUsername) {
+      dispatch(
+        getThreads({
+          topLevelOnly: true,
+          authorId: viewedUserId,
+          page: currentPage,
+          limit: 5,
+        })
+      );
+    }
+  }, [dispatch, viewedUserId, currentPage, lastFetchedUsername]);
   const isOwnProfile = loggedInUser?.id === user?.id
 
-  // Pagination click handlers (update to reset to page 1 on profile change if needed)
   const handlePrev = () => {
     if (currentPage > 1) {
       dispatch(
@@ -90,6 +88,13 @@ const page = () => {
    ))
 
   console.log('show button',isOwnProfile, loggedInUser?.id  )*/}
+  if (userStatus === "loading" || threadStatus === "loading") {
+    return <p className="text-white text-center mt-10">Loading...</p>; // Or use <Loader />
+  }
+
+  if (!user || userStatus === "failed") {
+    return <p className="text-white text-center mt-10 text-2xl">User not found</p>;
+  }
 
   return (
     <section className="w-full">

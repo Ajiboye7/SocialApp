@@ -108,10 +108,15 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    clearCurrentUser : (state)=>{
-      state.currentUser = null
-    }
+  clearCurrentUser: (state) => {
+    state.currentUser = null;
   },
+  clearUser: (state) => {
+    state.user = null;
+    state.status = "idle";
+    state.error = null;
+  },
+},
   extraReducers: (builder) => {
     builder
 
@@ -123,6 +128,7 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.currentUser = action.payload.currentUser;
         state.error = null;
+        //console.log('current user redux ',action.payload.currentUser );
       })
 
       .addCase(currentUser.rejected, (state, action) => {
@@ -184,4 +190,4 @@ const userSlice = createSlice({
 });
 
 export default userSlice.reducer;
-export const {clearCurrentUser} = userSlice.actions
+export const {clearCurrentUser, clearUser} = userSlice.actions

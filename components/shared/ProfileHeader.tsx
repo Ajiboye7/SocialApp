@@ -15,10 +15,10 @@ const ProfileHeader = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  console.log("user data", user);
+  //console.log("user data", user);
 
-  console.log("user id", user?.id);
-  console.log("current user is", currentUser?.id);
+  //console.log("user id", user?.id);
+  //console.log("current user is", currentUser?.id);
 
   return (
     <>
@@ -44,7 +44,8 @@ const ProfileHeader = () => {
         </div>
 
         {user?.id === currentUser?.id && (
-          <Link href={`/profile/${user?.username}/edit`}>
+         // <Link href={`/profile/${user?.username}/edit`}>
+            <Link href='/profile/edit'>
             <div className="flex items-center gap-2 bg-dark-3 rounded-lg py-2 px-4">
               <Image src="/assets/edit.svg" alt="edit" width={16} height={16} />
               <p className="text-white">Edit</p>

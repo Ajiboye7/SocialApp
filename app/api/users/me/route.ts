@@ -54,6 +54,7 @@ export async function GET(
       profile_picture: userData.profile_picture,
       username: userData.username,
       bio: userData.bio,
+      onboarded: userData.onboarded,
 
       threads: userData.threads.map((thread: any) => ({
         _id: thread._id,

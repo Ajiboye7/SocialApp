@@ -5,11 +5,16 @@ import Button from "@/components/shared/Button";
 import AccountProfile from "@/components/forms/AccountProfile";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { redirect } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 const page = () => {
   const { currentUser: user } = useSelector((state: RootState) => state.user);
   const state = useSelector((state: RootState) => state);
-  //console.log("Full Redux state:", state);
-  
+
+  /*const { isSignedIn } = useUser();
+  if (!isSignedIn) return null;
+
+  if (!user?.onboarded) redirect("/onboarding");*/
 
   const userData = {
     id: user?._id ?? "",
@@ -19,7 +24,7 @@ const page = () => {
     image: user?.profile_picture ?? "",
   };
 
-  console.log('userData edit' , userData)
+  //console.log('userData edit' , userData)
 
   return (
     <div>

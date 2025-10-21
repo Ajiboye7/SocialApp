@@ -38,7 +38,7 @@ const page = () => {
   const username = params.username as string;
 
   useEffect(() => {
-    dispatch(clearThreads());
+    //dispatch(clearThreads());
     if (username) dispatch(fetchUser(username as string));
     setLastFetchedUsername(username);
   }, [dispatch, username]);

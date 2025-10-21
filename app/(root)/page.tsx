@@ -105,9 +105,9 @@ const page = () => {
         </button>
       </div>
 
-      <SignOutButton redirectUrl="/sign-in">
+      {/*<SignOutButton redirectUrl="/sign-in">
         <button className="text-white mt-10 cursor-pointer">Sign Out</button>
-      </SignOutButton>
+      </SignOutButton>*/}
     </section>
   );
 };

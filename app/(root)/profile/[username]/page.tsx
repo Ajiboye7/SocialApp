@@ -19,13 +19,17 @@ import { clearCurrentUser } from "@/store/slices/userSlice";
 import Loader from "@/components/Loader";
 
 const page = () => {
-  const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(null);
+  const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
+    null
+  );
   const dispatch = useDispatch<AppDispatch>();
 
-  const { user, status: userStatus , currentUser: loggedInUser} = useSelector(
-    (state: RootState) => state.user
-  );
-  const viewedUserId = user?._id
+  const {
+    user,
+    status: userStatus,
+    currentUser: loggedInUser,
+  } = useSelector((state: RootState) => state.user);
+  const viewedUserId = user?._id;
 
   const {
     threads,
@@ -44,7 +48,11 @@ const page = () => {
   }, [dispatch, username]);
 
   useEffect(() => {
-    if (userStatus === 'succeeded' && viewedUserId && username === lastFetchedUsername) {
+    if (
+      userStatus === "succeeded" &&
+      viewedUserId &&
+      username === lastFetchedUsername
+    ) {
       dispatch(
         getThreads({
           topLevelOnly: true,
@@ -55,7 +63,7 @@ const page = () => {
       );
     }
   }, [dispatch, viewedUserId, currentPage, lastFetchedUsername]);
-  const isOwnProfile = loggedInUser?.id === user?.id
+  const isOwnProfile = loggedInUser?.id === user?.id;
 
   const handlePrev = () => {
     if (currentPage > 1) {
@@ -83,17 +91,21 @@ const page = () => {
     }
   };
 
-   {/*threads.map((t) => (
+  {
+    /*threads.map((t) => (
     console.log('author id',t.author.id)
    ))
 
-  console.log('show button',isOwnProfile, loggedInUser?.id  )*/}
+  console.log('show button',isOwnProfile, loggedInUser?.id  )*/
+  }
   if (userStatus === "loading" || threadStatus === "loading") {
     return <p className="text-white text-center mt-10">Loading...</p>; // Or use <Loader />
   }
 
   if (!user || userStatus === "failed") {
-    return <p className="text-white text-center mt-10 text-2xl">User not found</p>;
+    return (
+      <p className="text-white text-center mt-10 text-2xl">User not found</p>
+    );
   }
 
   return (
@@ -143,8 +155,9 @@ const page = () => {
                     username={t.author.username || "Unknown User"}
                     thread={t.thread}
                     comments={t.children}
-                    showDeleteButton={isOwnProfile && t.author.id === loggedInUser?._id}
-
+                    showDeleteButton={
+                      isOwnProfile && t.author.id === loggedInUser?._id
+                    }
                   />
                 ))
               ) : (
@@ -161,7 +174,7 @@ const page = () => {
         </Tabs>
       </div>
 
-     {/* Pagination */}
+      {/* Pagination */}
       <div className="flex justify-center gap-4 mt-6">
         <button
           disabled={currentPage <= 1}
@@ -182,9 +195,7 @@ const page = () => {
         </button>
       </div>
     </section>
-    
   );
- 
 };
 
 export default page;

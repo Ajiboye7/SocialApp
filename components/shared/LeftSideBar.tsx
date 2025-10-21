@@ -7,6 +7,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { RootState, AppDispatch } from "@/store/store";
 import { useSelector, useDispatch } from "react-redux";
+import { SignOutButton, SignedIn, useAuth } from "@clerk/nextjs";
 
 const LeftSideBar = () => {
   const router = useRouter();
@@ -50,13 +51,30 @@ const LeftSideBar = () => {
         })}
       </div>
 
-      <Link
+      {/*<Link
         href="/app/(auth)/sign-in"
         className="flex items-center gap-3 p-2 lg:p-4 "
       >
         <Image src="/assets/logout.svg" alt="logout" width={24} height={24} />
         <p className="text-[#FFFFFF] hidden lg:block ">Logout</p>
-      </Link>
+      </Link>*/}
+
+      <div className='mt-10'>
+        <SignedIn>
+          <SignOutButton redirectUrl="/sign-in">
+            <div className='flex cursor-pointer gap-4 p-4'>
+              <Image
+                src='/assets/logout.svg'
+                alt='logout'
+                width={24}
+                height={24}
+              />
+
+              <p className='text-[#FFFFFF] hidden lg:block'>Logout</p>
+            </div>
+          </SignOutButton>
+        </SignedIn>
+      </div>
     </div>
   );
 };

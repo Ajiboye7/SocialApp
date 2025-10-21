@@ -94,6 +94,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const topLevelOnly = searchParams.get("topLevelOnly") === "true";
     const userOnly = searchParams.get("userOnly") === "true";
+    const userComment = searchParams.get("UserCommentsOnly") === "true";
     const authorId = searchParams.get("authorId");
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
@@ -119,6 +120,8 @@ export async function GET(req: Request) {
     const query: any = {};
     if (topLevelOnly) {
       query.parentId = null;
+    } else if (userComment) {
+      query.parentId = { $ne: null };
     }
     if (effectiveAuthorId) {
       query.author = effectiveAuthorId;

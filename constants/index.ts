@@ -15,7 +15,6 @@ export const communityTabs = [
   { value: "requests", label: "Requests", icon: "/assets/request.svg" },
 ];
 
-// ✅ sidebarLinks must be defined inside a component
 export const useSidebarLinks = () => {
   const { user } = useSelector((state: RootState) => state.user);
   const username = user?.username;

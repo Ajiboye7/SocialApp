@@ -16,13 +16,14 @@ import { currentUser, fetchUser } from "@/store/slices/userSlice";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
-import Loader from "@/components/Loader";
+
 
 const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
     null
   );
   const dispatch = useDispatch<AppDispatch>();
+  const [activeTab, setActiveTab] = useState("threads");
 
   const {
     user,
@@ -43,17 +44,19 @@ const page = () => {
 
   useEffect(() => {
     //dispatch(clearThreads());
-    if (username) dispatch(fetchUser(username as string));
     setLastFetchedUsername(username);
+    if (username) dispatch(fetchUser(username as string));
+    
   }, [dispatch, username]);
 
   useEffect(() => {
     if (
-      userStatus === "succeeded" &&
+      userStatus === "succeeded" && 
       viewedUserId &&
       username === lastFetchedUsername
     ) {
       dispatch(
+        
         getThreads({
           topLevelOnly: true,
           authorId: viewedUserId,
@@ -61,8 +64,11 @@ const page = () => {
           limit: 5,
         })
       );
+      
     }
-  }, [dispatch, viewedUserId, currentPage, lastFetchedUsername]);
+  }, [dispatch, viewedUserId, currentPage, username, lastFetchedUsername]);
+  
+  console.log('user Threads', threads)
   const isOwnProfile = loggedInUser?.id === user?.id;
 
   const handlePrev = () => {
@@ -99,7 +105,7 @@ const page = () => {
   console.log('show button',isOwnProfile, loggedInUser?.id  )*/
   }
   if (userStatus === "loading" || threadStatus === "loading") {
-    return <p className="text-white text-center mt-10">Loading...</p>; // Or use <Loader />
+    return <p className="text-white text-center mt-10">Loading...</p>;
   }
 
   if (!user || userStatus === "failed") {
@@ -111,7 +117,6 @@ const page = () => {
   return (
     <section className="w-full">
       <ProfileHeader />
-
       <div className="mt-9">
         <Tabs defaultValue="threads" className="w-full">
           <TabsList className="w-full flex min-h-[50px] flex-1 items-center gap-3 bg-dark-2 text-light-2 data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-2 !important">
@@ -199,3 +204,51 @@ const page = () => {
 };
 
 export default page;
+
+/**
+ useEffect(() => {
+  if (
+    userStatus === "succeeded" &&
+    viewedUserId &&
+    username === lastFetchedUsername
+  ) {
+    let queryOptions: any = {
+      authorId: viewedUserId,
+      page: currentPage,
+      limit: 5,
+    };
+
+    if (activeTab === "threads") {
+      queryOptions.topLevelOnly = true;
+    } else if (activeTab === "replies") {
+      queryOptions.userComment = true;
+    }
+
+    dispatch(getThreads(queryOptions));
+  }
+}, [dispatch, viewedUserId, currentPage, lastFetchedUsername, activeTab]);
+
+<Tabs
+  value={activeTab}
+  onValueChange={(val) => setActiveTab(val)}
+  className="w-full"
+>
+
+
+useEffect(() => {
+  // Reset to first page when switching tabs
+  dispatch(
+    getThreads({
+      authorId: viewedUserId,
+      page: 1,
+      limit: 5,
+      topLevelOnly: activeTab === "threads",
+      userComment: activeTab === "replies",
+    })
+  );
+}, [activeTab]);
+
+
+
+ */
+

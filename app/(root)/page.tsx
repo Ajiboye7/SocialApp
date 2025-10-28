@@ -23,19 +23,7 @@ const page = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  //console.log("user fetched ", user);
- // console.log("top level threads", threads);
-
-  {
-    /*if (userStatus === "loading" || threadStatus === "loading") {
-    return (
-      <div className="mx-auto flex max-w-3xl flex-col justify-center items-center px-10 py-20 min-h-[100vh]">
-        <LoadingSpinner />
-        <p className="text-light-2 mt-4">Loading post</p>
-      </div>
-    );
-  }*/
-  }
+   
 
   useEffect(() => {
     dispatch(getThreads({ topLevelOnly: true, page: currentPage, limit: 5 }));

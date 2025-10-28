@@ -22,6 +22,8 @@ const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
     null
   );
+
+  
   const dispatch = useDispatch<AppDispatch>();
   const [activeTab, setActiveTab] = useState("threads");
 
@@ -30,7 +32,7 @@ const page = () => {
     status: userStatus,
     currentUser: loggedInUser,
   } = useSelector((state: RootState) => state.user);
-  const viewedUserId = user?._id;
+  const viewedUserId = user?._id as string;
 
   const {
     threads,
@@ -43,13 +45,16 @@ const page = () => {
   const username = params.username as string;
 
   useEffect(() => {
-    //dispatch(clearThreads());
+    dispatch(clearThreads());
     setLastFetchedUsername(username);
+    
     if (username) dispatch(fetchUser(username as string));
     
   }, [dispatch, username]);
 
   useEffect(() => {
+    
+    setLastFetchedUsername(username);
     if (
       userStatus === "succeeded" && 
       viewedUserId &&

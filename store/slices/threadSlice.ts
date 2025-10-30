@@ -200,8 +200,8 @@ export const getThreadById = createAsyncThunk(
       return rejectWithValue("An unexpected error occurred. Please try again.");
     }
   }
-);*/
-}
+);
+}*/}
 
 export const getThreads = createAsyncThunk(
   "threads/get",

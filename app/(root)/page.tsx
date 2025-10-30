@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { redirect } from "next/navigation";
 import LoadingThread from "@/components/LoadingThread";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getThreads } from "@/store/slices/threadSlice";
+import { clearThreads, getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
 
 const page = () => {
@@ -26,6 +26,7 @@ const page = () => {
    
 
   useEffect(() => {
+    dispatch (clearThreads())
     dispatch(getThreads({ topLevelOnly: true, page: currentPage, limit: 5 }));
   }, [dispatch]);
 

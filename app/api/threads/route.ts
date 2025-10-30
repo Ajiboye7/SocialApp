@@ -147,20 +147,7 @@ export async function GET(req: Request) {
     const totalUserThreadQuery: any = { ...query }; // Reuse for user-specific count
     const totalUserThread = await Thread.countDocuments(totalUserThreadQuery);
 
-    {
-      /*const totalThreads = await Thread.countDocuments();
-    const totalUserThreadQuery: any = {};
-
-    if (topLevelOnly) {
-      totalUserThreadQuery.parentId = null;
-    }
-
-    if (userOnly) {
-      totalUserThreadQuery.author = currentUser._id;
-    }
-
-    const totalUserThread = await Thread.countDocuments(totalUserThreadQuery);*/
-    }
+     
 
     const transformedThreads = threads.map((thread) => ({
       _id: thread._id,

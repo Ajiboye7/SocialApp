@@ -27,13 +27,15 @@ const LeftSideBar = () => {
             pathname === link.route;
           //if (link.route === "/profile")
             //link.route = `${link.route}/${username}`;
-          const href = link.route === "/profile" ? `/profile/${username}` : link.route;
+          //const href = link.route === "/profile" ? `/profile/${username}` : link.route;
+        
+
 
           return (
             <div key={link.label}>
               <Link
-                //href={link.route}
-                href={href}
+                href={link.route}
+                ///href={href}
                 className={`flex items-center gap-3 rounded-lg p-2 lg:p-4 ${
                   isActive && "bg-primary-500"
                 } `}

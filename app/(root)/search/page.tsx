@@ -6,6 +6,7 @@ import { fetchUsers } from "@/store/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import UserCard from "@/cards/UserCard";
+import { clearUser } from "@/store/slices/userSlice";
 
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,9 +14,10 @@ const page = () => {
    const [search, setSearch] = useState("");
 
   useEffect(() => {
+    dispatch(clearUser())
     dispatch(fetchUsers({page: currentPage, limit:10})).unwrap();
   }, [dispatch]);
-  console.log("list of users", users);
+  //console.log("list of users", users);
 
   const filteredUsers = users.filter((user) => {
     const query = search.toLowerCase();

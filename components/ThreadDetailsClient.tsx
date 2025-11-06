@@ -1,4 +1,4 @@
-// components/ThreadDetailsClient.tsx
+
 "use client";
 import ThreadCard from "@/cards/ThreadCard";
 import React, { useEffect } from "react";

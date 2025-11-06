@@ -17,14 +17,11 @@ import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
 
-
 const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
     null
   );
 
-  
-  
   const dispatch = useDispatch<AppDispatch>();
   const [activeTab, setActiveTab] = useState("threads");
 
@@ -48,27 +45,24 @@ const page = () => {
 
   useEffect(() => {
     dispatch(clearThreads());
-   
+
     setLastFetchedUsername(username);
-    
+
     if (username) dispatch(fetchUser(username as string));
     //console.log('first use effect render',viewedUserId)
-    
   }, [dispatch, username]);
 
   // console.log('views user id number 1', viewedUserId)
 
   useEffect(() => {
-    
     setLastFetchedUsername(username);
-    
+
     if (
-      userStatus === "succeeded" && 
+      userStatus === "succeeded" &&
       viewedUserId &&
       username === lastFetchedUsername
     ) {
       dispatch(
-        
         getThreads({
           topLevelOnly: true,
           authorId: viewedUserId,
@@ -76,12 +70,18 @@ const page = () => {
           limit: 5,
         })
       );
-       //console.log('second use effect render',viewedUserId)
+      //console.log('second use effect render',viewedUserId)
     }
-  }, [dispatch, viewedUserId, currentPage, lastFetchedUsername, username, userStatus]);
+  }, [
+    dispatch,
+    viewedUserId,
+    currentPage,
+    lastFetchedUsername,
+    username,
+    userStatus,
+  ]);
   //console.log('views user id number 2', viewedUserId)
-  
- 
+
   const isOwnProfile = loggedInUser?.id === user?.id;
 
   const handlePrev = () => {
@@ -264,4 +264,3 @@ useEffect(() => {
 
 
  */
-

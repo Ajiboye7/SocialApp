@@ -26,7 +26,7 @@ const page = () => {
    
 
   useEffect(() => {
-    dispatch (clearThreads())
+    dispatch (clearThreads());
     dispatch(getThreads({ topLevelOnly: true, page: currentPage, limit: 5 }));
   }, [dispatch]);
 

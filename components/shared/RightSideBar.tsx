@@ -4,17 +4,17 @@ import UserCard from "@/cards/UserCard";
 import { fetchUsers } from "@/store/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
-import { clearUser } from "@/store/slices/userSlice";
+import { fetchSidebarUsers } from "@/store/slices/userSlice";
+
 
 const RightSideBar = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { users, currentPage, totalPages } = useSelector(
+  const { sidebarUsers:users, currentPage } = useSelector(
     (state: RootState) => state.user
   );
 
   useEffect(() => {
-    dispatch(clearUser())
-    dispatch(fetchUsers({ page: currentPage, limit: 3 })).unwrap();
+    dispatch(fetchSidebarUsers({ page: currentPage, limit: 3 })).unwrap();
   }, [dispatch]);
 
   return (

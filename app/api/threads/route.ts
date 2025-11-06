@@ -90,7 +90,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // Parse query parameters
     const { searchParams } = new URL(req.url);
     const topLevelOnly = searchParams.get("topLevelOnly") === "true";
     const userOnly = searchParams.get("userOnly") === "true";
@@ -111,7 +110,6 @@ export async function GET(req: Request) {
           { status: 404 }
         );
       }
-
       effectiveAuthorId = authorId;
     } else if (userOnly) {
       effectiveAuthorId = currentUser._id;
@@ -146,8 +144,6 @@ export async function GET(req: Request) {
     const totalThreads = await Thread.countDocuments(query); // Use same query for total
     const totalUserThreadQuery: any = { ...query }; // Reuse for user-specific count
     const totalUserThread = await Thread.countDocuments(totalUserThreadQuery);
-
-     
 
     const transformedThreads = threads.map((thread) => ({
       _id: thread._id,

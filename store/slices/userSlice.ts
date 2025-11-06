@@ -23,8 +23,11 @@ interface UserState {
   user: User | null;
   currentUser: User | null;
   users: User[];
+  sidebarUsers: User[];
   totalPages: number;
   currentPage: number;
+  sidebarTotalPages: number;
+  sidebarCurrentPage: number;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
@@ -33,8 +36,11 @@ const initialState: UserState = {
   user: null,
   currentUser: null,
   users: [],
+  sidebarUsers: [],
   totalPages: 0,
   currentPage: 1,
+  sidebarTotalPages: 0,
+  sidebarCurrentPage: 1,
   status: "idle",
   error: null,
 };
@@ -56,6 +62,26 @@ export const currentUser = createAsyncThunk(
 
 export const fetchUsers = createAsyncThunk(
   "users/fetch",
+  async (
+    { page = 1, limit = 10 }: { page?: number; limit?: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.get(
+        `/api/users?page=${page}&limit=${limit}`
+      );
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("Failed to fetch user data");
+    }
+  }
+);
+
+export const fetchSidebarUsers = createAsyncThunk(
+  "users/fetchSidebar",
   async (
     { page = 1, limit = 10 }: { page?: number; limit?: number },
     { rejectWithValue }
@@ -108,15 +134,15 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-  clearCurrentUser: (state) => {
-    state.currentUser = null;
+    clearCurrentUser: (state) => {
+      state.currentUser = null;
+    },
+    clearUser: (state) => {
+      state.user = null;
+      state.status = "idle";
+      state.error = null;
+    },
   },
-  clearUser: (state) => {
-    state.user = null;
-    state.status = "idle";
-    state.error = null;
-  },
-},
   extraReducers: (builder) => {
     builder
 
@@ -149,6 +175,24 @@ const userSlice = createSlice({
       .addCase(fetchUsers.rejected, (state, action) => {
         state.status = "failed";
         state.error = (action.payload as string) || "Failed to fetch users";
+      })
+
+      .addCase(fetchSidebarUsers.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(fetchSidebarUsers.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.sidebarUsers = action.payload.users;
+        state.sidebarCurrentPage = action.payload.currentPage;
+        state.sidebarTotalPages = action.payload.totalPages;
+        state.error = null;
+      })
+
+      .addCase(fetchSidebarUsers.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          (action.payload as string) || "Failed to fetch sidebar users";
       })
 
       .addCase(fetchUser.pending, (state) => {
@@ -190,4 +234,4 @@ const userSlice = createSlice({
 });
 
 export default userSlice.reducer;
-export const {clearCurrentUser, clearUser} = userSlice.actions
+export const { clearCurrentUser, clearUser } = userSlice.actions;

@@ -36,7 +36,7 @@ const Page = () => {
         thread.children?.map((comment) => (
           <div
             key={comment._id}
-            className="flex items-center bg-gray-800 rounded-md p-3 mb-3 shadow-md"
+            className="flex items-center gap-2 rounded-md bg-dark-2 px-7 py-4 shadow-md"
           >
             <img
               src={comment.author?.profile_picture || "/default-avatar.png"}
@@ -45,7 +45,7 @@ const Page = () => {
             />
             <div>
               <p className="text-white">
-                <span className="font-semibold">
+                <span className="font-semibold text-primary-500">
                   {comment.author?.username}
                 </span>{" "}
                 commented on your post

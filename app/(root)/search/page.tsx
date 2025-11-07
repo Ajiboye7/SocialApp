@@ -7,10 +7,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import UserCard from "@/cards/UserCard";
 import { clearUser } from "@/store/slices/userSlice";
+import UserCardSkeleton from "@/components/UserCardSkeleton";
 
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { users, currentPage, totalPages } = useSelector((state: RootState) => state.user);
+  const { users, currentPage, totalPages, status } = useSelector((state: RootState) => state.user);
    const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -18,6 +19,10 @@ const page = () => {
     dispatch(fetchUsers({page: currentPage, limit:10})).unwrap();
   }, [dispatch]);
   //console.log("list of users", users);
+
+  if(status === 'loading'){
+   return <UserCardSkeleton />
+  }
 
   const filteredUsers = users.filter((user) => {
     const query = search.toLowerCase();

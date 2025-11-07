@@ -4,7 +4,7 @@ import ThreadCard from "@/cards/ThreadCard";
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
-import LoadingSpinner from "@/components/LoadingThread";
+import LoadingSpinner from "@/components/ContentSkeleton";
 import Comment from "@/components/forms/Comment";
 import { getThreadById } from "@/store/slices/threadSlice";
 

@@ -1,16 +1,17 @@
-"use client"
+"use client";
 
 import React, { useEffect } from "react";
 import { getThreads, clearThreads } from "@/store/slices/threadSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
+import LoadingThread from "@/components/ContentSkeleton";
+import ContentSkeleton from "@/components/ContentSkeleton";
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { threads, currentPage } = useSelector(
+  const { threads, currentPage, status } = useSelector(
     (state: RootState) => state.thread
   );
-  const { currentUser } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     dispatch(clearThreads());
@@ -23,6 +24,10 @@ const Page = () => {
       })
     );
   }, [dispatch, currentPage]);
+
+  if (status === "loading") {
+     return <ContentSkeleton items={1} avatar title lines={1} className="min-h-[30px]" />
+  }
 
   return (
     <div className="p-4">
@@ -62,56 +67,3 @@ const Page = () => {
 };
 
 export default Page;
-
-{
-  /*"use client";
-
-import React, { useEffect } from "react";
-import { getThreads } from "@/store/slices/threadSlice";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "@/store/store";
-import { clearThreads } from "@/store/slices/threadSlice";
-
-const page = () => {
-  const dispatch = useDispatch<AppDispatch>();
-
-  const {
-    threads,
-    status: threadStatus,
-    currentPage,
-    totalPages,
-    totalUserThread: totalPost,
-  } = useSelector((state: RootState) => state.thread);
-
-  const { currentUser } = useSelector((state: RootState) => state.user);
-
-  const userId = currentUser?._id;
-
-  useEffect(() => {
-    dispatch(clearThreads())
-    dispatch(
-      getThreads({
-        topLevelOnly: true,
-        userOnly : true,
-        //authorId: userId,
-        page: currentPage,
-        limit: 5,
-      })
-    );
-  }, []);
-
-  console.log('Activity Threads', threads)
-
-
-
-  return (
-    <div>
-      <h1 className="text-white">Activity</h1>
-
-     
-    </div>
-  );
-};
-
-export default page;*/
-}

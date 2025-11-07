@@ -4,10 +4,11 @@ import React, { useState, useEffect } from "react";
 import { SignOutButton } from "@clerk/nextjs";
 import { useSelector, useDispatch } from "react-redux";
 import { redirect } from "next/navigation";
-import LoadingThread from "@/components/LoadingThread";
+import LoadingThread from "@/components/ContentSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { clearThreads, getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
+import ContentSkeleton from "@/components/ContentSkeleton";
 
 const page = () => {
   const { user, status: userStatus } = useSelector(
@@ -31,7 +32,7 @@ const page = () => {
   }, [dispatch]);
 
   if (userStatus === "loading" || threadStatus === "loading") {
-    return <LoadingThread />;
+    return  <ContentSkeleton items={5} avatar lines={3} title />
   }
 
   return (

@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
-import LoadingSpinner from "@/components/LoadingThread";
+import LoadingSpinner from "@/components/ContentSkeleton";
 
 const page = () => {
   const router = useRouter();

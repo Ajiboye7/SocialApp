@@ -1,4 +1,5 @@
 import { Skeleton } from "./ui/skeleton";
+ 
 
 const ContentSkeleton = ({
   items = 3,
@@ -8,7 +9,7 @@ const ContentSkeleton = ({
   className = "",
 }) => {
   return (
-    <div className={`mx-auto flex max-w-3xl flex-col space-y-6 px-10 py-20 min-h-[100vh] ${className}`}>
+    <div className={`${className} mx-auto flex  flex-col space-y-6 px-5 py-10 min-h-[100vh] `}>
       {title && <Skeleton className="h-8 w-1/4 rounded-md bg-gray-700" />}
 
       {[...Array(items)].map((_, i) => (

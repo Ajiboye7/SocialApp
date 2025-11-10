@@ -26,7 +26,7 @@ const Page = () => {
   }, [dispatch, currentPage]);
 
   if (status === "loading") {
-     return <ContentSkeleton items={1} avatar title lines={1} className="min-h-[30px]" />
+     return <ContentSkeleton items={1} avatar title lines={1}   />
   }
 
   return (

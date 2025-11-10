@@ -29,6 +29,7 @@ interface UserState {
   sidebarTotalPages: number;
   sidebarCurrentPage: number;
   status: "idle" | "loading" | "succeeded" | "failed";
+   usersStatus: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 }
 
@@ -42,6 +43,7 @@ const initialState: UserState = {
   sidebarTotalPages: 0,
   sidebarCurrentPage: 1,
   status: "idle",
+  usersStatus: 'idle',
   error: null,
 };
 
@@ -163,17 +165,17 @@ const userSlice = createSlice({
           (action.payload as string) || "Failed to fetch current user";
       })
       .addCase(fetchUsers.pending, (state) => {
-        state.status = "loading";
+        state.usersStatus = "loading";
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.usersStatus = "succeeded";
         state.users = action.payload.users;
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;
         state.error = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
-        state.status = "failed";
+        state.usersStatus = "failed";
         state.error = (action.payload as string) || "Failed to fetch users";
       })
 

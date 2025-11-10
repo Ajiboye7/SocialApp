@@ -59,13 +59,13 @@ const ThreadCard = ({
 
     try {
       if (isComment && parentId) {
-        // Dispatch deleteComment for comments
+     
         await dispatch(
           deleteComment({ parentId, commentId: _id })
         ).unwrap();
         alert("Comment deleted successfully");
       } else {
-        // Dispatch deleteThread for top-level threads
+        
         await dispatch(deleteThread(threadId)).unwrap();
         alert("Thread deleted successfully");
       }
@@ -73,19 +73,6 @@ const ThreadCard = ({
       alert(error || `Failed to delete ${isComment ? "comment" : "thread"}`);
     }
   }; 
-
-  {/*const handleDelete = async ()=>{
-    try{
-      await dispatch(
-          deleteComment({ parentId, commentId: _id })
-        ).unwrap();
-        alert("Comment deleted successfully");
-
-    }catch(error: any){
- alert(error || `Failed to delete ${isComment ? "comment" : "thread"}`);
-    }
-  }*/}
-
 
 
   return (
@@ -108,7 +95,7 @@ const ThreadCard = ({
             <div className="w-px h-full bg-neutral-800 absolute top-9" />
           </div>
 
-          {/*<div className="relative mt-2 w-0.5 grow rounded-full bg-neutral-800"/>*/}
+        
 
           <div className="flex flex-col gap-2">
             <p className="text-light-1 text-[16px] leading-[140%] font-[600]">

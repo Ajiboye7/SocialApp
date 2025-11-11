@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     email: user.email,
     name: user.name,
     username: user.username,
-    // only set profile_picture if it doesn't exist
+    
     $setOnInsert: { profile_picture: user.profile_picture },
   },
   { upsert: true, new: true }

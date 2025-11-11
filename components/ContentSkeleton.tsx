@@ -6,10 +6,10 @@ const ContentSkeleton = ({
   avatar = true,
   title = true,
   lines = 2,
-  className = "",
+  className = "px-5 py-10 min-h-[100vh]",
 }) => {
   return (
-    <div className={`${className} mx-auto flex  flex-col space-y-6 px-5 py-10 min-h-[100vh] `}>
+    <div   className={` mx-auto flex flex-col space-y-6 ${className}`}>
       {title && <Skeleton className="h-8 w-1/4 rounded-md bg-gray-700" />}
 
       {[...Array(items)].map((_, i) => (

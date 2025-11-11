@@ -9,13 +9,16 @@ import UserCard from "@/cards/UserCard";
 import { clearUser } from "@/store/slices/userSlice";
 import UserCardSkeleton from "@/components/UserCardSkeleton";
 import ContentSkeleton from "@/components/ContentSkeleton";
-ContentSkeleton
+ 
 
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { users, currentPage, totalPages, usersStatus: status } = useSelector(
-    (state: RootState) => state.user
-  );
+  const {
+    users,
+    currentPage,
+    totalPages,
+    usersStatus: status,
+  } = useSelector((state: RootState) => state.user);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -23,10 +26,7 @@ const page = () => {
     dispatch(fetchUsers({ page: currentPage, limit: 10 })).unwrap();
   }, [dispatch]);
 
-  console.log('This is user listed', users)
-
-
- 
+  console.log("This is user listed", users);
 
   const filteredUsers = users.filter((user) => {
     const query = search.toLowerCase();
@@ -38,22 +38,27 @@ const page = () => {
 
   return (
     <section className=" ">
-      <h1 className="text-white text-[30px] font-[600] leading-[140%] mb-10">
+      <h1 className={`text-white text-[30px] font-[600] leading-[140%] mb-10 ${status === 'loading' ? 'hidden' : ''}  ` }>
         Search
       </h1>
 
-      {status === 'loading' ? (
-        <ContentSkeleton lines={0} items={1} avatar={false} className="min-h-[0vh]"/>
-      ): <SearchBar routeType="/search" search={search} setSearch={setSearch} />}
-
-        
+      {status === "loading" ? (
+        <ContentSkeleton
+          lines={0}
+          items={1}
+          avatar={false}
+          className="py-0"
+        />
+      ) : (
+        <SearchBar routeType="/search" search={search} setSearch={setSearch} />
+      )}
 
       <div className="mt-14 flex flex-col gap-9">
-        {status == 'loading' ? (
-          Array.from({ length: 4}).map((_, index) => (
-            <UserCardSkeleton key={index} />
+        {status == "loading" ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <UserCardSkeleton key={index}  button= {true}/>
           ))
-        ) :filteredUsers.length > 0 ? (
+        ) : filteredUsers.length > 0 ? (
           filteredUsers.map((user) => (
             <UserCard
               key={user.id}
@@ -63,15 +68,13 @@ const page = () => {
               imgUrl={user.profile_picture}
               personType="User"
             />
-          )) 
+          ))
         ) : (
           <p className="text-white">No user yet</p>
         )}
-        
       </div>
 
-
-      <div className="flex gap-4 mt-6">
+      <div className={`flex gap-4 mt-6 ${status === 'loading' ? 'hidden' : ''}`}>
         <button
           disabled={currentPage <= 1}
           onClick={() =>
@@ -94,6 +97,7 @@ const page = () => {
           Next
         </button>
       </div>
+     
     </section>
   );
 };

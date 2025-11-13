@@ -1,96 +1,250 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  CLERK WEBHOOK → MongoDB (organization.created)
-//  Next.js 15 App Router
-// ─────────────────────────────────────────────────────────────────────────────
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest, NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongoose";
+import User from "@/lib/models/user.model";
 import Community from "@/lib/models/community.model";
-import mongoose from "mongoose";
-
-export const dynamic = "force-dynamic"; // <-- important for Vercel
 
 export async function POST(req: NextRequest) {
-  // ───── 1. LOG THATURL & HEADERS (prove the request reached your code) ─────
-  const svixId = req.headers.get("svix-id") ?? "no-svix-id";
-  console.log("\nWEBHOOK RECEIVED → svix-id:", svixId);
-  console.log("URL:", req.url);
-  console.log("Method:", req.method);
-
-  // ───── 2. VERIFY CLERK SIGNATURE ─────
-  let evt;
   try {
-    evt = await verifyWebhook(req);
-    console.log("Signature OK – event type:", evt.type);
-  } catch (e: any) {
-    console.error("CLERK SIGNATURE FAILED:", e.message);
-    return NextResponse.json(
-      { error: "Invalid signature" },
-      { status: 401 }
-    );
-  }
+    // Verify the webhook signature
+    const evt = await verifyWebhook(req);
 
-  // ───── 3. CONNECT TO MONGO ─────
-  try {
     await connectToDatabase();
-    const ready = mongoose.connection.readyState === 1 ? "YES" : "NO";
-    console.log("MongoDB connected? →", ready);
-  } catch (e: any) {
-    console.error("MongoDB CONNECTION ERROR:", e.message);
-    return NextResponse.json(
-      { error: "DB connection failed" },
-      { status: 500 }
-    );
-  }
 
-  // ───── 4. HANDLE USER (optional, keep it) ─────
-  if (evt.type === "user.created") {
-    const d = evt.data;
-    console.log("user.created →", d.id);
-    // …your user logic…
-    return NextResponse.json({ message: "user ok" });
-  }
+    if (evt.type === "user.created") {
+      const userData = evt.data;
 
-  // ───── 5. HANDLE ORGANIZATION.CREATED ─────
-  if (evt.type === "organization.created") {
-    const org = evt.data;
-    console.log("organization.created payload →", JSON.stringify(org, null, 2));
+      const user = {
+        id: userData.id,
+        email: userData.email_addresses?.[0]?.email_address || "",
+        name: userData.first_name || userData.last_name || "Unknown",
+        username: userData.username || `user_${userData.id.slice(-8)}`,
+        profile_picture: userData.image_url || "",
+      };
 
-    try {
-      const saved = await Community.findOneAndUpdate(
-        { id: org.id }, // query
+      await User.findOneAndUpdate(
+        { id: user.id },
         {
-          $set: {
-            name: org.name ?? "Unnamed Org",
-            slug: org.slug ?? `org-${org.id.slice(-8)}`,
-            community_picture: org.image_url ?? "",
-            bio: org.public_metadata?.bio ?? "A new community",
-            createdBy: org.created_by, // <-- user who created the org
-          },
-          $setOnInsert: {
-            id: org.id,
-            threads: [],
-            members: [],
-          },
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          username: user.username,
+          $setOnInsert: { profile_picture: user.profile_picture },
         },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
+        { upsert: true, new: true }
       );
-
-      console.log("COMMUNITY SAVED → _id:", saved._id, "slug:", saved.slug);
+      console.log("User data saved:", user);
       return NextResponse.json(
-        { message: "org ok", mongoId: saved._id?.toString() },
+        { message: "Webhook processed" },
         { status: 200 }
       );
-    } catch (dbErr: any) {
-      console.error("MONGO SAVE ERROR:", dbErr.message);
-      return NextResponse.json(
-        { error: "Mongo save failed", details: dbErr.message },
-        { status: 500 }
-      );
     }
+
+    if (evt.type === "organization.created") {
+  console.log("Processing organization.created");
+
+  const org = evt.data;
+
+  const communityData = {
+    id: org.id,
+    name: org.name,
+    slug: org.slug || `org-${org.id.slice(-8)}`,
+    community_picture: org.image_url || "",
+    bio: org.public_metadata?.bio || "A new community",
+    createdBy: org.created_by, // ← critical!
+  };
+
+  try {
+    const community = await Community.findOneAndUpdate(
+      { id: communityData.id },
+      {
+        $set: {
+          name: communityData.name,
+          slug: communityData.slug,
+          community_picture: communityData.community_picture,
+          bio: communityData.bio,
+          createdBy: communityData.createdBy,
+        },
+        $setOnInsert: {
+          id: communityData.id,
+          threads: [],
+          members: [],
+        },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    console.log("Community saved:", community._id);
+    return NextResponse.json({ message: "Community created" }, { status: 200 });
+  } catch (dbError) {
+    console.error("MongoDB save failed:", dbError);
+    return NextResponse.json({ error: "DB save failed" }, { status: 500 });
+  }
+}
+
+    return NextResponse.json({ message: "Webhook received" }, { status: 200 });
+  } catch (err) {
+    console.error("Webhook error:", err);
+    return NextResponse.json(
+      { error: "Webhook processing failed" },
+      { status: 400 }
+    );
+  }
+}
+
+{
+  /*if (evt.type === "organization.created") {
+      const communityData = evt.data;
+
+      const community = {
+        id: communityData.id,
+        name: communityData.name,
+        slug: communityData.slug,
+        community_picture: communityData.image_url ?? "",
+        bio: "organization bio",
+        //createdBy: communityData.created_by || "system",
+      };
+
+      await Community.findOneAndUpdate(
+        { id: community.id },
+        { ...community },
+        { upsert: true, new: true }
+      );
+
+      console.log("✅ Community saved:", community);
+      return NextResponse.json({ message: "Community processed" }, { status: 200 });
+    }*/
+}
+
+{
+  /**
+
+  import { verifyWebhook } from "@clerk/nextjs/webhooks";
+import { NextRequest, NextResponse } from "next/server";
+import connectToDatabase from "@/lib/mongoose";
+import User from "@/lib/models/user.model";
+
+import Community from "@/lib/models/community.model";
+import { headers } from "next/headers";
+import { IncomingHttpHeaders } from "http";
+import { Webhook, WebhookRequiredHeaders } from "svix";
+
+type EventType =
+  | "organization.created"
+  | "organizationInvitation.created"
+  | "organizationMembership.created"
+  | "organizationMembership.deleted"
+  | "organization.updated"
+  | "organization.deleted";
+
+type Event = {
+  data: Record<string, string | number | Record<string, string>[]>;
+  object: "event";
+  type: EventType;
+};
+
+export async function POST(req: NextRequest) {
+
+  const payload = await req.json();
+  const header = await headers();
+
+  const heads = {
+    "svix-id": header.get("svix-id"),
+    "svix-timestamp": header.get("svix-timestamp"),
+    "svix-signature": header.get("svix-signature"),
+  };
+
+  
+
+  // Activitate Webhook in the Clerk Dashboard.
+  // After adding the endpoint, you'll see the secret on the right side.
+  const wh = new Webhook(process.env.NEXT_CLERK_WEBHOOK_SECRET || "");
+
+  let evnt: Event | null = null;
+
+  try {
+    evnt = wh.verify(
+      JSON.stringify(payload),
+      heads as IncomingHttpHeaders & WebhookRequiredHeaders
+    ) as Event;
+  } catch (err) {
+    return NextResponse.json({ message: err }, { status: 400 });
   }
 
-  // ───── 6. ANY OTHER EVENT ─────
-  console.log("Ignored event:", evt.type);
-  return NextResponse.json({ message: "ignored" });
+  const eventType: EventType = evnt?.type!;
+
+
+  
+  try {
+    // Verify the webhook signature
+    const evt = await verifyWebhook(req);
+
+    await connectToDatabase();
+
+    if (evt.type === "user.created") {
+      const userData = evt.data;
+
+      const user = {
+        id: userData.id,
+        email: userData.email_addresses?.[0]?.email_address || "",
+        name: userData.first_name || userData.last_name || "Unknown",
+        username: userData.username || `user_${userData.id.slice(-8)}`,
+        profile_picture: userData.image_url || "",
+      };
+
+      await User.findOneAndUpdate(
+        { id: user.id },
+        {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          username: user.username,
+          $setOnInsert: { profile_picture: user.profile_picture },
+        },
+        { upsert: true, new: true }
+      );
+      console.log("User data saved:", user);
+      return NextResponse.json(
+        { message: "Webhook processed" },
+        { status: 200 }
+      );
+    }
+
+    if (eventType === "organization.created") {
+      const { id, name, slug, logo_url, image_url, created_by } =
+      evnt?.data ?? {};
+
+      const community = {
+        id: id,
+        name: name,
+        slug: slug,
+        community_picture: image_url ?? "",
+        bio: "organization bio",
+        //createdBy: created_by || "system",
+      };
+
+      await Community.findOneAndUpdate(
+        { id: community.id },
+        { ...community },
+        { upsert: true, new: true }
+      );
+
+      console.log("✅ Community saved:", community);
+      return NextResponse.json(
+        { message: "Community processed" },
+        { status: 200 }
+      );
+    }
+
+    return NextResponse.json({ message: "Webhook received" }, { status: 200 });
+  } catch (err) {
+    console.error("Webhook error:", err);
+    return NextResponse.json(
+      { error: "Webhook processing failed" },
+      { status: 400 }
+    );
+  }
+}
+
+   */
 }

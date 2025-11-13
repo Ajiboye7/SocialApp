@@ -33,7 +33,7 @@ const page = () => {
   if (status === "loading" || !user) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col justify-center items-center px-10 py-20 min-h-[100vh]">
-        {/*<LoadingSpinner />*/} <p>...loadin</p>
+        <LoadingSpinner />
       </div>
     );
   }

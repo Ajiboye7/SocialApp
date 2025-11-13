@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
-import LoadingSpinner from "@/components/ContentSkeleton";
+import LoadingSpinner from "@/components/Spinner";
 
 const page = () => {
   const router = useRouter();
@@ -33,8 +33,7 @@ const page = () => {
   if (status === "loading" || !user) {
     return (
       <div className="mx-auto flex max-w-3xl flex-col justify-center items-center px-10 py-20 min-h-[100vh]">
-        <LoadingSpinner />
-        <p className="text-light-2 mt-4">Loading your profile...</p>
+        {/*<LoadingSpinner />*/} <p>...loadin</p>
       </div>
     );
   }

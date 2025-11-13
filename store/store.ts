@@ -1,34 +1,19 @@
-/*import userReducer from "../store/slices/userSlice";
 import { configureStore } from "@reduxjs/toolkit";
-
-export const store = configureStore({
-  reducer: {
-    user: userReducer,
-  },
-
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }),
-});
-
-export type AppDispatch = typeof store.dispatch;*/
-
-// store/store.ts
-import { configureStore } from '@reduxjs/toolkit';
 import userReducer from "../store/slices/userSlice";
-import threadReducer from '../store/slices/threadSlice'
+import threadReducer from "../store/slices/threadSlice";
+import communityReducer from "../store/slices/communitySlice";
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
-    thread: threadReducer
+    thread: threadReducer,
+    community: communityReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         // Ignore these action types
-        ignoredActions: ['persist/PERSIST'],
+        ignoredActions: ["persist/PERSIST"],
       },
     }),
 });

@@ -41,46 +41,36 @@ export async function POST(req: NextRequest) {
     }
 
     if (evt.type === "organization.created") {
-  console.log("Processing organization.created");
+      console.log("Processing organization.created");
 
-  const org = evt.data;
+       const communityData = evt.data;
 
-  const communityData = {
-    id: org.id,
-    name: org.name,
-    slug: org.slug || `org-${org.id.slice(-8)}`,
-    community_picture: org.image_url || "",
-    bio: org.public_metadata?.bio || "A new community",
-    createdBy: org.created_by, // ← critical!
-  };
+      const community = {
+        id: communityData.id,
+        name: communityData.name,
+        slug: communityData.slug,
+        community_picture: communityData.image_url ?? "",
+        bio: "organization bio",
+        //createdBy: communityData.created_by || "system",
+      };
 
-  try {
-    const community = await Community.findOneAndUpdate(
-      { id: communityData.id },
-      {
-        $set: {
-          name: communityData.name,
-          slug: communityData.slug,
-          community_picture: communityData.community_picture,
-          bio: communityData.bio,
-          createdBy: communityData.createdBy,
-        },
-        $setOnInsert: {
-          id: communityData.id,
-          threads: [],
-          members: [],
-        },
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
+      try {
+         await Community.findOneAndUpdate(
+        { id: community.id },
+        { ...community },
+        { upsert: true, new: true }
+      );
 
-    console.log("Community saved:", community._id);
-    return NextResponse.json({ message: "Community created" }, { status: 200 });
-  } catch (dbError) {
-    console.error("MongoDB save failed:", dbError);
-    return NextResponse.json({ error: "DB save failed" }, { status: 500 });
-  }
-}
+        console.log("Community saved:", community);
+        return NextResponse.json(
+          { message: "Community created" },
+          { status: 200 }
+        );
+      } catch (dbError) {
+        console.error("MongoDB save failed:", dbError);
+        return NextResponse.json({ error: "DB save failed" }, { status: 500 });
+      }
+    }
 
     return NextResponse.json({ message: "Webhook received" }, { status: 200 });
   } catch (err) {

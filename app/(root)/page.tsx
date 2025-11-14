@@ -15,7 +15,6 @@ const page = () => {
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
-  
 
   const {
     threads,
@@ -26,15 +25,13 @@ const page = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-   
-
   useEffect(() => {
-    dispatch (clearThreads());
+    dispatch(clearThreads());
     dispatch(getThreads({ topLevelOnly: true, page: currentPage, limit: 5 }));
   }, [dispatch]);
 
   if (userStatus === "loading" || threadStatus === "loading") {
-    return  <ContentSkeleton items={5} avatar lines={3} title />
+    return <ContentSkeleton items={5} avatar lines={3} title />;
   }
 
   return (

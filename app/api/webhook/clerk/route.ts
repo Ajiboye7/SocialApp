@@ -70,22 +70,33 @@ export async function POST(req: NextRequest) {
         threads : []
       };
 
-      try {
-        await Community.findOneAndUpdate(
-          { id: community.id },
-          { ...community },
-          { upsert: true, new: true }
-        );
+     try {
+  const savedCommunity = await Community.findOneAndUpdate(
+    { id: community.id },
+    { ...community },
+    { upsert: true, new: true }
+  );
 
-        console.log("Community saved:", community);
-        return NextResponse.json(
-          { message: "Community created" },
-          { status: 200 }
-        );
-      } catch (dbError) {
-        console.error("MongoDB save failed:", dbError);
-        return NextResponse.json({ error: "DB save failed" }, { status: 500 });
-      }
+  console.log("✅ Community saved:", savedCommunity);
+  return NextResponse.json(
+    { message: "Community created" },
+    { status: 200 }
+  );
+} catch (dbError : any) {
+  console.error("❌ MongoDB save failed:");
+  console.error("Error name:", dbError.name);
+  console.error("Error message:", dbError.message);
+  console.error("Error code:", dbError.code);
+  console.error("Full error:", JSON.stringify(dbError, null, 2));
+  
+  return NextResponse.json(
+    { 
+      error: "DB save failed",
+      details: dbError.message
+    }, 
+    { status: 500 }
+  );
+}
     }
 
     return NextResponse.json({ message: "Webhook received" }, { status: 200 });

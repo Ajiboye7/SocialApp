@@ -1,12 +1,12 @@
 import Community from "@/lib/models/community.model";
 import connectToDatabase from "@/lib/mongoose";
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import User from "@/lib/models/user.model";
 
-export async function POST(request: Request) {
-  //const { userId } = await auth();
-  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+export async function POST(req: Request) {
+  const { userId } = await auth();
+  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
 
   if (!userId) {
     return NextResponse.json(
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = await request.json();
+    const body = await req.json();
     const { id, name, slug, bio, community_picture } = body;
 
     if (!id || !name || !slug || !bio || !community_picture) {
@@ -77,6 +77,44 @@ export async function POST(request: Request) {
         success: false,
         message: "Internal server Error",
       },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(req: Request) {
+  //const { userId } = await auth();
+  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, message: "unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  try {
+    await connectToDatabase();
+    const communities = await Community.find({}).populate("members");
+
+    if (!communities) {
+      return NextResponse.json(
+        { success: false, message: "No community found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: communities,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Communities fetch error:", error);
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
       { status: 500 }
     );
   }

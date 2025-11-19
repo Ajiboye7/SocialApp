@@ -109,7 +109,7 @@ export async function GET(request: Request) {
 
     if (!users) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
+        { success: false, message: "Users not found" },
         { status: 404 }
       );
     }
@@ -127,7 +127,7 @@ export async function GET(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("User fetch error:", error);
+    console.error("Users fetch error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
       { status: 500 }

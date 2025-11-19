@@ -14,7 +14,7 @@ const communitySchema = new mongoose.Schema({
   slug: {
     type: String,
     required: true,
-    unique: true,
+    
   },
 
   community_picture: String,

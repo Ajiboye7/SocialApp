@@ -168,41 +168,6 @@ export const getThreadById = createAsyncThunk(
   }
 );
 
-{
-  /*export const getThreads = createAsyncThunk(
-  "thread/get",
-  async (
-    {
-      topLevelOnly,
-      userOnly,
-      page = 1,
-      limit = 10,
-    }: {
-      topLevelOnly?: boolean;
-      userOnly?: boolean;
-      page?: number;
-      limit?: number;
-    } = {},
-    { rejectWithValue }
-  ) => {
-    try {
-      const params = new URLSearchParams();
-      if (topLevelOnly) params.append("topLevelOnly", "true");
-      if (userOnly) params.append("userOnly", "true");
-      params.append("page", page.toString());
-      params.append("limit", limit.toString());
-      const response = await axios.get(`/api/threads?${params.toString()}`);
-      return response.data.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data.message || error.message);
-      }
-      return rejectWithValue("An unexpected error occurred. Please try again.");
-    }
-  }
-);
-}*/}
-
 export const getThreads = createAsyncThunk(
   "threads/get",
   async (params: ThreadParams, { rejectWithValue }) => {
@@ -213,8 +178,7 @@ export const getThreads = createAsyncThunk(
       if (params.authorId) url += `&authorId=${params.authorId}`;
 
       const response = await axios.get(url);
-      return response.data.data
-
+      return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -232,10 +196,8 @@ const threadSlice = createSlice({
       state.currentPage = 1;
       state.totalPages = 0;
       state.totalUserThread = 0;
-      state.error = null; 
+      state.error = null;
     },
-
-    
   },
 
   extraReducers: (builder) => {

@@ -5,6 +5,7 @@ import { fetchUsers } from "@/store/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { fetchSidebarUsers } from "@/store/slices/userSlice";
+import { getCommunities } from "@/store/slices/communitySlice";
 import UserCardSkeleton from "../UserCardSkeleton";
 
 const RightSideBar = () => {
@@ -15,8 +16,11 @@ const RightSideBar = () => {
     usersStatus: status,
   } = useSelector((state: RootState) => state.user);
 
+  const { communities } = useSelector((state: RootState) => state.community);
+
   useEffect(() => {
     dispatch(fetchSidebarUsers({ page: currentPage, limit: 3 })).unwrap();
+    dispatch(getCommunities()).unwrap();
   }, [dispatch]);
 
   return (
@@ -38,14 +42,14 @@ const RightSideBar = () => {
             Array.from({ length: 4 }).map((_, index) => (
               <UserCardSkeleton key={index} button={true} />
             ))
-          ) : users.length > 0 ? (
-            users.map((community) => (
+          ) : communities.length > 0 ? (
+            communities.map((community) => (
               <UserCard
                 key={community.id}
                 id={community.id}
                 name={community.name}
-                username={community.username}
-                imgUrl={community.profile_picture}
+                username={community.name}
+                imgUrl={community.community_picture}
                 personType="Community"
               />
             ))
@@ -85,9 +89,7 @@ const RightSideBar = () => {
               />
             ))
           ) : (
-            <p className="!text-base-regular text-light-3">
-              No communities yet
-            </p>
+            <p className="!text-base-regular text-light-3">No users yet</p>
           )}
         </div>
       </div>

@@ -39,3 +39,19 @@ export async function uploadImageToUploadThing(imageUrl: string): Promise<string
     return '';
   }
 }
+
+export async function imageUrlToBase64(url: string): Promise<string> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Image fetch failed");
+
+    const buffer = Buffer.from(await res.arrayBuffer());
+    const contentType = res.headers.get("content-type") || "image/png";
+
+    return `data:${contentType};base64,${buffer.toString("base64")}`;
+  } catch (err) {
+    console.error("Failed to convert image:", err);
+    return ""; // fallback
+  }
+}
+

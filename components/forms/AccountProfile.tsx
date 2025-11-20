@@ -42,7 +42,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
-  const { startUpload } = useUploadThing("imageUploader");
+  const { startUpload } = useUploadThing('imageUploader');
   const [files, setFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof profileValidation>>({

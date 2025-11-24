@@ -25,6 +25,8 @@ import { isBase64Image } from "@/lib/utils";
 import { updateUser } from "@/store/slices/userSlice";
 import { useDispatch, UseDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 interface Props {
   user: {
@@ -40,10 +42,12 @@ interface Props {
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
   const router = useRouter();
+  const { currentUser } = useSelector((state: RootState) => state.user);
 
   const dispatch = useDispatch<AppDispatch>();
-  const { startUpload } = useUploadThing('imageUploader');
+  const { startUpload } = useUploadThing("imageUploader");
   const [files, setFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof profileValidation>>({
     resolver: zodResolver(profileValidation),
@@ -58,10 +62,10 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   useEffect(() => {
     if (user) {
       form.reset({
-        profile_photo: user.image || "",
-        name: user.name || "",
-        username: user.username || "",
-        bio: user.bio || "",
+        profile_photo: currentUser?.profile_picture || "",
+        name: currentUser?.name || "",
+        username: currentUser?.username || "",
+        bio: currentUser?.bio || "",
       });
     }
   }, [user, form]);
@@ -87,6 +91,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
           profile_picture: data.profile_photo,
         })
       ).unwrap();
+      console.log("Submitting profile data:", data);
 
       router.push("/");
     } catch (error: any) {
@@ -232,6 +237,13 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
         >
           {btnTitle}
         </Button>
+        {/*<Button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-4 py-2 bg-primary-500 text-white font-semibold rounded w-full hover:bg-dark-2"
+        >
+          {isSubmitting ? "Saving..." : btnTitle}
+        </Button>*/}
       </form>
     </Form>
   );

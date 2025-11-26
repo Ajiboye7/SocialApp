@@ -16,6 +16,8 @@ const page = () => {
     (state: RootState) => state.user
   );
 
+ 
+
   const {
     threads,
     status: threadStatus,
@@ -51,6 +53,8 @@ const page = () => {
             username={t.author.username || "Unknown User"}
             thread={t.thread}
             comments={t.children}
+            createdAt={t.createdAt}
+            community={t.community}
           />
         ))
       ) : (

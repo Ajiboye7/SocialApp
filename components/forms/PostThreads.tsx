@@ -18,15 +18,18 @@ import { createThread } from "@/store/slices/threadSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { useRouter } from "next/navigation";
+import { useOrganization } from "@clerk/nextjs";
 
 const PostThreads = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const {organization} = useOrganization()
 
   const form = useForm<z.infer<typeof ThreadValidation>>({
     resolver: zodResolver(ThreadValidation),
     defaultValues: {
       thread: "",
+     
     },
   });
 
@@ -35,6 +38,7 @@ const PostThreads = () => {
       await dispatch(
         createThread({
           thread: data.thread,
+           communityId: organization? organization.id : null
         })
       ).unwrap();
 

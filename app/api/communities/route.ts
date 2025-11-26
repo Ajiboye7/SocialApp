@@ -95,7 +95,17 @@ export async function GET(req: Request) {
 
   try {
     await connectToDatabase();
-    const communities = await Community.find({}).populate("members");
+
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const skip = (page - 1) * limit;
+
+    const communities = await Community.find({})
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate("members");
 
     if (!communities) {
       return NextResponse.json(

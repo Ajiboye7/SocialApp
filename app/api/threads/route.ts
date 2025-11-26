@@ -3,6 +3,7 @@ import connectToDatabase from "@/lib/mongoose";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import User from "@/lib/models/user.model";
+import Community from "@/lib/models/community.model";
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { thread } = body;
+    const { thread, communityId } = body;
 
     if (!thread) {
       return NextResponse.json(
@@ -38,10 +39,19 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
+    
+    const mongoCommunity = await Community.findOne({id : communityId})
+    if(!mongoCommunity){
+      return NextResponse.json(
+        { success: false, message: "Organization not found in database." },
+        { status: 404 }
+      )
+    }
 
     const newThread = await Thread.create({
       thread,
       author: mongoUser._id,
+      community: mongoCommunity._id
     });
 
     mongoUser.threads.push(newThread._id);
@@ -71,8 +81,8 @@ export async function POST(request: Request) {
 }
 
 export async function GET(req: Request) {
-  const { userId } = await auth();
-  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  //const { userId } = await auth();
+  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   if (!userId) {
     return NextResponse.json(
       { success: false, message: "unauthorized" },
@@ -140,6 +150,10 @@ export async function GET(req: Request) {
         path: "author",
         select: "username profile_picture",
       })
+      .populate({
+        path : 'community',
+        model: Community
+      })
       .lean();
     const totalThreads = await Thread.countDocuments(query); // Use same query for total
     const totalUserThreadQuery: any = { ...query }; // Reuse for user-specific count
@@ -152,6 +166,14 @@ export async function GET(req: Request) {
         id: thread.author._id.toString(),
         username: thread.author.username,
         profile_picture: thread.author.profile_picture,
+      },
+      community: {
+        _id: thread.community._id.toString(),
+        picture: thread.community.community_picture,
+        name: thread.community.name,
+        slug: thread.community.slug,
+        bio: thread.community.bio,
+
       },
       createdAt: thread.createdAt,
       parentId: thread.parentId ? thread.parentId.toString() : null,

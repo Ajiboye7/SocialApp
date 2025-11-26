@@ -5,7 +5,7 @@ import { deleteComment } from "@/store/slices/threadSlice";
 import { deleteThread } from "@/store/slices/threadSlice";
 import { useDispatch, UseDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
-import { threadId } from "worker_threads";
+import { formatDateString } from "@/lib/utils";
 
 interface CommentAuthor {
   username: string;
@@ -31,6 +31,13 @@ interface Props {
   _id: string;
   threadId: string;
   comments?: Comment[];
+  community?: {
+    id: string;
+    name: string;
+    image: string;
+  } | null;
+
+  createdAt : string
 }
 
 const ThreadCard = ({
@@ -43,10 +50,12 @@ const ThreadCard = ({
   showDeleteButton,
   _id,
   threadId,
+  community,
+  createdAt
 }: Props) => {
   const dispatch = useDispatch<AppDispatch>();
 
-   const handleDelete = async () => {
+  const handleDelete = async () => {
     if (
       !confirm(
         `Are you sure you want to delete this ${
@@ -59,21 +68,16 @@ const ThreadCard = ({
 
     try {
       if (isComment && parentId) {
-     
-        await dispatch(
-          deleteComment({ parentId, commentId: _id })
-        ).unwrap();
+        await dispatch(deleteComment({ parentId, commentId: _id })).unwrap();
         alert("Comment deleted successfully");
       } else {
-        
         await dispatch(deleteThread(threadId)).unwrap();
         alert("Thread deleted successfully");
       }
     } catch (error: any) {
       alert(error || `Failed to delete ${isComment ? "comment" : "thread"}`);
     }
-  }; 
-
+  };
 
   return (
     <div
@@ -94,8 +98,6 @@ const ThreadCard = ({
 
             <div className="w-px h-full bg-neutral-800 absolute top-9" />
           </div>
-
-        
 
           <div className="flex flex-col gap-2">
             <p className="text-light-1 text-[16px] leading-[140%] font-[600]">
@@ -167,6 +169,26 @@ const ThreadCard = ({
         <div onClick={handleDelete} className="cursor-pointer">
           <Image src="/assets/delete.svg" alt="delete" width={18} height={18} />
         </div>
+      )}
+
+      {!isComment && community && (
+        <Link
+          href={`/communities/${community.id}`}
+          className="mt-5 flex items-center"
+        >
+          <p className="text-subtle-medium text-gray-1">
+            {formatDateString(createdAt)}
+            {community && ` - ${community.name} Community`}
+          </p>
+
+          <Image
+            src={community.image}
+            alt={community.name}
+            width={14}
+            height={14}
+            className="ml-1 rounded-full object-cover"
+          />
+        </Link>
       )}
     </div>
   );

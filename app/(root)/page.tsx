@@ -15,9 +15,6 @@ const page = () => {
   const { user, status: userStatus } = useSelector(
     (state: RootState) => state.user
   );
-
- 
-
   const {
     threads,
     status: threadStatus,
@@ -54,7 +51,11 @@ const page = () => {
             thread={t.thread}
             comments={t.children}
             createdAt={t.createdAt}
-            community={t.community}
+            community={t.community?{
+              id : t.community._id,
+              name : t.community.name,
+              image : t.community.community_picture
+            }: null}
           />
         ))
       ) : (

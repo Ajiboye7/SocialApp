@@ -36,8 +36,7 @@ interface Props {
     name: string;
     image: string;
   } | null;
-
-  createdAt : string
+  createdAt: string;
 }
 
 const ThreadCard = ({
@@ -51,7 +50,7 @@ const ThreadCard = ({
   _id,
   threadId,
   community,
-  createdAt
+  createdAt,
 }: Props) => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -79,14 +78,15 @@ const ThreadCard = ({
     }
   };
 
+ 
   return (
     <div
-      className={`relative w-full  mt-7 rounded-xl flex justify-between ${
+      className={`relative w-full   mt-7 rounded-xl flex justify-between ${
         isComment ? "px-0 xs-px-7 " : "bg-dark-2 p-7"
       }`}
     >
-      <div className="flex flex-col gap-3 ">
-        <div className="flex gap-4 ">
+      <div className="flex flex-col items-start justify-between ">
+        <div className="flex w-full flex-1 flex-row gap-4 ">
           <div className="relative flex flex-col items-center">
             <Image
               src={image || "/assets/profile.svg"}
@@ -142,7 +142,8 @@ const ThreadCard = ({
         </div>
 
         {comments.length > 0 && (
-          <div className="flex items-center gap-2 mt-4">
+          <div className="flex items-center gap-2 mt-4 ml-2">
+
             <div className="flex -space-x-3 z-10">
               {comments.slice(0, 3).map((comment) => (
                 <Image
@@ -163,6 +164,27 @@ const ThreadCard = ({
             </Link>
           </div>
         )}
+
+        {!isComment && community && (
+        <Link
+          href={`/communities/${community.id}`}
+          className="mt-5 flex items-center"
+        >
+          <p className="text-[12px] leading-[16px] font-[500] text-gray-1">
+            {formatDateString(createdAt)}
+            {community && ` - ${community.name} Community`}
+          </p>
+
+          <Image
+            src={community.image || "/assets/profile.svg"}
+            alt={community.name}
+            width={25}
+            height={25}
+            className="ml-1 rounded-full object-cover"
+          />
+        </Link>
+      )}
+      
       </div>
 
       {(isComment || showDeleteButton) && (
@@ -171,27 +193,9 @@ const ThreadCard = ({
         </div>
       )}
 
-      {!isComment && community && (
-        <Link
-          href={`/communities/${community.id}`}
-          className="mt-5 flex items-center"
-        >
-          <p className="text-subtle-medium text-gray-1">
-            {formatDateString(createdAt)}
-            {community && ` - ${community.name} Community`}
-          </p>
-
-          <Image
-            src={community.image}
-            alt={community.name}
-            width={14}
-            height={14}
-            className="ml-1 rounded-full object-cover"
-          />
-        </Link>
-      )}
+      
     </div>
-  );
+  )
 };
 
 export default ThreadCard;

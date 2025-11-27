@@ -4,7 +4,7 @@ import axios from "axios";
 interface ThreadData {
   thread: string;
   parentId?: string;
-  communityId? : string | null
+  communityId?: string | null;
 }
 
 interface ThreadParams {
@@ -15,12 +15,12 @@ interface ThreadParams {
   limit: number;
 }
 
-interface CommunityInfo{
-  _id: string,
-  name: string,
-  bio: string,
-  slug: string
-  picture: string
+interface CommunityInfo {
+  _id: string;
+  name: string;
+  bio: string;
+  slug: string;
+  community_picture: string;
 }
 
 interface Thread {
@@ -30,7 +30,7 @@ interface Thread {
   createdAt: string;
   parentId?: string;
   children: Comment[];
-  community: CommunityInfo
+  community: CommunityInfo;
 }
 interface AuthorInfo {
   id: string;

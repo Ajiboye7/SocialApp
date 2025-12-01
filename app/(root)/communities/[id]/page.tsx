@@ -41,7 +41,7 @@ const page = () => {
     totalUserThread: totalPost,
   } = useSelector((state: RootState) => state.thread);
   const params = useParams();
-  const username = params.username as string;
+  const username = params.id as string;
 
   useEffect(() => {
     dispatch(clearThreads());
@@ -129,9 +129,7 @@ const page = () => {
 
   return (
     <section className="w-full">
-      <ProfileHeader 
-      
-       />
+      <ProfileHeader  />
       <div className="mt-9">
         <Tabs defaultValue="threads" className="w-full">
           <TabsList className="w-full flex min-h-[50px] flex-1 items-center gap-3 bg-dark-2 text-light-2 data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-2 !important">
@@ -178,18 +176,13 @@ const page = () => {
                     showDeleteButton={
                       isOwnProfile && t.author.id === loggedInUser?._id
                     }
-                    createdAt={t.createdAt}
+                    createdAt={t.community.createdAt}
                   />
                 ))
               ) : (
                 <p className="text-white text-2xl">No posts yet</p>
               )}
 
-              {/*<ThreadsTab
-                currentUserId={user.id}
-                accountId={userInfo.id}
-                accountType="User"
-              />*/}
             </TabsContent>
           ))}
         </Tabs>
@@ -220,50 +213,3 @@ const page = () => {
 };
 
 export default page;
-
-/**
- useEffect(() => {
-  if (
-    userStatus === "succeeded" &&
-    viewedUserId &&
-    username === lastFetchedUsername
-  ) {
-    let queryOptions: any = {
-      authorId: viewedUserId,
-      page: currentPage,
-      limit: 5,
-    };
-
-    if (activeTab === "threads") {
-      queryOptions.topLevelOnly = true;
-    } else if (activeTab === "replies") {
-      queryOptions.userComment = true;
-    }
-
-    dispatch(getThreads(queryOptions));
-  }
-}, [dispatch, viewedUserId, currentPage, lastFetchedUsername, activeTab]);
-
-<Tabs
-  value={activeTab}
-  onValueChange={(val) => setActiveTab(val)}
-  className="w-full"
->
-
-
-useEffect(() => {
-  // Reset to first page when switching tabs
-  dispatch(
-    getThreads({
-      authorId: viewedUserId,
-      page: 1,
-      limit: 5,
-      topLevelOnly: activeTab === "threads",
-      userComment: activeTab === "replies",
-    })
-  );
-}, [activeTab]);
-
-
-
- */

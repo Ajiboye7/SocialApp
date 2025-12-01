@@ -21,6 +21,7 @@ interface CommunityInfo {
   bio: string;
   slug: string;
   community_picture: string;
+  createdAt: string;
 }
 
 interface Thread {

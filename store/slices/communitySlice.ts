@@ -7,6 +7,7 @@ interface CommunityDataTypes {
   slug: string;
   bio: string;
   community_picture: string;
+  createdAt: string;
 }
 
 interface Community {
@@ -21,12 +22,20 @@ interface CommunityState {
   communities: Community[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  pagination: {
+    currentPage: number;
+    limit: number;
+  };
 }
 
 const initialState: CommunityState = {
   communities: [],
   status: "idle",
   error: null,
+  pagination: {
+    currentPage: 1,
+    limit: 5,
+  },
 };
 
 export const createCommunity = createAsyncThunk(
@@ -49,6 +58,34 @@ export const getCommunities = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/api/communities");
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+  }
+);
+
+export const getCommunityById = createAsyncThunk(
+  "community/getCommunityById",
+  async (
+    {
+      communityId,
+      page = 1,
+      limit = 5,
+    }: { communityId: string; page: number; limit: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const params = new URLSearchParams();
+      params.append("page", page.toString());
+      params.append("limit", limit.toString());
+
+      const response = await axios.get(
+        `/api/communities/${communityId}?${params.toString()}`
+      );
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -96,6 +133,23 @@ const communitySlice = createSlice({
         state.status = "failed";
         state.error =
           (action.payload as string) || "Failed to create community";
+      })
+
+      .addCase(getCommunityById.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(getCommunityById.fulfilled, (state, action) => {
+        (state.status = "loading"),
+          (state.communities = action.payload.community);
+        state.pagination = action.payload.pagination;
+        state.error = null;
+      })
+
+      .addCase(getCommunityById.rejected, (state, action) => {
+        (state.status = "failed"),
+          (state.error =
+            (action.payload as string) || "Failed to get a community");
       });
   },
 });

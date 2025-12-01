@@ -67,55 +67,62 @@ export async function GET(
       });
 
     const transformedCommunity = {
-      _id: community._id,
-      id: community.id,
-      name: community.name,
-      slug: community.slug,
-      bio: community.bio,
+      community: {
+        _id: community._id,
+        id: community.id,
+        name: community.name,
+        slug: community.slug,
+        bio: community.bio,
 
-      createdBy: {
-        _id: community.createdBy._id,
-        username: community.createdBy.username,
-        profile_picture: community.createdBy.profile_picture,
+        createdBy: {
+          _id: community.createdBy._id,
+          username: community.createdBy.username,
+          profile_picture: community.createdBy.profile_picture,
+        },
+
+        members: community.members.map((member: any) => ({
+          _id: member._id,
+          username: member.username,
+          profile_picture: member.profile_picture,
+        })),
+
+        threads: community.threads.map((thread: any) => ({
+          _id: thread._id,
+          thread: thread.thread,
+          parentId: thread.parentId ? thread.parentId.toString() : null,
+          author: {
+            id: thread.author._id,
+            username: thread.author.username,
+            profile_picture: thread.author.profile_picture,
+          },
+          createdAt: thread.createdAt,
+          children: thread.children.map((child: any) => ({
+            _id: child._id,
+            author: {
+              _id: child.author._id,
+              username: child.author.username,
+              profile_picture: child.author.profile_picture,
+            },
+            parentId: child.parentId ? child.parentId.toString() : null,
+            thread: child.thread,
+            createdAt: child.createdAt,
+            children: [],
+          })),
+        })),
       },
 
-      members: community.members.map((member: any) => ({
-        _id: member._id,
-        username: member.username,
-        profile_picture: member.profile_picture,
-      })),
-
-      threads: community.threads.map((thread: any) => ({
-        _id: thread._id,
-        thread: thread.thread,
-        parentId: thread.parentId ? thread.parentId.toString() : null,
-        author: {
-          id: thread.author._id,
-          username: thread.author.username,
-          profile_picture: thread.author.profile_picture,
-        },
-        createdAt: thread.createdAt,
-        children: thread.children.map((child: any) => ({
-          _id: child._id,
-          author: {
-            _id: child.author._id,
-            username: child.author.username,
-            profile_picture: child.author.profile_picture,
-          },
-          parentId: child.parentId ? child.parentId.toString() : null,
-          thread: child.thread,
-          createdAt: child.createdAt,
-          children: [],
-        })),
-      })),
+      pagination: {
+        // totalComment,
+        //totalPages,
+        currentPage: page,
+        limit,
+      },
     };
 
     return NextResponse.json(
       {
         success: true,
-        data: {
-          community: transformedCommunity,
-        },
+        data: transformedCommunity
       },
       { status: 200 }
     );

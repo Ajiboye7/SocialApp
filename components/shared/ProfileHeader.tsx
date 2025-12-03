@@ -23,6 +23,7 @@ const ProfileHeader = ({
   bio,
   type,
 }: Props) => {
+  
   const {
     user,
     status: userStatus,
@@ -54,7 +55,7 @@ const ProfileHeader = ({
           </div>
         </div>
 
-        {userId === currentUser?.id && type !== "Community" && (
+        {userId === currentUser?._id && type !== "Community" && (
           <Link href="/profile/edit">
             <div className="flex items-center gap-2 bg-dark-3 rounded-lg py-2 px-4">
               <Image src="/assets/edit.svg" alt="edit" width={16} height={16} />

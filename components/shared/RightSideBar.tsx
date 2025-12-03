@@ -45,8 +45,8 @@ const RightSideBar = () => {
           ) : communities.length > 0 ? (
             communities.map((community) => (
               <UserCard
-                key={community.id}
-                id={community.id}
+                key={community._id}
+                id={community._id}
                 name={community.name}
                 username={community.name}
                 imgUrl={community.community_picture}

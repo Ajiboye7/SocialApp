@@ -17,8 +17,7 @@ import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
 
-
-const page = () => {
+const Page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
     null
   );
@@ -32,7 +31,7 @@ const page = () => {
     currentUser: loggedInUser,
   } = useSelector((state: RootState) => state.user);
 
-  console.log('users display', user)
+  //console.log('users display', user)
 
   const viewedUserId = user?._id as string;
 
@@ -52,7 +51,6 @@ const page = () => {
     setLastFetchedUsername(username);
 
     if (username) dispatch(fetchUser(username as string));
-    //console.log('first use effect render',viewedUserId)
   }, [dispatch, username]);
 
   // console.log('views user id number 1', viewedUserId)
@@ -73,7 +71,6 @@ const page = () => {
           limit: 5,
         })
       );
-      //console.log('second use effect render',viewedUserId)
     }
   }, [
     dispatch,
@@ -132,14 +129,14 @@ const page = () => {
 
   return (
     <section className="w-full">
-      <ProfileHeader 
-      imgUrl={user.profile_picture}
-      userId={user._id}
-      name= {user.name}
-      username={user.username}
-      bio= {user.bio}
-       />
-       {/*<ProfileHeader/>*/}
+      <ProfileHeader
+        imgUrl={user.profile_picture}
+        userId={user._id}
+        name={user.name}
+        username={user.username}
+        bio={user.bio}
+      />
+      {/*<ProfileHeader/>*/}
       <div className="mt-9">
         <Tabs defaultValue="threads" className="w-full">
           <TabsList className="w-full flex min-h-[50px] flex-1 items-center gap-3 bg-dark-2 text-light-2 data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-2 !important">
@@ -227,7 +224,7 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
 
 /**
  useEffect(() => {

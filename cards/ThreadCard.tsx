@@ -78,7 +78,6 @@ const ThreadCard = ({
     }
   };
 
- 
   return (
     <div
       className={`relative w-full   mt-7 rounded-xl flex justify-between ${
@@ -143,7 +142,6 @@ const ThreadCard = ({
 
         {comments.length > 0 && (
           <div className="flex items-center gap-2 mt-4 ml-2">
-
             <div className="flex -space-x-3 z-10">
               {comments.slice(0, 3).map((comment) => (
                 <Image
@@ -166,25 +164,24 @@ const ThreadCard = ({
         )}
 
         {!isComment && community && (
-        <Link
-          href={`/communities/${community.id}`}
-          className="mt-5 flex items-center"
-        >
-          <p className="text-[12px] leading-[16px] font-[500] text-gray-1">
-            {formatDateString(createdAt)}
-            {community && ` - ${community.name} Community`}
-          </p>
+          <Link
+            href={`/communities/${community.id}`}
+            className="mt-5 flex items-center"
+          >
+            <p className="text-[12px] leading-[16px] font-[500] text-gray-1">
+              {formatDateString(createdAt)}
+              {community && ` - ${community.name} Community`}
+            </p>
 
-          <Image
-            src={community.image || "/assets/profile.svg"}
-            alt={community.name}
-            width={25}
-            height={25}
-            className="ml-1 rounded-full object-cover"
-          />
-        </Link>
-      )}
-      
+            <Image
+              src={community.image || "/assets/profile.svg"}
+              alt={community.name}
+              width={25}
+              height={25}
+              className="ml-1 rounded-full object-cover"
+            />
+          </Link>
+        )}
       </div>
 
       {(isComment || showDeleteButton) && (
@@ -193,9 +190,11 @@ const ThreadCard = ({
         </div>
       )}
 
-      
+       
+
+
     </div>
-  )
+  );
 };
 
 export default ThreadCard;

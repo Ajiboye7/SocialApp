@@ -16,6 +16,8 @@ import { currentUser, fetchUser } from "@/store/slices/userSlice";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
+import { getCommunityById } from "@/store/slices/communitySlice";
+import { string } from "zod";
 
 const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
@@ -31,7 +33,9 @@ const page = () => {
     currentUser: loggedInUser,
   } = useSelector((state: RootState) => state.user);
 
-  const viewedUserId = user?._id as string;
+  const { status, community } = useSelector(
+    (state: RootState) => state.community
+  );
 
   const {
     threads,
@@ -41,46 +45,13 @@ const page = () => {
     totalUserThread: totalPost,
   } = useSelector((state: RootState) => state.thread);
   const params = useParams();
-  const username = params.id as string;
+  const communityId = params.id as string;
 
   useEffect(() => {
-    dispatch(clearThreads());
+    if (communityId) dispatch(getCommunityById(communityId as string));
+  }, [dispatch, communityId]);
 
-    setLastFetchedUsername(username);
-
-    if (username) dispatch(fetchUser(username as string));
-    //console.log('first use effect render',viewedUserId)
-  }, [dispatch, username]);
-
-  // console.log('views user id number 1', viewedUserId)
-
-  useEffect(() => {
-    setLastFetchedUsername(username);
-
-    if (
-      userStatus === "succeeded" &&
-      viewedUserId &&
-      username === lastFetchedUsername
-    ) {
-      dispatch(
-        getThreads({
-          topLevelOnly: true,
-          authorId: viewedUserId,
-          page: currentPage,
-          limit: 5,
-        })
-      );
-      //console.log('second use effect render',viewedUserId)
-    }
-  }, [
-    dispatch,
-    viewedUserId,
-    currentPage,
-    lastFetchedUsername,
-    username,
-    userStatus,
-  ]);
-  //console.log('views user id number 2', viewedUserId)
+  console.log("Community object", community);
 
   const isOwnProfile = loggedInUser?.id === user?.id;
 
@@ -89,7 +60,7 @@ const page = () => {
       dispatch(
         getThreads({
           topLevelOnly: true,
-          authorId: viewedUserId,
+          //authorId: viewedUserId,
           page: currentPage - 1,
           limit: 5,
         })
@@ -102,7 +73,7 @@ const page = () => {
       dispatch(
         getThreads({
           topLevelOnly: true,
-          authorId: viewedUserId,
+          //authorId: viewedUserId,
           page: currentPage + 1,
           limit: 5,
         })
@@ -117,19 +88,20 @@ const page = () => {
 
   console.log('show button',isOwnProfile, loggedInUser?.id  )*/
   }
-  if (userStatus === "loading" || threadStatus === "loading") {
+  if (status === "loading") {
     return <p className="text-white text-center mt-10">Loading...</p>;
-  }
-
-  if (!user || userStatus === "failed") {
-    return (
-      <p className="text-white text-center mt-10 text-2xl">User not found</p>
-    );
   }
 
   return (
     <section className="w-full">
-      <ProfileHeader  />
+      <ProfileHeader
+        userId={community?.id ?? ""}
+        name={community?.name ?? ""}
+        username={community?.slug ?? ""}
+        bio={community?.bio ?? ""}
+        imgUrl={community?.community_picture ?? ""}
+        type="Community"
+      />
       <div className="mt-9">
         <Tabs defaultValue="threads" className="w-full">
           <TabsList className="w-full flex min-h-[50px] flex-1 items-center gap-3 bg-dark-2 text-light-2 data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-2 !important">
@@ -162,7 +134,7 @@ const page = () => {
               value={tab.value}
               className="w-full text-light-1"
             >
-              {threads.length > 0 ? (
+              {/*{threads.length > 0 ? (
                 threads.map((t) => (
                   <ThreadCard
                     parentId={t._id}
@@ -181,8 +153,28 @@ const page = () => {
                 ))
               ) : (
                 <p className="text-white text-2xl">No posts yet</p>
+              )}*/}
+              {community?.threads.length === 0 ? (
+                <p>No threads yet.</p>
+              ) : (
+                community?.threads.map((t) => (
+                  <ThreadCard
+                    parentId={t._id}
+                    threadId={t._id}
+                    _id={t._id}
+                    key={t._id}
+                    image={t.author.profile_picture || "/assets/profile.svg"}
+                    username={t.author.username || "Unknown User"}
+                    thread={t.thread}
+                    comments={t.children}
+                    showDeleteButton={
+                      isOwnProfile && t.author.id === loggedInUser?._id
+                    }
+                    createdAt={t.createdAt}
+                    
+                  />
+                ))
               )}
-
             </TabsContent>
           ))}
         </Tabs>

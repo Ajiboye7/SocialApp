@@ -30,8 +30,8 @@ export async function GET(
 
     const community = await Community.findById(resolvedParams.id)
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
+      //.skip(skip)
+      //.limit(limit)
       .populate({
         path: "createdBy",
         model: User,

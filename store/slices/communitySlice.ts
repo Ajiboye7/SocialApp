@@ -9,16 +9,51 @@ interface CommunityDataTypes {
   community_picture: string;
   createdAt: string;
 }
+interface CommunityInfo {
+  _id: string;
+  name: string;
+  bio: string;
+  slug: string;
+  community_picture: string;
+  createdAt: string;
+}
+interface Comment {
+  _id: string;
+  author: AuthorInfo;
+  thread: string;
+  createdAt: string;
+  parentId: string;
+  children: Comment[];
+}
+
+interface Thread {
+  _id: string;
+  author: AuthorInfo;
+  thread: string;
+  createdAt: string;
+  parentId?: string;
+  children: Comment[];
+  community: CommunityInfo;
+}
+interface AuthorInfo {
+  id: string;
+  username: string;
+  profile_picture: string;
+}
+
 
 interface Community {
   id: string;
+  _id: string;
   name: string;
   slug: string;
   bio: string;
+  threads: Thread[]
   community_picture: string;
   createdBy: string;
 }
 interface CommunityState {
+  community : Community | null
   communities: Community[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
@@ -29,6 +64,7 @@ interface CommunityState {
 }
 
 const initialState: CommunityState = {
+  community: null,
   communities: [],
   status: "idle",
   error: null,
@@ -71,21 +107,18 @@ export const getCommunities = createAsyncThunk(
 export const getCommunityById = createAsyncThunk(
   "community/getCommunityById",
   async (
-    {
-      communityId,
-      page = 1,
-      limit = 5,
-    }: { communityId: string; page: number; limit: number },
+    communityId : string,
     { rejectWithValue }
   ) => {
     try {
-      const params = new URLSearchParams();
+      /*const params = new URLSearchParams();
       params.append("page", page.toString());
-      params.append("limit", limit.toString());
+      params.append("limit", limit.toString());*/
 
-      const response = await axios.get(
+      /*const response = await axios.get(
         `/api/communities/${communityId}?${params.toString()}`
-      );
+      );*/
+      const response = await axios.get(`/api/communities/${communityId}`)
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -140,8 +173,8 @@ const communitySlice = createSlice({
       })
 
       .addCase(getCommunityById.fulfilled, (state, action) => {
-        (state.status = "loading"),
-          (state.communities = action.payload.community);
+        (state.status = "succeeded"),
+          (state.community = action.payload.community);
         state.pagination = action.payload.pagination;
         state.error = null;
       })

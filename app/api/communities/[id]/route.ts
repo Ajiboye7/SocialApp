@@ -41,11 +41,35 @@ export async function GET(
         {
           path: "members",
           model: User,
-          select: "name username image _id id",
+          select: "name username profile_picture _id id",
         },
       ])
 
       .populate({
+        path: "threads",
+        model: Thread,
+        select: "thread parentId createdAt children author", // <-- ADD THIS
+        populate: [
+          {
+            path: "author",
+            model: User,
+            select: "name username profile_picture",
+          },
+          {
+            path: "children",
+            model: Thread,
+            select: "thread parentId createdAt author", // <-- ADD THIS TOO
+            populate: {
+              path: "author",
+              model: User,
+              select: "username profile_picture",
+            },
+          },
+        ],
+      });
+      
+      /**
+       .populate({
         path: "threads",
         model: Thread,
         populate: [
@@ -65,6 +89,7 @@ export async function GET(
           },
         ],
       });
+       */
 
     const transformedCommunity = {
       community: {
@@ -73,6 +98,7 @@ export async function GET(
         name: community.name,
         slug: community.slug,
         bio: community.bio,
+        community_picture: community.community_picture,
 
         createdBy: {
           _id: community.createdBy._id,
@@ -122,7 +148,7 @@ export async function GET(
     return NextResponse.json(
       {
         success: true,
-        data: transformedCommunity
+        data: transformedCommunity,
       },
       { status: 200 }
     );

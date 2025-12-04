@@ -55,7 +55,10 @@ export async function POST(request: Request) {
     });
 
     mongoUser.threads.push(newThread._id);
+    mongoCommunity.threads.push(newThread._id)
+    
     await mongoUser.save();
+    await mongoCommunity.save()
 
     return NextResponse.json(
       {

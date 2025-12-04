@@ -34,7 +34,7 @@ interface Thread {
   community: CommunityInfo;
 }
 interface AuthorInfo {
-  id: string;
+  _id: string;
   username: string;
   profile_picture: string;
 }

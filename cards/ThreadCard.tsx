@@ -95,7 +95,9 @@ const ThreadCard = ({
               className="rounded-full z-10"
             />
 
-            <div className="w-px h-full bg-neutral-800 absolute top-9" />
+            {comments.length > 0 && (
+              <div className="w-px h-full bg-neutral-800 absolute top-9" />
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -189,10 +191,6 @@ const ThreadCard = ({
           <Image src="/assets/delete.svg" alt="delete" width={18} height={18} />
         </div>
       )}
-
-       
-
-
     </div>
   );
 };

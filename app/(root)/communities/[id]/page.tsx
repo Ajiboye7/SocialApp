@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
-import { profileTabs } from "@/constants";
+import { communityTabs, profileTabs } from "@/constants";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import ProfileHeader from "@/components/shared/ProfileHeader";
@@ -18,6 +18,7 @@ import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
 import { getCommunityById } from "@/store/slices/communitySlice";
 import { string } from "zod";
+import UserCard from "@/cards/UserCard";
 
 const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
@@ -105,7 +106,7 @@ const page = () => {
       <div className="mt-9">
         <Tabs defaultValue="threads" className="w-full">
           <TabsList className="w-full flex min-h-[50px] flex-1 items-center gap-3 bg-dark-2 text-light-2 data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-2 !important">
-            {profileTabs.map((tab) => (
+            {communityTabs.map((tab) => (
               <TabsTrigger
                 key={tab.label}
                 value={tab.value}
@@ -128,55 +129,54 @@ const page = () => {
               </TabsTrigger>
             ))}
           </TabsList>
-          {profileTabs.map((tab) => (
-            <TabsContent
-              key={`content-${tab.label}`}
-              value={tab.value}
-              className="w-full text-light-1"
-            >
-              {/*{threads.length > 0 ? (
-                threads.map((t) => (
-                  <ThreadCard
-                    parentId={t._id}
-                    threadId={t._id}
-                    _id={t._id}
-                    key={t._id}
-                    image={t.author.profile_picture || "/assets/profile.svg"}
-                    username={t.author.username || "Unknown User"}
-                    thread={t.thread}
-                    comments={t.children}
-                    showDeleteButton={
-                      isOwnProfile && t.author.id === loggedInUser?._id
-                    }
-                    createdAt={t.community.createdAt}
-                  />
-                ))
+
+          <TabsContent value="threads">
+            {community?.threads.length === 0 ? (
+              <p>No threads yet.</p>
+            ) : (
+              community?.threads.map((t) => (
+                <ThreadCard
+                  parentId={t._id}
+                  threadId={t._id}
+                  _id={t._id}
+                  key={t._id}
+                  image={t.author.profile_picture || "/assets/profile.svg"}
+                  username={t.author.username || "Unknown User"}
+                  thread={t.thread}
+                  comments={t.children}
+                  createdAt={t.createdAt}
+                  community={
+                    community
+                      ? {
+                          id: community._id,
+                          name: community.name,
+                          image: community.community_picture,
+                        }
+                      : null
+                  }
+                />
+              ))
+            )}
+          </TabsContent>
+
+          <TabsContent value="members">
+              <section className='mt-9 flex flex-col gap-10'>
+              {community?.members.length === 0 ? (
+                <p className="text-white">No members yet</p>
               ) : (
-                <p className="text-white text-2xl">No posts yet</p>
-              )}*/}
-              {community?.threads.length === 0 ? (
-                <p>No threads yet.</p>
-              ) : (
-                community?.threads.map((t) => (
-                  <ThreadCard
-                    parentId={t._id}
-                    threadId={t._id}
-                    _id={t._id}
-                    key={t._id}
-                    image={t.author.profile_picture || "/assets/profile.svg"}
-                    username={t.author.username || "Unknown User"}
-                    thread={t.thread}
-                    comments={t.children}
-                    showDeleteButton={
-                      isOwnProfile && t.author.id === loggedInUser?._id
-                    }
-                    createdAt={t.createdAt}
-                    
+                community?.members.map((member) => (
+                  <UserCard
+                    key={member._id}
+                    id={member._id}
+                    name={member.username}
+                    imgUrl={member.profile_picture}
+                    username={member.username}
+                    personType="User"
                   />
                 ))
               )}
-            </TabsContent>
-          ))}
+            </section>
+          </TabsContent>
         </Tabs>
       </div>
 

@@ -181,7 +181,7 @@ const Page = () => {
                     thread={t.thread}
                     comments={t.children}
                     showDeleteButton={
-                      isOwnProfile && t.author.id === loggedInUser?._id
+                      isOwnProfile && t.author._id === loggedInUser?._id
                     }
                     createdAt={t.createdAt}
                   />

@@ -63,6 +63,7 @@ const ProfileHeader = ({
             </div>
           </Link>
         )}
+        
       </div>
       <p className="text-white mt-8">{bio}</p>
 

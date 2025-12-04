@@ -1,18 +1,3 @@
-/*import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  /* config options here
-  images: {
-    domains: ['img.clerk.com']
-  },
-};
-
-export default nextConfig;*/
-
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -27,15 +12,22 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "*.ufs.sh",   
+        hostname: "*.ufs.sh",
       },
       {
         protocol: "https",
-        hostname: "utfs.io",  
+        hostname: "utfs.io",
+      },
+      {
+        protocol: "https",
+        hostname: "uploadthing.com",     // <-- Add this
+      },
+      {
+        protocol: "https",
+        hostname: "f.uploadthing.com",   // <-- Required for CDN files
       }
     ],
   },
 };
 
 export default nextConfig;
-

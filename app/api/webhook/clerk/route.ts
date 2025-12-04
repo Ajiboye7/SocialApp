@@ -38,63 +38,58 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
     }
-    if (evt.type === "organization.updated") {
-      console.log("Processing organization.updated");
-      console.log("Full event data:", JSON.stringify(evt.data, null, 2));
+if (evt.type === "organization.updated") {
+  console.log("Processing organization.updated");
+  
+  const communityData = evt.data;
+  const creatorClerkId = communityData.created_by;
+  
+  try {
+    // Find the creator user
+    const creatorUser = await User.findOne({ id: creatorClerkId });
 
-      const communityData = evt.data;
-
-      try {
-        // First, check if the community exists
-        const existingCommunity = await Community.findOne({
-          id: communityData.id,
-        });
-
-        if (!existingCommunity) {
-          console.log("Community not found, skipping update");
-          return NextResponse.json(
-            { message: "Community not found" },
-            { status: 200 }
-          );
-        }
-
-        console.log(
-          "Current community_picture:",
-          existingCommunity.community_picture
-        );
-        console.log("New image_url from webhook:", communityData.image_url);
-
-        // Update the community with new data
-        const updateData: any = {
-          name: communityData.name,
-          slug: communityData.slug,
-        };
-
-        // Always update the image if it exists
-        if (communityData.image_url) {
-          updateData.community_picture = communityData.image_url;
-        }
-
-        const updatedCommunity = await Community.findOneAndUpdate(
-          { id: communityData.id },
-          updateData,
-          { new: true }
-        );
-
-        console.log("Community updated successfully:", updatedCommunity);
-
-        return NextResponse.json(
-          { message: "Community updated", data: updatedCommunity },
-          { status: 200 }
-        );
-      } catch (error) {
-        console.error("Error updating community:", error);
-        return NextResponse.json(
-          { error: "Failed to update community" },
-          { status: 500 }
-        );
-      }
+    if (!creatorUser) {
+      console.log("Creator user not found in DB");
+      return NextResponse.json(
+        { error: "Creator user not found in DB" },
+        { status: 400 }
+      );
     }
+
+    const creatorMongoId = creatorUser._id;
+
+    // Upsert: create if doesn't exist, update if exists
+    const community = await Community.findOneAndUpdate(
+      { id: communityData.id },
+      {
+        id: communityData.id,
+        name: communityData.name,
+        slug: communityData.slug,
+        community_picture: communityData.image_url ?? "",
+        bio: "organization bio",
+        createdBy: creatorMongoId,
+        $setOnInsert: { 
+          members: [creatorMongoId],
+          threads: []
+        }
+      },
+      { upsert: true, new: true }
+    );
+
+    console.log("Community saved/updated:", community);
+    
+    return NextResponse.json(
+      { message: "Community processed", data: community },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error processing community:", error);
+    return NextResponse.json(
+      { error: "Failed to process community" },
+      { status: 500 }
+    );
+  }
+}
 
     return NextResponse.json({ message: "Webhook received" }, { status: 200 });
   } catch (err) {

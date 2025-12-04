@@ -39,65 +39,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (evt.type === "organization.created") {
-      console.log("Processing organization.created");
+   if (evt.type === "organization.updated") {
+  const communityData = evt.data;
+  
+  // Only update if image_url exists and is not the default
+  if (communityData.image_url && !communityData.image_url.includes('"type":"default"')) {
+    await Community.findOneAndUpdate(
+      { id: communityData.id },
+      { 
+        community_picture: communityData.image_url,
+        name: communityData.name,
+        slug: communityData.slug
+      },
+      { new: true }
+    );
+  }
 
-      const communityData = evt.data;
-      const creatorClerkId = communityData.created_by;
-
-      const creatorUser = await User.findOne({ id: creatorClerkId });
-
-      if (!creatorUser) {
-        return NextResponse.json(
-          { error: "Creator user not found in DB" },
-          { status: 400 }
-        );
-      }
-
-      const creatorMongoId = creatorUser._id;
-
-      // Fetch fresh organization data from Clerk API
-      const clerkOrgData = await fetch(
-        `https://api.clerk.com/v1/organizations/${communityData.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
-          },
-        }
-      ).then((res) => res.json());
-
-      //console.log("Fresh Clerk data:", clerkOrgData);
-
-      const community = {
-        id: clerkOrgData.id,
-        name: clerkOrgData.name,
-        slug: clerkOrgData.slug,
-        community_picture: clerkOrgData.image_url ?? "", 
-        bio: "organization bio",
-        createdBy: creatorMongoId,
-        members: [creatorMongoId],
-        threads: [],
-      };
-
-      try {
-        await Community.findOneAndUpdate(
-          { id: community.id },
-          { ...community },
-          { upsert: true, new: true }
-        );
-
-        //console.log("Community saved:", community);
-        return NextResponse.json(
-          { message: "Community created" },
-          { status: 200 }
-        );
-      } catch (dbError) {
-        console.error("MongoDB save failed:", dbError);
-        return NextResponse.json({ error: "DB save failed" }, { status: 500 });
-      }
-    }
-
-    return NextResponse.json({ message: "Webhook received" }, { status: 200 });
+  return NextResponse.json({ message: "Community updated" }, { status: 200 });
+}
   } catch (err) {
     console.error("Webhook error:", err);
     return NextResponse.json(

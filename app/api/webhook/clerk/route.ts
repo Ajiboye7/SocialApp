@@ -38,25 +38,65 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
     }
+    if (evt.type === "organization.updated") {
+      console.log("Processing organization.updated");
+      console.log("Full event data:", JSON.stringify(evt.data, null, 2));
 
-   if (evt.type === "organization.updated") {
-  const communityData = evt.data;
-  
-  // Only update if image_url exists and is not the default
-  if (communityData.image_url && !communityData.image_url.includes('"type":"default"')) {
-    await Community.findOneAndUpdate(
-      { id: communityData.id },
-      { 
-        community_picture: communityData.image_url,
-        name: communityData.name,
-        slug: communityData.slug
-      },
-      { new: true }
-    );
-  }
+      const communityData = evt.data;
 
-  return NextResponse.json({ message: "Community updated" }, { status: 200 });
-}
+      try {
+        // First, check if the community exists
+        const existingCommunity = await Community.findOne({
+          id: communityData.id,
+        });
+
+        if (!existingCommunity) {
+          console.log("Community not found, skipping update");
+          return NextResponse.json(
+            { message: "Community not found" },
+            { status: 200 }
+          );
+        }
+
+        console.log(
+          "Current community_picture:",
+          existingCommunity.community_picture
+        );
+        console.log("New image_url from webhook:", communityData.image_url);
+
+        // Update the community with new data
+        const updateData: any = {
+          name: communityData.name,
+          slug: communityData.slug,
+        };
+
+        // Always update the image if it exists
+        if (communityData.image_url) {
+          updateData.community_picture = communityData.image_url;
+        }
+
+        const updatedCommunity = await Community.findOneAndUpdate(
+          { id: communityData.id },
+          updateData,
+          { new: true }
+        );
+
+        console.log("Community updated successfully:", updatedCommunity);
+
+        return NextResponse.json(
+          { message: "Community updated", data: updatedCommunity },
+          { status: 200 }
+        );
+      } catch (error) {
+        console.error("Error updating community:", error);
+        return NextResponse.json(
+          { error: "Failed to update community" },
+          { status: 500 }
+        );
+      }
+    }
+
+    return NextResponse.json({ message: "Webhook received" }, { status: 200 });
   } catch (err) {
     console.error("Webhook error:", err);
     return NextResponse.json(

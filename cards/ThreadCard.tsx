@@ -87,13 +87,15 @@ const ThreadCard = ({
       <div className="flex flex-col items-start justify-between ">
         <div className="flex w-full flex-1 flex-row gap-4 ">
           <div className="relative flex flex-col items-center">
-            <Image
+            <div className="relative h-12 w-12">
+              <Image
               src={image || "/assets/profile.svg"}
               alt="profile"
-              width={50}
-              height={50}
+              fill
               className="rounded-full z-10"
             />
+            </div>
+            
 
             {comments.length > 0 && (
               <div className="w-px h-full bg-neutral-800 absolute top-9" />
@@ -144,14 +146,15 @@ const ThreadCard = ({
 
         {comments.length > 0 && (
           <div className="flex items-center gap-2 mt-4 ml-2">
-            <div className="flex -space-x-3 z-10">
+            <div className="flex -space-x-3 z-10 relative w-6 h-6">
               {comments.slice(0, 3).map((comment) => (
                 <Image
                   key={comment._id}
                   src={comment.author.profile_picture || "/assets/profile.svg"}
                   alt={comment.author.username}
-                  width={30}
-                  height={30}
+                  fill
+                  //width={30}
+                  //height={30}
                   className="rounded-full border-2 border-dark-2"
                 />
               ))}
@@ -168,20 +171,20 @@ const ThreadCard = ({
         {!isComment && community && (
           <Link
             href={`/communities/${community.id}`}
-            className="mt-5 flex items-center"
+            className="mt-5 flex items-center space-x-2"
           >
             <p className="text-[12px] leading-[16px] font-[500] text-gray-1">
               {formatDateString(createdAt)}
               {community && ` - ${community.name} Community`}
             </p>
-
-            <Image
-              src={community.image || "/assets/profile.svg"}
-              alt={community.name}
-              width={25}
-              height={25}
-              className="ml-1 rounded-full object-cover"
-            />
+            <div className="relative w-5 h-5">
+              <Image
+                src={community.image || "/assets/profile.svg"}
+                alt={community.name}
+                fill
+                className="rounded-full object-cover"
+              />
+            </div>
           </Link>
         )}
       </div>

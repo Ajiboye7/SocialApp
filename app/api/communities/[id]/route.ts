@@ -4,6 +4,7 @@ import User from "@/lib/models/user.model";
 import { NextResponse } from "next/server";
 import Thread from "@/lib/models/thread.model";
 import Community from "@/lib/models/community.model";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export async function GET(
   req: Request,
@@ -67,29 +68,6 @@ export async function GET(
           },
         ],
       });
-      
-      /**
-       .populate({
-        path: "threads",
-        model: Thread,
-        populate: [
-          {
-            path: "author",
-            model: User,
-            select: "name image id",
-          },
-          {
-            path: "children",
-            model: Thread,
-            populate: {
-              path: "author",
-              model: User,
-              select: "image _id",
-            },
-          },
-        ],
-      });
-       */
 
     const transformedCommunity = {
       community: {
@@ -151,6 +129,63 @@ export async function GET(
         data: transformedCommunity,
       },
       { status: 200 }
+    );
+  } catch (error) {
+    console.error("Community fetch error:", error);
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  //const { userId } = await auth();
+  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  const resolvedParams = await params;
+
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, message: "unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  try {
+    await connectToDatabase();
+    const community = await Community.findById(resolvedParams.id);
+    if (!community) {
+      return NextResponse.json(
+        { success: false, message: "community not found" },
+        { status: 404 }
+      );
+    }
+    const user = await User.findOne({ id: userId });
+    const mongoUserId = user._id;
+
+    const clerkCommunityId = community.id;
+
+    if (
+      community.requests.includes(mongoUserId) ||
+      community.members.includes(mongoUserId)
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Already applied or already a member" },
+        { status: 400 }
+      );
+    }
+
+    community.requests.push(mongoUserId);
+    await community.save();
+    // @ts-ignore
+    await clerkClient.organizations.addMember(clerkCommunityId, userId);
+
+    return NextResponse.json(
+      { success: true, message: "Join request submitted" },
+      { status: 201 }
     );
   } catch (error) {
     console.error("Community fetch error:", error);

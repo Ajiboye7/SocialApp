@@ -29,8 +29,9 @@ const UserCard = ({ id, name, username, imgUrl, personType }: Props) => {
           <Image
             src={imgUrl || "/assets/profile.svg"}
             alt="user_logo"
-            width={48}
-            height={48}
+            //width={48}
+            //height={48}
+            fill
             className="rounded-full object-cover"
           />
         </div>

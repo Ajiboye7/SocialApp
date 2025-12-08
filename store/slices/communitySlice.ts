@@ -1,3 +1,4 @@
+import Community from "@/lib/models/community.model";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -16,6 +17,8 @@ interface CommunityInfo {
   slug: string;
   community_picture: string;
   createdAt: string;
+  members: [];
+  requests: [];
 }
 interface Comment {
   _id: string;
@@ -41,20 +44,20 @@ interface AuthorInfo {
   profile_picture: string;
 }
 
-
 interface Community {
   id: string;
   _id: string;
   name: string;
   slug: string;
   bio: string;
-  members: AuthorInfo[]
-  threads: Thread[]
+  members: AuthorInfo[];
+  threads: Thread[];
+  requests: AuthorInfo[];
   community_picture: string;
   createdBy: string;
 }
 interface CommunityState {
-  community : Community | null
+  community: Community | null;
   communities: Community[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
@@ -107,10 +110,7 @@ export const getCommunities = createAsyncThunk(
 
 export const getCommunityById = createAsyncThunk(
   "community/getCommunityById",
-  async (
-    communityId : string,
-    { rejectWithValue }
-  ) => {
+  async (communityId: string, { rejectWithValue }) => {
     try {
       /*const params = new URLSearchParams();
       params.append("page", page.toString());
@@ -119,13 +119,53 @@ export const getCommunityById = createAsyncThunk(
       /*const response = await axios.get(
         `/api/communities/${communityId}?${params.toString()}`
       );*/
-      const response = await axios.get(`/api/communities/${communityId}`)
+      const response = await axios.get(`/api/communities/${communityId}`);
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
       }
       return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+  }
+);
+
+export const sendJoinRequest = createAsyncThunk(
+  "community/joinRequest",
+  async (communityId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`/api/communities/${communityId}`);
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+  }
+);
+
+export const joinRequestDecision = createAsyncThunk(
+  "community/handleJoinRequestDecision",
+  async (
+    {
+      communityId,
+      userId,
+      action,
+    }: { communityId: string; userId: string; action: "accept" | "reject" },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.patch(
+        `/api/communities/${communityId}/${userId}?action=${action}`
+      );
+
+      return response.data.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("Unexpected error occurred.");
     }
   }
 );
@@ -184,7 +224,40 @@ const communitySlice = createSlice({
         (state.status = "failed"),
           (state.error =
             (action.payload as string) || "Failed to get a community");
-      });
+      })
+
+      .addCase(sendJoinRequest.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(sendJoinRequest.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        if (state.community) {
+          state.community.requests = action.payload.requests;
+        }
+      })
+
+      .addCase(sendJoinRequest.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          (action.payload as string) || "failed to send join request";
+      })
+
+      .addCase(joinRequestDecision.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(joinRequestDecision.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        if(state.community){
+          state.community.requests = action.payload.requests
+          state.community.members = action.payload.members
+        }
+      })
+      .addCase(joinRequestDecision.rejected, (state, action)=>{
+        state.status = 'failed'
+        state.error = (action.payload as string) || 'Failed to select decision'
+      })
   },
 });
 

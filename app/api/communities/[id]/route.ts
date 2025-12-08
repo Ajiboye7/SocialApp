@@ -49,7 +49,7 @@ export async function GET(
       .populate({
         path: "threads",
         model: Thread,
-        select: "thread parentId createdAt children author", // <-- ADD THIS
+        select: "thread parentId createdAt children author",
         populate: [
           {
             path: "author",
@@ -59,7 +59,7 @@ export async function GET(
           {
             path: "children",
             model: Thread,
-            select: "thread parentId createdAt author", // <-- ADD THIS TOO
+            select: "thread parentId createdAt author",
             populate: {
               path: "author",
               model: User,
@@ -180,12 +180,128 @@ export async function POST(
 
     community.requests.push(mongoUserId);
     await community.save();
-    // @ts-ignore
-    await clerkClient.organizations.addMember(clerkCommunityId, userId);
 
     return NextResponse.json(
-      { success: true, message: "Join request submitted" },
+      {
+        success: true,
+        message: "Join request submitted",
+        data: { requests: community.requests },
+      },
       { status: 201 }
+    );
+  } catch (error) {
+    console.error("Community fetch error:", error);
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+/*try {
+      const clerkResponse = await fetch(
+        `https://api.clerk.com/v1/organizations/${clerkCommunityId}/memberships`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            role: "org:member",
+          }),
+        }
+      );
+
+      if (!clerkResponse.ok) {
+        const errorData = await clerkResponse.json();
+        console.error("Clerk API error:", errorData);
+        
+        // Rollback MongoDB change if Clerk fails
+        community.requests.pull(mongoUserId);
+        await community.save();
+        
+        return NextResponse.json(
+          { success: false, message: "Failed to add member to Clerk organization" },
+          { status: 500 }
+        );
+      }
+
+      //const clerkData = await clerkResponse.json();
+      //console.log("User added to Clerk organization:", clerkData);
+      
+    } catch (clerkError) {
+      console.error("Clerk membership error:", clerkError);
+      
+      // Rollback MongoDB change
+      community.requests.pull(mongoUserId);
+      await community.save();
+      
+      return NextResponse.json(
+        { success: false, message: "Failed to sync with Clerk" },
+        { status: 500 }
+      );
+    }*/
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string, userId: string }> }
+) {
+  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  const resolvedParams = await params;
+
+  if (!userId) {
+    return NextResponse.json(
+      { success: false, message: "unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  const url = new URL(req.url);
+  const action = url.searchParams.get("action");
+  if (!action || !["accept", "reject"].includes(action)) {
+    return NextResponse.json(
+      { success: false, message: "Invalid or missing action" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await connectToDatabase();
+    const mongoUserId = resolvedParams.userId
+    const community = await Community.findById(resolvedParams.id);
+    if (!community) {
+      return NextResponse.json(
+        { success: false, message: "Community not found" },
+        { status: 404 }
+      );
+    }
+
+    if (!community.requests.includes(mongoUserId)) {
+      return NextResponse.json(
+        { success: false, message: "User not in request list" },
+        { status: 400 }
+      );
+    }
+
+    community.requests = community.requests.filter(
+      (id: any) => id.toString() !== mongoUserId
+    );
+
+    if (action === "accept") {
+      community.members.push(mongoUserId);
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: action === "accept" ? "User accepted" : "User rejected",
+        data: {
+          requests: community.requests,
+          members: community.members,
+        },
+      },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Community fetch error:", error);

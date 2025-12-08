@@ -126,6 +126,7 @@ const page = () => {
                     {totalPost}
                   </p>
                 )}
+
               </TabsTrigger>
             ))}
           </TabsList>

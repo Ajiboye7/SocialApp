@@ -19,7 +19,8 @@ import { clearCurrentUser } from "@/store/slices/userSlice";
 import { getCommunityById } from "@/store/slices/communitySlice";
 import { string } from "zod";
 import UserCard from "@/cards/UserCard";
-
+import JoinRequestCard from "@/cards/RequestCard";
+import { joinRequestDecision } from "@/store/slices/communitySlice";
 const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
     null
@@ -52,9 +53,6 @@ const page = () => {
     if (communityId) dispatch(getCommunityById(communityId as string));
   }, [dispatch, communityId]);
 
-  console.log("Community object", community);
-
-  const isOwnProfile = loggedInUser?.id === user?.id;
 
   const handlePrev = () => {
     if (currentPage > 1) {
@@ -80,6 +78,32 @@ const page = () => {
         })
       );
     }
+  };
+
+  const handleAccept = () => {
+    if (!community?._id || !loggedInUser?._id) return;
+
+    dispatch(
+      joinRequestDecision({
+        id: community._id,
+        userId: loggedInUser._id,
+        action: "accept",
+      })
+    );
+     alert('Request accepted');
+  };
+
+  const handleReject = () => {
+    if (!community?._id || !loggedInUser?._id) return;
+
+    dispatch(
+      joinRequestDecision({
+        id: community._id,
+        userId: loggedInUser._id,
+        action: "reject",
+      })
+    );
+     alert('Request rejected');
   };
 
   {
@@ -126,7 +150,6 @@ const page = () => {
                     {totalPost}
                   </p>
                 )}
-
               </TabsTrigger>
             ))}
           </TabsList>
@@ -161,7 +184,7 @@ const page = () => {
           </TabsContent>
 
           <TabsContent value="members">
-              <section className='mt-9 flex flex-col gap-10'>
+            <section className="mt-9 flex flex-col gap-10">
               {community?.members.length === 0 ? (
                 <p className="text-white">No members yet</p>
               ) : (
@@ -173,6 +196,26 @@ const page = () => {
                     imgUrl={member.profile_picture}
                     username={member.username}
                     personType="User"
+                  />
+                ))
+              )}
+            </section>
+          </TabsContent>
+
+          <TabsContent value="requests">
+            <section className="mt-9 flex flex-col gap-10">
+              {community?.requests?.length === 0 ? (
+                <p className="text-white">No requests yet</p>
+              ) : (
+                community?.requests?.map((req) => (
+                  <JoinRequestCard
+                    key={req._id}
+                    id={req._id}
+                    name={req.username}
+                    username={req.username}
+                    imgUrl={req.profile_picture}
+                    onAccept={handleAccept}
+                    onReject={handleReject}
                   />
                 ))
               )}

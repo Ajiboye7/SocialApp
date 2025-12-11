@@ -54,7 +54,7 @@ interface Community {
   threads: Thread[];
   requests: AuthorInfo[];
   community_picture: string;
-  createdBy: string;
+  createdBy: AuthorInfo;
 }
 interface CommunityState {
   community: Community | null;
@@ -149,15 +149,15 @@ export const joinRequestDecision = createAsyncThunk(
   "community/handleJoinRequestDecision",
   async (
     {
-      communityId,
+      id,
       userId,
       action,
-    }: { communityId: string; userId: string; action: "accept" | "reject" },
+    }: { id: string; userId: string; action: "accept" | "reject" },
     { rejectWithValue }
   ) => {
     try {
       const response = await axios.patch(
-        `/api/communities/${communityId}/${userId}?action=${action}`
+        `/api/communities/${id}/request/${userId}?action=${action}`
       );
 
       return response.data.data;

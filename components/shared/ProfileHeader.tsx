@@ -110,7 +110,7 @@ const ProfileHeader = ({
   const handleJoinCommunity = () =>{
     if(!community?._id) return
 
-    dispatch (sendJoinRequest(community._id))
+    dispatch (sendJoinRequest({communityId: community._id, request: 'do'}))
   }
   
 

@@ -132,9 +132,9 @@ export const getCommunityById = createAsyncThunk(
 
 export const sendJoinRequest = createAsyncThunk(
   "community/joinRequest",
-  async (communityId: string, { rejectWithValue }) => {
+  async ({communityId, request} :{communityId: string, request: string}, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`/api/communities/${communityId}`);
+      const response = await axios.post(`/api/communities/${communityId}?request=${request}`);
       return response.data.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {

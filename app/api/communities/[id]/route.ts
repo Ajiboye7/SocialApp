@@ -91,10 +91,10 @@ export async function GET(
           profile_picture: community.createdBy.profile_picture,
         },
 
-        requests: community.requests.map((request: any)=>({
-           _id:request._id,
-          username:request.username,
-          profile_picture:request.profile_picture,
+        requests: community.requests.map((request: any) => ({
+          _id: request._id,
+          username: request.username,
+          profile_picture: request.profile_picture,
         })),
 
         members: community.members.map((member: any) => ({
@@ -168,6 +168,15 @@ export async function POST(
     );
   }
 
+  const url = new URL(req.url);
+  const request = url.searchParams.get("request");
+  if (!request || !["do", "undo"].includes(request)) {
+    return NextResponse.json(
+      { success: false, message: "Invalid or missing action" },
+      { status: 400 }
+    );
+  }
+
   try {
     await connectToDatabase();
     const community = await Community.findById(resolvedParams.id);
@@ -192,16 +201,28 @@ export async function POST(
       );
     }
 
-    community.requests.push(mongoUserId);
+    if (request === "do") {
+      if (!community.requests.includes(mongoUserId)) {
+        community.requests.push(mongoUserId);
+      }
+    } else if (request === "undo") {
+      community.requests = community.requests.filter(
+        (id: any) => id.toString() !== mongoUserId.toString()
+      );
+    }
+
     await community.save();
 
     return NextResponse.json(
       {
         success: true,
-        message: "Join request submitted",
+        message:
+          request === "do"
+            ? "Join request submitted"
+            : "Join request cancelled",
         data: { requests: community.requests },
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
     console.error("Community fetch error:", error);
@@ -257,4 +278,3 @@ export async function POST(
         { status: 500 }
       );
     }*/
-

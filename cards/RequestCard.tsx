@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 interface JoinRequestCardProps {
   id: string;
@@ -43,19 +44,19 @@ export default function JoinRequestCard({
 
       {/* Action Buttons */}
       <div className="flex gap-2">
-        <button
+        <Button
           onClick={() => onAccept()}
           className="px-3 py-1.5 rounded-lg bg-green-600 text-light-1 text-sm font-semibold hover:bg-green-700 transition"
         >
           Accept
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={() => onReject() }
           className="px-3 py-1.5 rounded-lg bg-red-600 text-light-1 text-sm font-semibold hover:bg-red-700 transition"
         >
           Reject
-        </button>
+        </Button>
       </div>
     </article>
   );

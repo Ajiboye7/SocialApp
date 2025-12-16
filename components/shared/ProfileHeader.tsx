@@ -83,6 +83,7 @@ import Link from "next/link";
 import { RootState, AppDispatch } from "@/store/store";
 import { useSelector, useDispatch } from "react-redux";
 import { sendJoinRequest } from "@/store/slices/communitySlice";
+import { Button } from "@/components/ui/button";
 
 
 interface Props {
@@ -147,13 +148,30 @@ const ProfileHeader = ({
 
         {type === "Community" &&
           currentUser?._id !== community?.createdBy._id && (
-            <button
+            <Button
               onClick={handleJoinCommunity}
-              className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 transition rounded-lg py-2 px-4 text-white"
+              className="flex items-center gap-2 bg-primary-500  transition rounded-lg py-2 px-4 text-white"
             >
               <p>Join</p>
-            </button>
+            </Button>
           )}
+
+          {/**
+           *   <Button
+      variant="outline"
+      onClick={() =>
+        toast("Event has been created", {
+          description: "Sunday, December 03, 2023 at 9:00 AM",
+          action: {
+            label: "Undo",
+            onClick: () => console.log("Undo"),
+          },
+        })
+      }
+    >
+      Show Toast
+    </Button>
+           */}
       </div>
 
       <p className="text-white mt-8">{bio}</p>

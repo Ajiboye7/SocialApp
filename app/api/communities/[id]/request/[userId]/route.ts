@@ -6,10 +6,9 @@ import Thread from "@/lib/models/thread.model";
 import Community from "@/lib/models/community.model";
 import { clerkClient } from "@clerk/nextjs/server";
 
-
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string, userId: string }> }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   //const { userId } = await auth();
   const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
@@ -33,7 +32,7 @@ export async function PATCH(
 
   try {
     await connectToDatabase();
-    const mongoUserId = resolvedParams.userId
+    const mongoUserId = resolvedParams.userId;
     const community = await Community.findById(resolvedParams.id);
     if (!community) {
       return NextResponse.json(
@@ -59,13 +58,24 @@ export async function PATCH(
 
     await community.save();
 
+    const populatedCommunity = await Community.findById(resolvedParams.id)
+      .populate("requests", "_id username profile_picture")
+      .populate("members", "_id username profile_picture");
+
+       const totalRequests = community.requests.length;
+    const totalMembers = community.members.length;
+    const totalThreads = community.threads?.length || 0;
+
     return NextResponse.json(
       {
         success: true,
         message: action === "accept" ? "User accepted" : "User rejected",
         data: {
-          requests: community.requests,
-          members: community.members,
+          requests: populatedCommunity.requests,
+          members: populatedCommunity.members,
+          totalRequests,
+          totalMembers,
+          totalThreads
         },
       },
       { status: 200 }

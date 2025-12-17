@@ -61,6 +61,9 @@ interface CommunityState {
   communities: Community[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  totalThreads: number;
+  totalRequests: number;
+  totalMembers: number;
   pagination: {
     currentPage: number;
     limit: number;
@@ -72,6 +75,9 @@ const initialState: CommunityState = {
   communities: [],
   status: "idle",
   error: null,
+  totalThreads: 0,
+  totalRequests: 0,
+  totalMembers: 0,
   pagination: {
     currentPage: 1,
     limit: 5,
@@ -83,7 +89,11 @@ export const createCommunity = createAsyncThunk(
   async (communityData: CommunityDataTypes, { rejectWithValue }) => {
     try {
       const response = await axios.post("/api/communities", communityData);
-      return response.data.data;
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -98,7 +108,11 @@ export const getCommunities = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/api/communities");
-      return response.data.data;
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -120,7 +134,11 @@ export const getCommunityById = createAsyncThunk(
         `/api/communities/${communityId}?${params.toString()}`
       );*/
       const response = await axios.get(`/api/communities/${communityId}`);
-      return response.data.data;
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -132,10 +150,19 @@ export const getCommunityById = createAsyncThunk(
 
 export const sendJoinRequest = createAsyncThunk(
   "community/joinRequest",
-  async ({communityId, request} :{communityId: string, request: 'do' | 'undo'}, { rejectWithValue }) => {
+  async (
+    { communityId, request }: { communityId: string; request: "do" | "undo" },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await axios.post(`/api/communities/${communityId}?request=${request}`);
-      return response.data.data;
+      const response = await axios.post(
+        `/api/communities/${communityId}?request=${request}`
+      );
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -160,7 +187,11 @@ export const joinRequestDecision = createAsyncThunk(
         `/api/communities/${id}/request/${userId}?action=${action}`
       );
 
-      return response.data.data;
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -183,7 +214,7 @@ const communitySlice = createSlice({
 
       .addCase(createCommunity.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.communities.push(action.payload);
+        state.communities.push(action.payload.data);
         state.error = null;
       })
 
@@ -199,7 +230,7 @@ const communitySlice = createSlice({
 
       .addCase(getCommunities.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.communities = action.payload;
+        state.communities = action.payload.data;
         state.error = null;
       })
 
@@ -215,8 +246,11 @@ const communitySlice = createSlice({
 
       .addCase(getCommunityById.fulfilled, (state, action) => {
         (state.status = "succeeded"),
-          (state.community = action.payload.community);
-        state.pagination = action.payload.pagination;
+          (state.community = action.payload.data.community);
+        state.totalMembers = action.payload.data.totalMembers || 0;
+        state.totalRequests = action.payload.data.totalRequests || 0;
+        state.totalThreads = action.payload.data.totalThreads || 0;
+        state.pagination = action.payload.data.pagination;
         state.error = null;
       })
 
@@ -233,8 +267,18 @@ const communitySlice = createSlice({
       .addCase(sendJoinRequest.fulfilled, (state, action) => {
         state.status = "succeeded";
         if (state.community) {
-          state.community.requests = action.payload.requests;
+          state.community.requests = action.payload.data.requests;
+          state.totalMembers = action.payload.data.totalMembers;
+          state.totalRequests = action.payload.data.totalRequests;
+          state.totalThreads = action.payload.data.totalThreads;
         }
+
+        console.log(
+          "community count",
+          state.totalMembers,
+          state.totalRequests,
+          state.totalThreads
+        );
       })
 
       .addCase(sendJoinRequest.rejected, (state, action) => {
@@ -249,15 +293,18 @@ const communitySlice = createSlice({
 
       .addCase(joinRequestDecision.fulfilled, (state, action) => {
         state.status = "succeeded";
-        if(state.community){
-          state.community.requests = action.payload.requests
-          state.community.members = action.payload.members
+        if (state.community) {
+          state.community.requests = action.payload.data.requests;
+          state.community.members = action.payload.data.members;
+          state.totalMembers = action.payload.data.totalMembers || 0;
+          state.totalRequests = action.payload.data.totalRequests || 0;
+          state.totalThreads = action.payload.data.totalThreads || 0;
         }
       })
-      .addCase(joinRequestDecision.rejected, (state, action)=>{
-        state.status = 'failed'
-        state.error = (action.payload as string) || 'Failed to select decision'
-      })
+      .addCase(joinRequestDecision.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = (action.payload as string) || "Failed to select decision";
+      });
   },
 });
 

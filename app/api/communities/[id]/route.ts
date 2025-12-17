@@ -76,6 +76,10 @@ export async function GET(
         ],
       });
 
+       const totalRequests = community.requests.length;
+    const totalMembers = community.members.length;
+    const totalThreads = community.threads?.length || 0;
+
     const transformedCommunity = {
       community: {
         _id: community._id,
@@ -128,6 +132,10 @@ export async function GET(
         })),
       },
 
+       totalRequests,
+      totalMembers,
+      totalThreads,
+
       pagination: {
         // totalComment,
         //totalPages,
@@ -136,9 +144,10 @@ export async function GET(
       },
     };
 
-    return NextResponse.json(
+     return NextResponse.json(
       {
         success: true,
+        message: "Community fetched successfully",
         data: transformedCommunity,
       },
       { status: 200 }
@@ -156,8 +165,8 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
-  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  //const { userId } = await auth();
+  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   //const userId = 'user_35QSrRZm9wI1YNGWc1mBjEmVBb9'
   const resolvedParams = await params;
 
@@ -191,21 +200,28 @@ export async function POST(
 
     const clerkCommunityId = community.id;
 
-    if (
-      community.requests.includes(mongoUserId) ||
-      community.members.includes(mongoUserId)
-    ) {
-      return NextResponse.json(
-        { success: false, message: "Already applied or already a member" },
-        { status: 400 }
-      );
+    if (request === "do") {
+      if (
+        community.requests.includes(mongoUserId) ||
+        community.members.includes(mongoUserId)
+      ) {
+        return NextResponse.json(
+          { success: false, message: "Already applied or already a member" },
+          { status: 400 }
+        );
+      }
+
+      community.requests.push(mongoUserId);
     }
 
-    if (request === "do") {
+    if (request === "undo") {
       if (!community.requests.includes(mongoUserId)) {
-        community.requests.push(mongoUserId);
+        return NextResponse.json(
+          { success: false, message: "No pending request to undo" },
+          { status: 400 }
+        );
       }
-    } else if (request === "undo") {
+
       community.requests = community.requests.filter(
         (id: any) => id.toString() !== mongoUserId.toString()
       );
@@ -213,17 +229,51 @@ export async function POST(
 
     await community.save();
 
-    return NextResponse.json(
-      {
-        success: true,
-        message:
-          request === "do"
-            ? "Join request submitted"
-            : "Join request cancelled",
-        data: { requests: community.requests },
-      },
-      { status: 200 }
-    );
+    // After saving the community, use aggregation to get counts
+const communityWithCounts = await Community.aggregate([
+  { $match: { _id: community._id } },
+  {
+    $lookup: {
+      from: "threads", // Make sure this matches your actual collection name
+      localField: "_id",
+      foreignField: "community",
+      as: "threads"
+    }
+  },
+  {
+    $project: {
+      requests: 1,
+      members: 1,
+      totalRequests: { $size: "$requests" },
+      totalMembers: { $size: "$members" },
+      totalThreads: { $size: "$threads" },
+      // You can also populate if needed
+      populatedRequests: "$requests",
+      populatedMembers: "$members"
+    }
+  }
+]);
+
+const result = communityWithCounts[0];
+
+return NextResponse.json(
+  {
+    success: true,
+    message: request === "do" 
+      ? "Join request submitted" 
+      : "Join request cancelled",
+    data: {
+      requests: await User.find({ _id: { $in: community.requests } })
+        .select("_id username profile_picture"),
+      members: await User.find({ _id: { $in: community.members } })
+        .select("_id username profile_picture"),
+      totalRequests: result.totalRequests,
+      totalMembers: result.totalMembers,
+      totalThreads: result.totalThreads,
+    },
+  },
+  { status: 200 }
+);
   } catch (error) {
     console.error("Community fetch error:", error);
     return NextResponse.json(

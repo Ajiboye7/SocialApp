@@ -21,6 +21,7 @@ import { string } from "zod";
 import UserCard from "@/cards/UserCard";
 import JoinRequestCard from "@/cards/RequestCard";
 import { joinRequestDecision } from "@/store/slices/communitySlice";
+import { toast } from "sonner";
 const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
     null
@@ -35,9 +36,11 @@ const page = () => {
     currentUser: loggedInUser,
   } = useSelector((state: RootState) => state.user);
 
-  const { status, community } = useSelector(
+  const { status, community, totalMembers, totalRequests, totalThreads } = useSelector(
     (state: RootState) => state.community
   );
+
+  console.log('community state',  community, totalMembers, totalRequests, totalThreads)
 
   const {
     threads,
@@ -52,7 +55,6 @@ const page = () => {
   useEffect(() => {
     if (communityId) dispatch(getCommunityById(communityId as string));
   }, [dispatch, communityId]);
-
 
   const handlePrev = () => {
     if (currentPage > 1) {
@@ -80,39 +82,44 @@ const page = () => {
     }
   };
 
-  const handleAccept = () => {
-    if (!community?._id || !loggedInUser?._id) return;
+  
+  const handleAccept = async () => {
+  if (!community?._id || !loggedInUser?._id) return;
 
-    dispatch(
+  try {
+    const result = await dispatch(
       joinRequestDecision({
         id: community._id,
-        userId: loggedInUser._id,
+        userId: loggedInUser?._id,
         action: "accept",
       })
-    );
-     alert('Request accepted');
-  };
+    ).unwrap();
 
-  const handleReject = () => {
-    if (!community?._id || !loggedInUser?._id) return;
+    toast.success(result.message);
+  } catch (err) {
+    toast.error(String(err));
+  }
+};
 
-    dispatch(
+  const handleReject = async () => {
+  if (!community?._id || !loggedInUser?._id) return;
+
+  try {
+    const result = await dispatch(
       joinRequestDecision({
         id: community._id,
-        userId: loggedInUser._id,
+        userId: loggedInUser?._id,
         action: "reject",
       })
-    );
-     alert('Request rejected');
-  };
+    ).unwrap();
 
-  {
-    /*threads.map((t) => (
-    console.log('author id',t.author.id)
-   ))
-
-  console.log('show button',isOwnProfile, loggedInUser?.id  )*/
+    toast.info(result.message);
+  } catch (err) {
+    toast.error(String(err));
   }
+};
+
+  
   if (status === "loading") {
     return <p className="text-white text-center mt-10">Loading...</p>;
   }
@@ -145,16 +152,32 @@ const page = () => {
                 />
                 <p className="max-sm:hidden">{tab.label}</p>
 
-                {tab.label === "Threads" && (
+                {tab.label === "Threads" &&  (
                   <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
-                    {totalPost}
+                    {totalThreads}
                   </p>
                 )}
+
+                 {tab.label === "Members" &&  (
+                  <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
+                    {totalMembers}
+                  </p>
+                )}
+
+                 {tab.label === "Requests" &&  (
+                  <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2">
+                    {totalRequests}
+                  </p>
+                )}
+
+
+                
               </TabsTrigger>
             ))}
           </TabsList>
 
           <TabsContent value="threads">
+            
             {community?.threads.length === 0 ? (
               <p>No threads yet.</p>
             ) : (

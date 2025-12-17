@@ -158,8 +158,8 @@ export async function GET(req: Request) {
         model: Community,
       })
       .lean();
-    const totalThreads = await Thread.countDocuments(query); // Use same query for total
-    const totalUserThreadQuery: any = { ...query }; // Reuse for user-specific count
+    const totalThreads = await Thread.countDocuments(query); 
+    const totalUserThreadQuery: any = { ...query }; 
     const totalUserThread = await Thread.countDocuments(totalUserThreadQuery);
 
     const transformedThreads = threads.map((thread) => ({

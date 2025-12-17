@@ -12,7 +12,7 @@ import { Provider } from "react-redux";
 import { store } from "@/store/store";
 import ReduxProvider from "@/components/ReduxProvider";
 import Loader from "@/components/Loader";
-
+import { Toaster } from "@/components/ui/sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -58,6 +58,7 @@ export default function RootLayout({
             </main>
 
             <BottomBar />
+            <Toaster />
           </body>
         </html>
       </ClerkProvider>

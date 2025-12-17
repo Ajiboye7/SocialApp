@@ -91,7 +91,11 @@ export const createThread = createAsyncThunk(
   async (thread: ThreadData, { rejectWithValue }) => {
     try {
       const response = await axios.post("/api/threads", thread);
-      return response.data.data;
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -108,7 +112,11 @@ export const createComment = createAsyncThunk(
       const response = await axios.post(`/api/threads/${parentId}/comment`, {
         thread,
       });
-      return response.data.data;
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -219,7 +227,7 @@ const threadSlice = createSlice({
 
       .addCase(createThread.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.threads.push(action.payload);
+        state.threads.push(action.payload.data);
         state.error = null;
       })
 
@@ -248,13 +256,13 @@ const threadSlice = createSlice({
       .addCase(createComment.fulfilled, (state, action) => {
         state.status = "succeeded";
         const parentThread = state.threads.find(
-          (t) => t._id === action.payload.parentId
+          (t) => t._id === action.payload.data.parentId
         );
         if (parentThread) {
           parentThread.children = parentThread.children || [];
-          parentThread.children.push(action.payload);
+          parentThread.children.push(action.payload.data);
         } else {
-          state.threads.push(action.payload);
+          state.threads.push(action.payload.data);
         }
         state.error = null;
         state.isComment = true;

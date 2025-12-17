@@ -52,7 +52,11 @@ export const currentUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/api/users/me");
-      return response.data.data;
+     return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -72,7 +76,11 @@ export const fetchUsers = createAsyncThunk(
       const response = await axios.get(
         `/api/users?page=${page}&limit=${limit}`
       );
-      return response.data.data;
+     return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -92,7 +100,11 @@ export const fetchSidebarUsers = createAsyncThunk(
       const response = await axios.get(
         `/api/users?page=${page}&limit=${limit}`
       );
-      return response.data.data;
+     return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -107,7 +119,11 @@ export const fetchUser = createAsyncThunk(
   async (username: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(`/api/users/${username}`);
-      return response.data.data;
+     return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -122,7 +138,11 @@ export const updateUser = createAsyncThunk(
   async (userData: UserData, { rejectWithValue }) => {
     try {
       const response = await axios.put("/api/users/", userData);
-      return response.data.data;
+     return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+      };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.response?.data.message || error.message);
@@ -154,7 +174,7 @@ const userSlice = createSlice({
 
       .addCase(currentUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.currentUser = action.payload.currentUser;
+        state.currentUser = action.payload.data.currentUser;
         state.error = null;
         //console.log('current user redux ',action.payload.currentUser );
       })
@@ -169,9 +189,9 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.usersStatus = "succeeded";
-        state.users = action.payload.users;
-        state.totalPages = action.payload.totalPages;
-        state.currentPage = action.payload.currentPage;
+        state.users = action.payload.data.users;
+        state.totalPages = action.payload.data.totalPages;
+        state.currentPage = action.payload.data.currentPage;
         state.error = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
@@ -185,9 +205,9 @@ const userSlice = createSlice({
 
       .addCase(fetchSidebarUsers.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.sidebarUsers = action.payload.users;
-        state.sidebarCurrentPage = action.payload.currentPage;
-        state.sidebarTotalPages = action.payload.totalPages;
+        state.sidebarUsers = action.payload.data.users;
+        state.sidebarCurrentPage = action.payload.data.currentPage;
+        state.sidebarTotalPages = action.payload.data.totalPages;
         state.error = null;
       })
 
@@ -203,7 +223,7 @@ const userSlice = createSlice({
 
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.user = action.payload.user;
+        state.user = action.payload.data.user;
         state.error = null;
         //console.log("Redux - User data received:", action.payload.user);
         /* console.log(
@@ -223,7 +243,7 @@ const userSlice = createSlice({
       })
 
       .addCase(updateUser.fulfilled, (state, action) => {
-        (state.status = "succeeded"), (state.user = action.payload);
+        (state.status = "succeeded"), (state.user = action.payload.data);
         state.error = null;
       })
 

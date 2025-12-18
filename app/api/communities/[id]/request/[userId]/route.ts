@@ -33,6 +33,14 @@ export async function PATCH(
   try {
     await connectToDatabase();
     const mongoUserId = resolvedParams.userId;
+    const mongoCommunityId = resolvedParams.id
+    const user = await User.findById(resolvedParams.userId)
+    if(!user){
+       return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
     const community = await Community.findById(resolvedParams.id);
     if (!community) {
       return NextResponse.json(
@@ -54,9 +62,11 @@ export async function PATCH(
 
     if (action === "accept") {
       community.members.push(mongoUserId);
+       user.communities.push(mongoCommunityId);
     }
 
     await community.save();
+    await user.save();
 
     const populatedCommunity = await Community.findById(resolvedParams.id)
       .populate("requests", "_id username profile_picture")

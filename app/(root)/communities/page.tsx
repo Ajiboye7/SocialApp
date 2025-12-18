@@ -9,28 +9,29 @@ import UserCard from "@/cards/UserCard";
 import { clearUser } from "@/store/slices/userSlice";
 import UserCardSkeleton from "@/components/UserCardSkeleton";
 import ContentSkeleton from "@/components/ContentSkeleton";
- import { getCommunities } from "@/store/slices/communitySlice";
+ import { clearCommunity, getCommunities } from "@/store/slices/communitySlice";
 
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const {
+  /*const {
     users,
     currentPage,
     totalPages,
     usersStatus: status,
-  } = useSelector((state: RootState) => state.user);
+  } = useSelector((state: RootState) => state.user);*/
 
-  const {communities} = useSelector((state : RootState)=> state.community);
+  const {communities, status, pagination: { currentPage },  } = useSelector((state : RootState)=> state.community);
   
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    dispatch(clearUser());
-    dispatch(fetchUsers({ page: currentPage, limit: 10 })).unwrap();
-    dispatch(getCommunities());
+    //dispatch(clearUser());
+    //dispatch(fetchUsers({ page: currentPage, limit: 10 })).unwrap();
+    dispatch(clearCommunity())
+    dispatch(getCommunities({page: currentPage, limit: 5}));
   }, [dispatch]);
 
-  console.log("This is user listed", users);
+  //console.log("This is user listed", users);
 
   const filteredCommunities = communities.filter((community) => {
     const query = search.toLowerCase();
@@ -74,11 +75,11 @@ const page = () => {
             />
           ))
         ) : (
-          <p className="text-white">No user yet</p>
+          <p className="text-white">No community yet</p>
         )}
       </div>
 
-      <div className={`flex gap-4 mt-6 ${status === 'loading' ? 'hidden' : ''}`}>
+      {/*<div className={`flex gap-4 mt-6 ${status === 'loading' ? 'hidden' : ''}`}>
         <button
           disabled={currentPage <= 1}
           onClick={() =>
@@ -100,7 +101,7 @@ const page = () => {
         >
           Next
         </button>
-      </div>
+      </div>*/}
      
     </section>
   );

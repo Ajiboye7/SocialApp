@@ -17,6 +17,7 @@ import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
 import { getCommunityById } from "@/store/slices/communitySlice";
+import { clearCommunity } from "@/store/slices/communitySlice";
 import { string } from "zod";
 import UserCard from "@/cards/UserCard";
 import JoinRequestCard from "@/cards/RequestCard";
@@ -53,6 +54,7 @@ const page = () => {
   const communityId = params.id as string;
 
   useEffect(() => {
+    dispatch(clearCommunity())
     if (communityId) dispatch(getCommunityById(communityId as string));
   }, [dispatch, communityId]);
 

@@ -100,12 +100,12 @@ export async function GET(req: Request) {
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const skip = (page - 1) * limit;
+    const totalCommunity = await Community.countDocuments();
 
     const communities = await Community.find({})
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 })
-      .populate("members");
+      .sort({ createdAt: -1 });
 
     if (!communities) {
       return NextResponse.json(
@@ -118,6 +118,10 @@ export async function GET(req: Request) {
       {
         success: true,
         data: communities,
+        pagination: {
+          totalPages: Math.ceil(totalCommunity / limit),
+          currentPage: page,
+        },
       },
       { status: 200 }
     );

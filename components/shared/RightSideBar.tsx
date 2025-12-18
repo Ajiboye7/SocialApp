@@ -1,12 +1,14 @@
 "use client";
 import React, { useEffect } from "react";
 import UserCard from "@/cards/UserCard";
-import { fetchUsers } from "@/store/slices/userSlice";
+import { clearUser, fetchUsers } from "@/store/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import { fetchSidebarUsers } from "@/store/slices/userSlice";
 import { getCommunities } from "@/store/slices/communitySlice";
 import UserCardSkeleton from "../UserCardSkeleton";
+import { getSidebarCommunities } from "@/store/slices/communitySlice";
+import { clearCommunity } from "@/store/slices/communitySlice";
 
 const RightSideBar = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,22 +18,19 @@ const RightSideBar = () => {
     usersStatus: status,
   } = useSelector((state: RootState) => state.user);
 
-  const { communities } = useSelector((state: RootState) => state.community);
+  const { communities, pagination: { currentPage: page } } = useSelector((state: RootState) => state.community);
 
   useEffect(() => {
-    dispatch(fetchSidebarUsers({ page: currentPage, limit: 3 })).unwrap();
-    dispatch(getCommunities()).unwrap();
+    dispatch(clearUser())
+    dispatch(fetchSidebarUsers({ page: currentPage, limit: 3 }));
+    dispatch(clearCommunity())
+    dispatch(getSidebarCommunities({page: page, limit: 1}));
   }, [dispatch]);
+
+  
 
   return (
     <section className="custom-scrollbar sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-l border-l-dark-4 bg-dark-2 px-10 pb-6 pt-28 max-xl:hidden">
-      {/*<div className="flex flex-col gap-5 w-[350px]">
-          <h3 className=" text-[20px] font-[500] leading-[140%] text-light-1">
-            Suggested communities
-          </h3>
-          <p className="text-light-3">No community yet</p>
-        </div>*/}
-
       <div className="flex flex-1 flex-col justify-start">
         <h3 className="text-heading4-medium text-light-1">
           Suggested Communities

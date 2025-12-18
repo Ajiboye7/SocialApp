@@ -55,10 +55,12 @@ interface Community {
   requests: AuthorInfo[];
   community_picture: string;
   createdBy: AuthorInfo;
+  
 }
 interface CommunityState {
   community: Community | null;
   communities: Community[];
+  sidebarCommunities : Community[]
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   totalThreads: number;
@@ -73,6 +75,7 @@ interface CommunityState {
 const initialState: CommunityState = {
   community: null,
   communities: [],
+  sidebarCommunities: [],
   status: "idle",
   error: null,
   totalThreads: 0,
@@ -105,9 +108,9 @@ export const createCommunity = createAsyncThunk(
 
 export const getCommunities = createAsyncThunk(
   "community/get",
-  async (_, { rejectWithValue }) => {
+  async ({page, limit} :{page: number, limit: number}, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/api/communities");
+      const response = await axios.get(`/api/communities?page=${page}&limit=${limit}`);
       return {
         success: response.data.success,
         message: response.data.message,
@@ -121,6 +124,27 @@ export const getCommunities = createAsyncThunk(
     }
   }
 );
+
+
+export const getSidebarCommunities = createAsyncThunk(
+  "communitySidebar/get",
+  async ({page, limit} :{page: number, limit: number}, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/api/communities?page=${page}&limit=${limit}`);
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        pagination: response.data.pagination,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+  }
+);
+
 
 export const getCommunityById = createAsyncThunk(
   "community/getCommunityById",
@@ -204,7 +228,14 @@ export const joinRequestDecision = createAsyncThunk(
 const communitySlice = createSlice({
   name: "community",
   initialState,
-  reducers: {},
+  reducers: {
+    clearCommunity : (state)=>{
+      state.communities = []
+      state.community = null;
+      state.status = 'idle'
+      state.error = null;
+    }
+  },
 
   extraReducers: (builder) => {
     builder
@@ -239,6 +270,24 @@ const communitySlice = createSlice({
         state.error =
           (action.payload as string) || "Failed to create community";
       })
+
+      .addCase(getSidebarCommunities.pending, (state) => {
+        state.status = "loading";
+      })
+
+      .addCase(getSidebarCommunities.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.sidebarCommunities = action.payload.pagination;
+        state.error = null;
+      })
+
+      .addCase(getSidebarCommunities.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          (action.payload as string) || "Failed to create community";
+      })
+
+
 
       .addCase(getCommunityById.pending, (state) => {
         state.status = "loading";
@@ -309,3 +358,4 @@ const communitySlice = createSlice({
 });
 
 export default communitySlice.reducer;
+export const {clearCommunity} = communitySlice.actions

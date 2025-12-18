@@ -22,7 +22,7 @@ export default function JoinRequestCard({
   const router = useRouter();
 
   return (
-    <article className="flex justify-between gap-4 rounded-xl bg-dark-3 p-4 items-center border border-dark-4 hover:border-primary-500 transition">
+    <article className="flex justify-between gap-4 rounded-xl bg-dark-3 p-4 items-center border border-dark-1 transition">
       {/* User Info */}
       <div className="flex flex-1 items-center gap-3">
         <div className="relative h-12 w-12">

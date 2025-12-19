@@ -35,14 +35,10 @@ const page = () => {
     item: loggedInUser,
   } = useSelector((state: RootState) => state.user.currentUser);
 
-  /*const { status, community, totalMembers, totalRequests, totalThreads } = useSelector(
-    (state: RootState) => state.community
-  );*/
 
   const {status, item : community, totals : {totalMembers, totalRequests, totalThreads}} = useSelector((state: RootState)=> state.community.community)
 
-  //console.log('community state', community , totalMembers, totalRequests, totalThreads)
-
+  
   const {
     threads,
     status: threadStatus,

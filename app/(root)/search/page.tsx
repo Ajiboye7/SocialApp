@@ -14,11 +14,11 @@ import ContentSkeleton from "@/components/ContentSkeleton";
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
   const {
-    users,
-    currentPage,
-    totalPages,
-    usersStatus: status,
-  } = useSelector((state: RootState) => state.user);
+    items:users,
+    pagination: {currentPage},
+    pagination: {totalPages},
+   status,
+  } = useSelector((state: RootState) => state.user.users);
   const [search, setSearch] = useState("");
 
   useEffect(() => {

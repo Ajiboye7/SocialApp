@@ -25,8 +25,8 @@ const ProfileHeader = ({
   bio,
   type,
 }: Props) => {
-  const { currentUser } = useSelector((state: RootState) => state.user);
-  const { community } = useSelector((state: RootState) => state.community);
+  const { item: currentUser } = useSelector((state: RootState) => state.user.currentUser);
+  const { item: community } = useSelector((state: RootState) => state.community.community);
   const dispatch = useDispatch<AppDispatch>();
 
   const handleJoinCommunity = async () => {

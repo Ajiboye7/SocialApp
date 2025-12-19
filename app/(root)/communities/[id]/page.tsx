@@ -32,16 +32,16 @@ const page = () => {
   const [activeTab, setActiveTab] = useState("threads");
 
   const {
-    user,
-    status: userStatus,
-    currentUser: loggedInUser,
-  } = useSelector((state: RootState) => state.user);
+    item: loggedInUser,
+  } = useSelector((state: RootState) => state.user.currentUser);
 
-  const { status, community, totalMembers, totalRequests, totalThreads } = useSelector(
+  /*const { status, community, totalMembers, totalRequests, totalThreads } = useSelector(
     (state: RootState) => state.community
-  );
+  );*/
 
-  console.log('community state',  community, totalMembers, totalRequests, totalThreads)
+  const {status, item : community, totals : {totalMembers, totalRequests, totalThreads}} = useSelector((state: RootState)=> state.community.community)
+
+  //console.log('community state', community , totalMembers, totalRequests, totalThreads)
 
   const {
     threads,

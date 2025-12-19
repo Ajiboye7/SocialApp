@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { stat } from "fs";
+
 
 interface UserData {
   name: string;
@@ -20,31 +20,64 @@ interface User {
 }
 
 interface UserState {
-  user: User | null;
-  currentUser: User | null;
-  users: User[];
-  sidebarUsers: User[];
-  totalPages: number;
-  currentPage: number;
-  sidebarTotalPages: number;
-  sidebarCurrentPage: number;
-  status: "idle" | "loading" | "succeeded" | "failed";
-   usersStatus: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
+  users: {
+    items: User[];
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+    pagination: {
+      currentPage: number;
+      limit: number;
+      totalPages: number;
+    };
+  };
+
+  sidebar: {
+    items: User[];
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
+  user: {
+    item: User | null;
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
+
+  currentUser: {
+    item: User | null;
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
 }
 
 const initialState: UserState = {
-  user: null,
-  currentUser: null,
-  users: [],
-  sidebarUsers: [],
-  totalPages: 0,
-  currentPage: 1,
-  sidebarTotalPages: 0,
-  sidebarCurrentPage: 1,
-  status: "idle",
-  usersStatus: 'idle',
-  error: null,
+  users: {
+    items: [],
+    status: "idle",
+    error: null,
+    pagination: {
+      currentPage: 1,
+      limit: 4,
+      totalPages: 0,
+    },
+  },
+
+  sidebar: {
+    items: [],
+    status: "idle",
+    error: null,
+  },
+
+  user: {
+    item: null,
+    status: "idle",
+    error: null,
+  },
+
+  currentUser: {
+    item: null,
+    status: "idle",
+    error: null,
+  },
 };
 
 export const currentUser = createAsyncThunk(
@@ -52,7 +85,7 @@ export const currentUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get("/api/users/me");
-     return {
+      return {
         success: response.data.success,
         message: response.data.message,
         data: response.data.data,
@@ -76,7 +109,7 @@ export const fetchUsers = createAsyncThunk(
       const response = await axios.get(
         `/api/users?page=${page}&limit=${limit}`
       );
-     return {
+      return {
         success: response.data.success,
         message: response.data.message,
         data: response.data.data,
@@ -100,7 +133,7 @@ export const fetchSidebarUsers = createAsyncThunk(
       const response = await axios.get(
         `/api/users?page=${page}&limit=${limit}`
       );
-     return {
+      return {
         success: response.data.success,
         message: response.data.message,
         data: response.data.data,
@@ -119,7 +152,7 @@ export const fetchUser = createAsyncThunk(
   async (username: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(`/api/users/${username}`);
-     return {
+      return {
         success: response.data.success,
         message: response.data.message,
         data: response.data.data,
@@ -138,7 +171,7 @@ export const updateUser = createAsyncThunk(
   async (userData: UserData, { rejectWithValue }) => {
     try {
       const response = await axios.put("/api/users/", userData);
-     return {
+      return {
         success: response.data.success,
         message: response.data.message,
         data: response.data.data,
@@ -157,102 +190,94 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     clearCurrentUser: (state) => {
-      state.currentUser = null;
+      state.currentUser.item = null;
     },
     clearUser: (state) => {
-      state.user = null;
-      state.users = []
-      state.status = "idle";
-      state.error = null;
-      
+    
+      state.users.items = [];
+      state.users.status = "idle";
+      state.users.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
 
       .addCase(currentUser.pending, (state) => {
-        state.status = "loading";
+        state.currentUser.status = "loading";
       })
 
       .addCase(currentUser.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.currentUser.status = "succeeded";
         state.currentUser = action.payload.data.currentUser;
-        state.error = null;
+        state.currentUser.error = null;
         //console.log('current user redux ',action.payload.currentUser );
       })
 
       .addCase(currentUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.error =
+        state.currentUser.status = "failed";
+        state.currentUser.error =
           (action.payload as string) || "Failed to fetch current user";
       })
       .addCase(fetchUsers.pending, (state) => {
-        state.usersStatus = "loading";
+        state.users.status = "loading";
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.usersStatus = "succeeded";
-        state.users = action.payload.data.users;
-        state.totalPages = action.payload.data.totalPages;
-        state.currentPage = action.payload.data.currentPage;
-        state.error = null;
+        state.users.status = "succeeded";
+        state.users.items = action.payload.data.users;
+        state.users.pagination.totalPages = action.payload.data.totalPages;
+        state.users.pagination.currentPage = action.payload.data.currentPage;
+        state.users.error = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
-        state.usersStatus = "failed";
-        state.error = (action.payload as string) || "Failed to fetch users";
+        state.users.status = "failed";
+        state.users.error = (action.payload as string) || "Failed to fetch users";
       })
 
       .addCase(fetchSidebarUsers.pending, (state) => {
-        state.status = "loading";
+        state.sidebar.status = "loading";
       })
 
       .addCase(fetchSidebarUsers.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.sidebarUsers = action.payload.data.users;
-        state.sidebarCurrentPage = action.payload.data.currentPage;
-        state.sidebarTotalPages = action.payload.data.totalPages;
-        state.error = null;
+        state.sidebar.status = "succeeded";
+        state.sidebar.items = action.payload.data.users;
+        state.sidebar.error = null;
       })
 
       .addCase(fetchSidebarUsers.rejected, (state, action) => {
-        state.status = "failed";
-        state.error =
+        state.sidebar.status = "failed";
+        state.sidebar.error =
           (action.payload as string) || "Failed to fetch sidebar users";
       })
 
       .addCase(fetchUser.pending, (state) => {
-        state.status = "loading";
+        state.user.status = "loading";
       })
 
       .addCase(fetchUser.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.user = action.payload.data.user;
-        state.error = null;
-        //console.log("Redux - User data received:", action.payload.user);
-        /* console.log(
-          "Redux - Profile picture:",
-          action.payload.user
-        );*/
+        state.user.status = "succeeded";
+        state.user.item = action.payload.data.user;
+        state.user.error = null;
       })
 
       .addCase(fetchUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.user = null;
-        state.error = (action.payload as string) || "Failed to get user";
+        state.user.status = "failed";
+        state.user.item = null;
+        state.user.error = (action.payload as string) || "Failed to get user";
       })
 
       .addCase(updateUser.pending, (state) => {
-        state.status = "loading";
+        state.user.status = "loading";
       })
 
       .addCase(updateUser.fulfilled, (state, action) => {
-        (state.status = "succeeded"), (state.user = action.payload.data);
-        state.error = null;
+        (state.user.status = "succeeded"), (state.user.item = action.payload.data);
+        state.user.error = null;
       })
 
       .addCase(updateUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.user = null;
-        state.error = (action.payload as string) || "Failed to update user";
+        state.user.status = "failed";
+        state.user.item = null;
+        state.user.error = (action.payload as string) || "Failed to update user";
       });
   },
 });

@@ -25,11 +25,15 @@ const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [activeTab, setActiveTab] = useState("threads");
 
-  const {
+  /*const {
     user,
     status: userStatus,
     currentUser: loggedInUser,
-  } = useSelector((state: RootState) => state.user);
+  } = useSelector((state: RootState) => state.user);*/
+
+  const {item: user , status: userStatus} = useSelector((state: RootState)=> state.user.user)
+
+  const {item: loggedInUser} = useSelector((state: RootState)=> state.user.currentUser)
 
   //console.log('users display', user)
 
@@ -110,13 +114,7 @@ const Page = () => {
     }
   };
 
-  {
-    /*threads.map((t) => (
-    console.log('author id',t.author.id)
-   ))
-
-  console.log('show button',isOwnProfile, loggedInUser?.id  )*/
-  }
+ 
   if (userStatus === "loading" || threadStatus === "loading") {
     return <p className="text-white text-center mt-10">Loading...</p>;
   }
@@ -190,17 +188,12 @@ const Page = () => {
                 <p className="text-white text-2xl">No posts yet</p>
               )}
 
-              {/*<ThreadsTab
-                currentUserId={user.id}
-                accountId={userInfo.id}
-                accountType="User"
-              />*/}
             </TabsContent>
           ))}
         </Tabs>
       </div>
 
-      {/* Pagination */}
+      
       <div className="flex justify-center gap-4 mt-6">
         <button
           disabled={currentPage <= 1}

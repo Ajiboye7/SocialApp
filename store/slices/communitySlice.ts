@@ -55,35 +55,75 @@ interface Community {
   requests: AuthorInfo[];
   community_picture: string;
   createdBy: AuthorInfo;
-  
 }
+
 interface CommunityState {
-  community: Community | null;
-  communities: Community[];
-  sidebarCommunities : Community[]
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-  totalThreads: number;
-  totalRequests: number;
-  totalMembers: number;
-  pagination: {
-    currentPage: number;
-    limit: number;
+  communities: {
+    items: Community[];
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+    pagination: {
+      currentPage: number;
+      limit: number;
+      totalPages?: number;
+    };
+    totals: {
+      totalThreads: number;
+      totalRequests: number;
+      totalMembers: number;
+    };
+  };
+
+  sidebar: {
+    items: Community[];
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+  };
+
+  community: {
+    item: Community | null;
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null;
+    totals: {
+      totalThreads: number;
+      totalRequests: number;
+      totalMembers: number;
+    };
   };
 }
 
+
 const initialState: CommunityState = {
-  community: null,
-  communities: [],
-  sidebarCommunities: [],
-  status: "idle",
-  error: null,
-  totalThreads: 0,
-  totalRequests: 0,
-  totalMembers: 0,
-  pagination: {
-    currentPage: 1,
-    limit: 5,
+  communities: {
+    items: [],
+    status: "idle",
+    error: null,
+    pagination: {
+      currentPage: 1,
+      limit: 10,
+    },
+    totals: {
+      totalThreads: 0,
+      totalRequests: 0,
+      totalMembers: 0,
+    },
+  },
+
+  sidebar: {
+    items: [],
+    status: "idle",
+    error: null,
+  },
+
+  community: {
+    item: null,
+    status: "idle",
+    error: null,
+    totals: {
+      totalThreads: 0,
+      totalRequests: 0,
+      totalMembers: 0,
+    },
   },
 };
 
@@ -108,32 +148,18 @@ export const createCommunity = createAsyncThunk(
 
 export const getCommunities = createAsyncThunk(
   "community/get",
-  async ({page, limit} :{page: number, limit: number}, { rejectWithValue }) => {
+  async (
+    { page, limit }: { page: number; limit: number },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await axios.get(`/api/communities?page=${page}&limit=${limit}`);
+      const response = await axios.get(
+        `/api/communities?page=${page}&limit=${limit}`
+      );
       return {
         success: response.data.success,
         message: response.data.message,
         data: response.data.data,
-      };
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data.message || error.message);
-      }
-      return rejectWithValue("An unexpected error occurred. Please try again.");
-    }
-  }
-);
-
-
-export const getSidebarCommunities = createAsyncThunk(
-  "communitySidebar/get",
-  async ({page, limit} :{page: number, limit: number}, { rejectWithValue }) => {
-    try {
-      const response = await axios.get(`/api/communities?page=${page}&limit=${limit}`);
-      return {
-        success: response.data.success,
-        message: response.data.message,
         pagination: response.data.pagination,
       };
     } catch (error) {
@@ -145,18 +171,35 @@ export const getSidebarCommunities = createAsyncThunk(
   }
 );
 
+export const getSidebarCommunities = createAsyncThunk(
+  "communitySidebar/get",
+  async (
+    { page, limit }: { page: number; limit: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.get(
+        `/api/communities?page=${page}&limit=${limit}`
+      );
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
+        //pagination: response.data.pagination,
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(error.response?.data.message || error.message);
+      }
+      return rejectWithValue("An unexpected error occurred. Please try again.");
+    }
+  }
+);
 
 export const getCommunityById = createAsyncThunk(
   "community/getCommunityById",
   async (communityId: string, { rejectWithValue }) => {
     try {
-      /*const params = new URLSearchParams();
-      params.append("page", page.toString());
-      params.append("limit", limit.toString());*/
-
-      /*const response = await axios.get(
-        `/api/communities/${communityId}?${params.toString()}`
-      );*/
       const response = await axios.get(`/api/communities/${communityId}`);
       return {
         success: response.data.success,
@@ -229,133 +272,135 @@ const communitySlice = createSlice({
   name: "community",
   initialState,
   reducers: {
-    clearCommunity : (state)=>{
-      state.communities = []
-      state.community = null;
-      state.status = 'idle'
-      state.error = null;
-    }
+    clearCommunity: (state) => {
+      state.communities.items = [];
+      state.communities.status = "idle";
+      state.communities.error = null;
+    },
   },
 
   extraReducers: (builder) => {
     builder
       .addCase(createCommunity.pending, (state) => {
-        state.status = "loading";
+        state.communities.status = "loading";
       })
 
       .addCase(createCommunity.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.communities.push(action.payload.data);
-        state.error = null;
+        state.communities.status = "succeeded";
+        state.communities.items.push(action.payload.data);
+        state.communities.error = null;
       })
 
       .addCase(createCommunity.rejected, (state, action) => {
-        state.status = "failed";
-        state.error =
+        state.communities.status = "failed";
+        state.communities.error =
           (action.payload as string) || "Failed to create community";
       })
 
       .addCase(getCommunities.pending, (state) => {
-        state.status = "loading";
+        state.communities.status = "loading";
       })
 
       .addCase(getCommunities.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.communities = action.payload.data;
-        state.error = null;
+        state.communities.status = "succeeded";
+        state.communities.items = action.payload.data;
+        state.communities.pagination = action.payload.pagination;
+        state.communities.error = null;
       })
 
       .addCase(getCommunities.rejected, (state, action) => {
-        state.status = "failed";
-        state.error =
+        state.communities.status = "failed";
+        state.communities.error =
           (action.payload as string) || "Failed to create community";
       })
 
       .addCase(getSidebarCommunities.pending, (state) => {
-        state.status = "loading";
+        state.sidebar.status = "loading";
       })
 
       .addCase(getSidebarCommunities.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.sidebarCommunities = action.payload.pagination;
-        state.error = null;
+        state.sidebar.status = "succeeded";
+        state.sidebar.items = action.payload.data;
+        //state.sidebar.pagination = action.payload.pagination;
+        state.sidebar.error = null;
       })
 
       .addCase(getSidebarCommunities.rejected, (state, action) => {
-        state.status = "failed";
-        state.error =
+        state.sidebar.status = "failed";
+        state.sidebar.error =
           (action.payload as string) || "Failed to create community";
       })
 
-
-
       .addCase(getCommunityById.pending, (state) => {
-        state.status = "loading";
+        state.community.status = "loading";
       })
 
       .addCase(getCommunityById.fulfilled, (state, action) => {
-        (state.status = "succeeded"),
-          (state.community = action.payload.data.community);
-        state.totalMembers = action.payload.data.totalMembers || 0;
-        state.totalRequests = action.payload.data.totalRequests || 0;
-        state.totalThreads = action.payload.data.totalThreads || 0;
-        state.pagination = action.payload.data.pagination;
-        state.error = null;
+        (state.community.status = "succeeded"),
+          (state.community.item = action.payload.data.community);
+        state.community.totals.totalMembers =
+          action.payload.data.totalMembers || 0;
+        state.community.totals.totalRequests =
+          action.payload.data.totalRequests || 0;
+        state.community.totals.totalThreads =
+          action.payload.data.totalThreads || 0;
+        //state.community.pagination = action.payload.data.pagination;
+        state.community.error = null;
       })
 
       .addCase(getCommunityById.rejected, (state, action) => {
-        (state.status = "failed"),
-          (state.error =
+        (state.community.status = "failed"),
+          (state.community.error =
             (action.payload as string) || "Failed to get a community");
       })
 
       .addCase(sendJoinRequest.pending, (state) => {
-        state.status = "loading";
+        state.community.status = "loading";
       })
 
       .addCase(sendJoinRequest.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.community.status = "succeeded";
         if (state.community) {
-          state.community.requests = action.payload.data.requests;
-          state.totalMembers = action.payload.data.totalMembers;
-          state.totalRequests = action.payload.data.totalRequests;
-          state.totalThreads = action.payload.data.totalThreads;
+          state.community.item = action.payload.data.requests;
+          state.community.totals.totalMembers =
+            action.payload.data.totalMembers;
+          state.community.totals.totalRequests =
+            action.payload.data.totalRequests;
+          state.community.totals.totalThreads =
+            action.payload.data.totalThreads;
         }
-
-        console.log(
-          "community count",
-          state.totalMembers,
-          state.totalRequests,
-          state.totalThreads
-        );
       })
 
       .addCase(sendJoinRequest.rejected, (state, action) => {
-        state.status = "failed";
-        state.error =
+        state.community.status = "failed";
+        state.community.error =
           (action.payload as string) || "failed to send join request";
       })
 
       .addCase(joinRequestDecision.pending, (state) => {
-        state.status = "loading";
+        state.community.status = "loading";
       })
 
       .addCase(joinRequestDecision.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        if (state.community) {
-          state.community.requests = action.payload.data.requests;
-          state.community.members = action.payload.data.members;
-          state.totalMembers = action.payload.data.totalMembers || 0;
-          state.totalRequests = action.payload.data.totalRequests || 0;
-          state.totalThreads = action.payload.data.totalThreads || 0;
+        state.community.status = "succeeded";
+        if (state.community.item) {
+          state.community.item.requests = action.payload.data.requests;
+          state.community.item.members = action.payload.data.members;
+          state.community.totals.totalMembers =
+            action.payload.data.totalMembers || 0;
+          state.community.totals.totalRequests =
+            action.payload.data.totalRequests || 0;
+          state.community.totals.totalThreads =
+            action.payload.data.totalThreads || 0;
         }
       })
       .addCase(joinRequestDecision.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action.payload as string) || "Failed to select decision";
+        state.community.status = "failed";
+        state.community.error =
+          (action.payload as string) || "Failed to select decision";
       });
   },
 });
 
 export default communitySlice.reducer;
-export const {clearCommunity} = communitySlice.actions
+export const { clearCommunity } = communitySlice.actions;

@@ -135,13 +135,6 @@ export async function GET(
        totalRequests,
       totalMembers,
       totalThreads,
-
-      pagination: {
-        // totalComment,
-        //totalPages,
-        currentPage: page,
-        limit,
-      },
     };
 
      return NextResponse.json(

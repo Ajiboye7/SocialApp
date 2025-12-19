@@ -20,7 +20,7 @@ const page = () => {
     usersStatus: status,
   } = useSelector((state: RootState) => state.user);*/
 
-  const {communities, status, pagination: { currentPage },  } = useSelector((state : RootState)=> state.community);
+  const {items : communities, status, pagination: { currentPage },  } = useSelector((state : RootState)=> state.community.communities);
   
   const [search, setSearch] = useState("");
 
@@ -28,7 +28,7 @@ const page = () => {
     //dispatch(clearUser());
     //dispatch(fetchUsers({ page: currentPage, limit: 10 })).unwrap();
     dispatch(clearCommunity())
-    dispatch(getCommunities({page: currentPage, limit: 5}));
+    dispatch(getCommunities({page: currentPage, limit: 3}));
   }, [dispatch]);
 
   //console.log("This is user listed", users);

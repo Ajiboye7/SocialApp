@@ -13,18 +13,18 @@ import { clearCommunity } from "@/store/slices/communitySlice";
 const RightSideBar = () => {
   const dispatch = useDispatch<AppDispatch>();
   const {
-    sidebarUsers: users,
-    currentPage,
-    usersStatus: status,
-  } = useSelector((state: RootState) => state.user);
+    items: users,
 
-  const { communities, pagination: { currentPage: page } } = useSelector((state: RootState) => state.community);
+    status: status,
+  } = useSelector((state: RootState) => state.user.sidebar);
+
+  const { items: communities,  } = useSelector((state: RootState) => state.community.sidebar);
 
   useEffect(() => {
     dispatch(clearUser())
-    dispatch(fetchSidebarUsers({ page: currentPage, limit: 3 }));
+    dispatch(fetchSidebarUsers({ page: 1, limit: 3 }));
     dispatch(clearCommunity())
-    dispatch(getSidebarCommunities({page: page, limit: 1}));
+    dispatch(getSidebarCommunities({page: 1, limit: 3}));
   }, [dispatch]);
 
   

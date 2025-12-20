@@ -83,8 +83,8 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  //const { userId } = await auth();
-  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  const { userId } = await auth();
+  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
 
   if (!userId) {
     return NextResponse.json(

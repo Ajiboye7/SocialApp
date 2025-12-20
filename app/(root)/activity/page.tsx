@@ -24,9 +24,10 @@ const Page = () => {
       })
     );
   }, [dispatch, currentPage]);
+  console.log('My Threads', threads)
 
   if (status === "loading") {
-     return <ContentSkeleton items={1} avatar title lines={1}   />
+     return <ContentSkeleton items={1} avatar title lines={1}/>
   }
 
   return (

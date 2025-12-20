@@ -12,8 +12,8 @@ import ContentSkeleton from "@/components/ContentSkeleton";
 import LoadingSpinner from "@/components/Spinner";
 
 const page = () => {
-  const { user, status: userStatus } = useSelector(
-    (state: RootState) => state.user
+  const {  status: userStatus } = useSelector(
+    (state: RootState) => state.user.users
   );
   const {
     threads,

@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import User from "../../../lib/models/user.model";
 import connectToDatabase from "@/lib/mongoose";
 import { auth } from "@clerk/nextjs/server";
-import { success } from "zod";
-import { parse } from "path";
 
 export async function PUT(request: Request) {
   const { userId } = await auth();

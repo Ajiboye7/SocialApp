@@ -9,11 +9,45 @@ interface UserData {
   profile_picture: string;
 }
 
+interface AuthorInfo {
+  _id: string;
+  username: string;
+  profile_picture: string;
+}
+
+interface Comment {
+  _id: string;
+  author: AuthorInfo;
+  thread: string;
+  createdAt: string;
+  parentId: string;
+  children: Comment[];
+}
+interface CommunityInfo {
+  _id: string;
+  name: string;
+  bio: string;
+  slug: string;
+  community_picture: string;
+  createdAt: string;
+}
+
+interface Thread {
+  _id: string;
+  author: AuthorInfo;
+  thread: string;
+  createdAt: string;
+  parentId?: string;
+  children: Comment[];
+  community?: CommunityInfo;
+}
+
 interface User {
   id: string;
   _id: string;
   name: string;
   username: string;
+  threads: Thread [];
   bio: string;
   profile_picture: string;
   onboarded: boolean;
@@ -208,7 +242,7 @@ const userSlice = createSlice({
 
       .addCase(currentUser.fulfilled, (state, action) => {
         state.currentUser.status = "succeeded";
-        state.currentUser = action.payload.data.currentUser;
+        state.currentUser.item = action.payload.data.currentUser;
         state.currentUser.error = null;
         //console.log('current user redux ',action.payload.currentUser );
       })

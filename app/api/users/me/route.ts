@@ -8,10 +8,11 @@ export async function GET(
   req: Request,
   
 ) {
-  const { userId } = await auth();
-  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  //const { userId } = await auth();
+  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   //user_31uxzj4iC5fXhBxWeNhmTAi6IjL
   //const { username } = params;
+  
     
 
   if (!userId) {
@@ -35,7 +36,7 @@ export async function GET(
           populate: {
             path: "author",
             model: User,
-            select: "name image id",  
+            select: "username profile_picture id",  
           },
         },
       ],

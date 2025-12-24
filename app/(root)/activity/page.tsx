@@ -6,28 +6,39 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
 import LoadingThread from "@/components/ContentSkeleton";
 import ContentSkeleton from "@/components/ContentSkeleton";
+import { currentUser } from "@/store/slices/userSlice";
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { threads, currentPage, status } = useSelector(
+  /*const { threads, currentPage, status } = useSelector(
     (state: RootState) => state.thread
+  );*/
+  const { item, status } = useSelector(
+    (state: RootState) => state.user.currentUser
   );
 
-  useEffect(() => {
+  /*useEffect(() => {
     dispatch(clearThreads());
     dispatch(
       getThreads({
         topLevelOnly: true,
         userOnly: true,
-        page: currentPage,
+        //authorId: '68b72b3bb55c90cd4b7a2617',
+        page: 1,
         limit: 5,
       })
     );
-  }, [dispatch, currentPage]);
-  console.log('My Threads', threads)
+  }, [dispatch]);*/
+
+  const threads = item?.threads;
+  console.log("My Threads", threads);
+
+  useEffect(() => {
+    dispatch(currentUser());
+  }, [dispatch]);
 
   if (status === "loading") {
-     return <ContentSkeleton items={1} avatar title lines={1}/>
+    return <ContentSkeleton items={1} avatar title lines={1} />;
   }
 
   return (

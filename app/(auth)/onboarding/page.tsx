@@ -1,17 +1,53 @@
 "use client";
+
 import React, { useEffect } from "react";
-import Image from "next/image";
-import Button from "@/components/shared/Button";
-import AccountProfile from "@/components/forms/AccountProfile";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/Spinner";
+import AccountProfile from "@/components/forms/AccountProfile";
+import { useUser } from "@clerk/nextjs";
 
 const page = () => {
   const router = useRouter();
-  const { currentUser: user, status } = useSelector((state: RootState) => state.user);
+  const {  isLoaded, isSignedIn } = useUser();
+  const { item: user, status } = useSelector(
+    (state: RootState) => state.user.currentUser
+  );
+
+  /*useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      router.replace("/sign-in");
+      return;
+    }
+
+    if (status === "succeeded" && user?.onboarded) {
+      router.replace("/");
+    }
+  }, [isLoaded, isSignedIn, status, user, router]);*/
+
+  console.log('my user,', user)
+
+  if (status === "loading" || !isLoaded) {
+    return (
+      <div className="mx-auto flex min-h-screen items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (status === "failed") {
+    return (
+      <div className="mx-auto flex min-h-[60vh] flex-col items-center justify-center">
+        <h2 className="text-red-500 text-xl">Error loading user data</h2>
+        <p className="text-light-2 mt-2">
+          Please refresh the page to try again.
+        </p>
+      </div>
+    );
+  }
 
   const userData = {
     id: user?._id ?? "",
@@ -21,72 +57,20 @@ const page = () => {
     image: user?.profile_picture ?? "",
   };
 
-  console.log( 'user Data onboarded', user)
-
-
-  useEffect(() => {
-    if (status === "succeeded" && user?.onboarded) {
-      redirect("/");
-    }
-  }, [status, user]);
-
-  if (status === "loading" || !user) {
-    return (
-      <div className="mx-auto flex max-w-3xl flex-col justify-center items-center px-10 py-20 min-h-[100vh]">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  if (status === "failed") {
-    return (
-      <div className="mx-auto flex max-w-3xl flex-col justify-center items-center px-10 py-20 min-h-[60vh]">
-        <h2 className="text-red-500 text-xl">Error loading user data</h2>
-        <p className="text-light-2 mt-2">
-          Please refresh the page to try again.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto flex max-w-3xl flex-col justify-start px-10 py-20">
-      <h1 className="text-light-1 text-[30px] leading-[140%] font-[600] mb-5">
+    <div className="mx-auto flex max-w-3xl flex-col px-10 py-20">
+      <h1 className="text-light-1 text-[30px] font-[600] mb-5">
         Onboarding
       </h1>
-      <p className="text-light-2 text-[16px] leading-[140%] font-[400]">
+      <p className="text-light-2 text-[16px]">
         Complete your profile now, to use Threads.
       </p>
+
       <section className="mt-9 bg-dark-2 p-10">
-       <AccountProfile user={userData} btnTitle="Continue" />
+        <AccountProfile user={userData} btnTitle="Continue" />
       </section>
     </div>
   );
 };
 
 export default page;
-
-/*"use client";
-import React from "react";
-import { currentUser } from "@clerk/nextjs/server";
-import Image from "next/image";
-import { SignOutButton, SignedIn, useAuth } from "@clerk/nextjs";
-import { usePathname, useRouter } from "next/navigation";
-
-const page = () => {
-  const router = useRouter();
-  return (
-    <div>
-      <h1 className="text-white">ONBOARDING</h1>
-      <SignOutButton>
-        <div className="flex cursor-pointer gap-4 p-4">
-          <Image src="/assets/logout.svg" alt="logout" width={24} height={24} />
-
-          <p className="text-light-2 max-lg:hidden">Logout</p>
-        </div>
-      </SignOutButton>
-    </div>
-  );
-};
-
-export default page;*/

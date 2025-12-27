@@ -10,26 +10,10 @@ import { currentUser } from "@/store/slices/userSlice";
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
-  /*const { threads, currentPage, status } = useSelector(
-    (state: RootState) => state.thread
-  );*/
+
   const { item, status } = useSelector(
     (state: RootState) => state.user.currentUser
   );
-
-  /*useEffect(() => {
-    dispatch(clearThreads());
-    dispatch(
-      getThreads({
-        topLevelOnly: true,
-        userOnly: true,
-        //authorId: '68b72b3bb55c90cd4b7a2617',
-        page: 1,
-        limit: 5,
-      })
-    );
-  }, [dispatch]);*/
-
   const threads = item?.threads;
   console.log("My Threads", threads);
 
@@ -53,7 +37,7 @@ const Page = () => {
         thread.children?.map((comment) => (
           <div
             key={comment._id}
-            className="flex items-center gap-2 rounded-md bg-dark-2 px-7 py-4 shadow-md"
+            className="flex items-center gap-2 rounded-md bg-dark-2 px-7 py-4 shadow-md my-2"
           >
             <img
               src={comment.author?.profile_picture || "/default-avatar.png"}

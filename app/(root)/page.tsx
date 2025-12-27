@@ -22,6 +22,11 @@ const page = () => {
     totalPages,
   } = useSelector((state: RootState) => state.thread);
 
+  const {item: user} = useSelector((state : RootState)=> state.user.currentUser)
+
+  if(!user) redirect('/sign-in');
+  if(!user?.onboarded) redirect("/onboarding");
+
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -30,7 +35,7 @@ const page = () => {
   }, [dispatch]);
 
   if (userStatus === "loading" || threadStatus === "loading") {
-    return <ContentSkeleton items={5} avatar lines={3} title />;
+    return <ContentSkeleton items={5} avatar lines={3} title />
   }
 
   return (
@@ -62,7 +67,7 @@ const page = () => {
         <p className="text-white text-2xl">No posts yet</p>
       )}
 
-      {/* Pagination */}
+      
       <div className="flex justify-center gap-4 mt-6">
         <button
           disabled={currentPage <= 1}
@@ -98,10 +103,6 @@ const page = () => {
           Next
         </button>
       </div>
-
-      {/*<SignOutButton redirectUrl="/sign-in">
-        <button className="text-white mt-10 cursor-pointer">Sign Out</button>
-      </SignOutButton>*/}
     </section>
   );
 };

@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-
 interface UserData {
   name: string;
   userName: string;
@@ -47,7 +46,7 @@ interface User {
   _id: string;
   name: string;
   username: string;
-  threads: Thread [];
+  threads: Thread[];
   bio: string;
   profile_picture: string;
   onboarded: boolean;
@@ -225,9 +224,11 @@ const userSlice = createSlice({
   reducers: {
     clearCurrentUser: (state) => {
       state.currentUser.item = null;
+      state.currentUser.status = "idle";
+      state.currentUser.error = null;
     },
+
     clearUser: (state) => {
-    
       state.users.items = [];
       state.users.status = "idle";
       state.users.error = null;
@@ -264,7 +265,8 @@ const userSlice = createSlice({
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.users.status = "failed";
-        state.users.error = (action.payload as string) || "Failed to fetch users";
+        state.users.error =
+          (action.payload as string) || "Failed to fetch users";
       })
 
       .addCase(fetchSidebarUsers.pending, (state) => {
@@ -304,14 +306,16 @@ const userSlice = createSlice({
       })
 
       .addCase(updateUser.fulfilled, (state, action) => {
-        (state.user.status = "succeeded"), (state.user.item = action.payload.data);
+        state.user.status = "succeeded";
+        state.user.item = action.payload.data;
         state.user.error = null;
       })
 
       .addCase(updateUser.rejected, (state, action) => {
         state.user.status = "failed";
         state.user.item = null;
-        state.user.error = (action.payload as string) || "Failed to update user";
+        state.user.error =
+          (action.payload as string) || "Failed to update user";
       });
   },
 });

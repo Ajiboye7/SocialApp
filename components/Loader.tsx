@@ -8,7 +8,7 @@ import { fetchUsers } from '@/store/slices/userSlice';
 import { useUser } from "@clerk/nextjs";
 import { fetchUser } from '@/store/slices/userSlice';
 import { currentUser } from '@/store/slices/userSlice';
-//import { getThreads } from '@/store/slices/threadSlice';
+
 import { clearThreads } from '@/store/slices/threadSlice';
 
 export default function Loader() {

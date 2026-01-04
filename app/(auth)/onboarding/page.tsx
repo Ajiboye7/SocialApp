@@ -8,14 +8,14 @@ import LoadingSpinner from "@/components/Spinner";
 import AccountProfile from "@/components/forms/AccountProfile";
 import { useUser } from "@clerk/nextjs";
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
-  const {  isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
   const { item: user, status } = useSelector(
     (state: RootState) => state.user.currentUser
   );
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (!isLoaded) return;
 
     if (!isSignedIn) {
@@ -23,14 +23,21 @@ const page = () => {
       return;
     }
 
+    if (status === "loading") return;
+
     if (status === "succeeded" && user?.onboarded) {
       router.replace("/");
     }
-  }, [isLoaded, isSignedIn, status, user, router]);*/
+  }, [isLoaded, isSignedIn, status, user?.onboarded, router]);
 
-  console.log('my user,', user)
-
-  if (status === "loading" || !isLoaded) {
+  if (!isLoaded || status === "loading") {
+    return (
+      <div className="mx-auto flex min-h-screen items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+  if (!isSignedIn || (status === "succeeded" && user?.onboarded)) {
     return (
       <div className="mx-auto flex min-h-screen items-center justify-center">
         <LoadingSpinner />
@@ -59,9 +66,7 @@ const page = () => {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col px-10 py-20">
-      <h1 className="text-light-1 text-[30px] font-[600] mb-5">
-        Onboarding
-      </h1>
+      <h1 className="text-light-1 text-[30px] font-[600] mb-5">Onboarding</h1>
       <p className="text-light-2 text-[16px]">
         Complete your profile now, to use Threads.
       </p>
@@ -73,4 +78,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

@@ -35,7 +35,6 @@ const Page = () => {
 
   const {item: loggedInUser} = useSelector((state: RootState)=> state.user.currentUser)
 
-  //console.log('users display', user)
 
   const viewedUserId = user?._id as string;
 
@@ -57,7 +56,6 @@ const Page = () => {
     if (username) dispatch(fetchUser(username as string));
   }, [dispatch, username]);
 
-  // console.log('views user id number 1', viewedUserId)
 
   useEffect(() => {
     setLastFetchedUsername(username);
@@ -84,7 +82,7 @@ const Page = () => {
     username,
     userStatus,
   ]);
-  //console.log('views user id number 2', viewedUserId)
+ 
 
   const isOwnProfile = loggedInUser?.id === user?.id;
 
@@ -121,7 +119,7 @@ const Page = () => {
 
   if (!user || userStatus === "failed") {
     return (
-      <p className="text-white text-center mt-10 text-2xl">User not found</p>
+      <p className="text-white text-center mt-10 text-2xl">You are not signed in</p>
     );
   }
 

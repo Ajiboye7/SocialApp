@@ -222,12 +222,11 @@ export async function POST(
 
     await community.save();
 
-    // After saving the community, use aggregation to get counts
 const communityWithCounts = await Community.aggregate([
   { $match: { _id: community._id } },
   {
     $lookup: {
-      from: "threads", // Make sure this matches your actual collection name
+      from: "threads",
       localField: "_id",
       foreignField: "community",
       as: "threads"
@@ -240,7 +239,6 @@ const communityWithCounts = await Community.aggregate([
       totalRequests: { $size: "$requests" },
       totalMembers: { $size: "$members" },
       totalThreads: { $size: "$threads" },
-      // You can also populate if needed
       populatedRequests: "$requests",
       populatedMembers: "$members"
     }

@@ -77,14 +77,14 @@ const RightSideBar = () => {
               <UserCardSkeleton key={index} button={true} />
             ))
           ) : users.length > 0 ? (
-            users.map((community) => (
+            users.map((user) => (
               <UserCard
-                key={community.id}
-                id={community.id}
-                name={community.name}
-                username={community.username}
-                imgUrl={community.profile_picture}
-                personType="Community"
+                key={user.id}
+                id={user.id}
+                name={user.name}
+                username={user.username}
+                imgUrl={user.profile_picture}
+                personType="User"
               />
             ))
           ) : (

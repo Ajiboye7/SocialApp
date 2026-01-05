@@ -81,8 +81,6 @@ export async function GET(request: Request) {
 
   //const userId = "user_31uxzj4iC5fXhBxWeNhmTAi6IjL";
 
-  //console.log("API /api/users GET userId:", userId);
-
   if (!userId) {
     return NextResponse.json(
       { success: false, message: "Unauthorized" },
@@ -132,5 +130,3 @@ export async function GET(request: Request) {
     );
   }
 }
-
-

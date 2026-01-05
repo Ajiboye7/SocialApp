@@ -276,6 +276,9 @@ const communitySlice = createSlice({
       state.communities.items = [];
       state.communities.status = "idle";
       state.communities.error = null;
+      state.community.item = null
+      state.community.status = "idle";
+      state.community.error = null;
     },
   },
 

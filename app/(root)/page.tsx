@@ -1,23 +1,12 @@
 "use client";
 import ThreadCard from "@/cards/ThreadCard";
-import React, { useState, useEffect } from "react";
-import { SignOutButton } from "@clerk/nextjs";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
-import LoadingThread from "@/components/ContentSkeleton";
-import { Skeleton } from "@/components/ui/skeleton";
 import { clearThreads, getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
 import ContentSkeleton from "@/components/ContentSkeleton";
-import LoadingSpinner from "@/components/Spinner";
-import { useUser } from "@clerk/nextjs";
 
 const Page = () => {
-  const router = useRouter();
-  const { isLoaded, isSignedIn } = useUser();
-  const { status: userStatus } = useSelector(
-    (state: RootState) => state.user.users
-  );
   const {
     threads,
     status: threadStatus,
@@ -31,32 +20,6 @@ const Page = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  // Handle authentication and onboarding redirects
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    if (!isSignedIn) {
-      router.replace("/sign-in");
-      return;
-    }
-
-    // Wait for user data to load
-    if (currentUserStatus === "loading") return;
-
-    // If user data loaded but user doesn't exist or not onboarded
-    if (currentUserStatus === "succeeded") {
-      if (!user) {
-        router.replace("/sign-in");
-        return;
-      }
-      if (!user.onboarded) {
-        router.replace("/onboarding");
-        return;
-      }
-    }
-  }, [isLoaded, isSignedIn, currentUserStatus, user, router]);
-
-  // Load threads only when user is ready
   useEffect(() => {
     if (
       currentUserStatus === "succeeded" &&
@@ -66,19 +29,10 @@ const Page = () => {
       dispatch(clearThreads());
       dispatch(getThreads({ topLevelOnly: true, page: currentPage, limit: 5 }));
     }
-  }, [currentUserStatus, user?.onboarded, dispatch]);
+  }, [currentUserStatus, user?.onboarded, dispatch, currentPage]);
 
-  // Show loading while checking auth or user status
-  if (
-    !isLoaded ||
-    currentUserStatus === "loading" ||
-    !user ||
-    !user.onboarded
-  ) {
-    return <ContentSkeleton items={5} avatar lines={3} title />;
-  }
-
-  if (userStatus === "loading" || threadStatus === "loading") {
+  // Show loading while threads are being fetched
+  if (threadStatus === "loading") {
     return <ContentSkeleton items={5} avatar lines={3} title />;
   }
 

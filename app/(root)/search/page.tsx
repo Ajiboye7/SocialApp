@@ -23,10 +23,10 @@ const page = () => {
 
   useEffect(() => {
     dispatch(clearUser());
-    dispatch(fetchUsers({ page: currentPage, limit: 10 })).unwrap();
+    dispatch(fetchUsers({ page: currentPage, limit: 10 }));
   }, [dispatch]);
 
-  console.log("This is user listed", users);
+  //console.log("This is user listed", users);
 
   const filteredUsers = users.filter((user) => {
     const query = search.toLowerCase();

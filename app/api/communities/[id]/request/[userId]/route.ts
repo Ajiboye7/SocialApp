@@ -1,4 +1,4 @@
-import connectToDatabase from "@/lib/mongoose";
+/*import connectToDatabase from "@/lib/mongoose";
 import { auth } from "@clerk/nextjs/server";
 import User from "@/lib/models/user.model";
 import { NextResponse } from "next/server";
@@ -144,10 +144,10 @@ export async function PATCH(
       { status: 500 }
     );
   }
-}
+}*/
 
 
-/**
+
  import connectToDatabase from "@/lib/mongoose";
 import { auth } from "@clerk/nextjs/server";
 import User from "@/lib/models/user.model";
@@ -183,6 +183,15 @@ export async function PATCH(
     const mongoUserId = resolvedParams.userId;
     const mongoCommunityId = resolvedParams.id;
     
+    /*const authUser = await User.findOne({ id: userId });
+
+    if(!authUser){
+      return NextResponse.json(
+        { success: false, message: "Auth User not found" },
+        { status: 404 }
+      );
+    }*/
+
     const user = await User.findById(mongoUserId);
     if (!user) {
       return NextResponse.json(
@@ -200,7 +209,7 @@ export async function PATCH(
     }
 
     // Check if requesting user is admin/creator of the community
-    if (community.created_by.toString() !== userId) {
+    if (community.createdBy.toString() !== mongoUserId) {
       return NextResponse.json(
         { success: false, message: "Only community admins can accept/reject requests" },
         { status: 403 }
@@ -325,4 +334,4 @@ export async function PATCH(
     );
   }
 }
- */
+ 

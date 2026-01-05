@@ -13,6 +13,7 @@ import { store } from "@/store/store";
 import ReduxProvider from "@/components/ReduxProvider";
 import Loader from "@/components/Loader";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthGuard } from "@/components/AuthGuard";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -49,10 +50,11 @@ export default function RootLayout({
             <TopBar />
             <main className="flex">
               <LeftSideBar />
-
-              <section className="bg-dark-1 flex-1 min-h-screen pt-30 px-10 lg:px-20 pb-20 ">
-                <div className="mx-auto w-full max-w-4xl">{children} </div>
-              </section>
+              <AuthGuard>
+                <section className="bg-dark-1 flex-1 min-h-screen pt-30 px-10 lg:px-20 pb-20 ">
+                  <div className="mx-auto w-full max-w-4xl">{children} </div>
+                </section>
+              </AuthGuard>
 
               <RightSideBar />
             </main>

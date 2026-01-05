@@ -10,6 +10,7 @@ export async function GET(
 ) {
   const { userId } = await auth();
   //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  //const userId = 'user_35QSrRZm9wI1YNGWc1mBjEmVBb9'
   //user_31uxzj4iC5fXhBxWeNhmTAi6IjL
   //const { username } = params;
   const resolvedParams = await params;

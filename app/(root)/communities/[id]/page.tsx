@@ -78,7 +78,7 @@ const page = () => {
     }
   };
 
-  // FIXED: Now accepts requestUserId parameter
+ 
   const handleAccept = async (requestUserId: string) => {
     if (!community?._id || !requestUserId) return;
 
@@ -86,7 +86,7 @@ const page = () => {
       const result = await dispatch(
         joinRequestDecision({
           id: community._id,
-          userId: requestUserId, // Use the request user's ID, not logged in user
+          userId: requestUserId,
           action: "accept",
         })
       ).unwrap();
@@ -97,7 +97,6 @@ const page = () => {
     }
   };
 
-  // FIXED: Now accepts requestUserId parameter
   const handleReject = async (requestUserId: string) => {
     if (!community?._id || !requestUserId) return;
 
@@ -105,7 +104,7 @@ const page = () => {
       const result = await dispatch(
         joinRequestDecision({
           id: community._id,
-          userId: requestUserId, // Use the request user's ID, not logged in user
+          userId: requestUserId,
           action: "reject",
         })
       ).unwrap();
@@ -170,7 +169,7 @@ const page = () => {
           </TabsList>
 
           <TabsContent value="threads">
-            {community?.threads.length === 0 ? (
+            {community?.threads?.length === 0 ? (
               <p>No threads yet.</p>
             ) : (
               community?.threads.map((t) => (
@@ -200,7 +199,7 @@ const page = () => {
 
           <TabsContent value="members">
             <section className="mt-9 flex flex-col gap-10">
-              {community?.members.length === 0 ? (
+              {community?.members?.length === 0 ? (
                 <p className="text-white">No members yet</p>
               ) : (
                 community?.members.map((member) => (

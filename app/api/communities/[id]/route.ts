@@ -10,8 +10,8 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  //const { userId } = await auth();
-  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  const { userId } = await auth();
+
   const resolvedParams = await params;
 
   if (!userId) {
@@ -31,8 +31,6 @@ export async function GET(
 
     const community = await Community.findById(resolvedParams.id)
       .sort({ createdAt: -1 })
-      //.skip(skip)
-      //.limit(limit)
       .populate({
         path: "createdBy",
         model: User,
@@ -76,7 +74,7 @@ export async function GET(
         ],
       });
 
-       const totalRequests = community.requests.length;
+    const totalRequests = community.requests.length;
     const totalMembers = community.members.length;
     const totalThreads = community.threads?.length || 0;
 
@@ -132,12 +130,12 @@ export async function GET(
         })),
       },
 
-       totalRequests,
+      totalRequests,
       totalMembers,
       totalThreads,
     };
 
-     return NextResponse.json(
+    return NextResponse.json(
       {
         success: true,
         message: "Community fetched successfully",
@@ -159,8 +157,6 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
-  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
-  //const userId = 'user_35QSrRZm9wI1YNGWc1mBjEmVBb9'
   const resolvedParams = await params;
 
   if (!userId) {
@@ -222,49 +218,52 @@ export async function POST(
 
     await community.save();
 
-const communityWithCounts = await Community.aggregate([
-  { $match: { _id: community._id } },
-  {
-    $lookup: {
-      from: "threads",
-      localField: "_id",
-      foreignField: "community",
-      as: "threads"
-    }
-  },
-  {
-    $project: {
-      requests: 1,
-      members: 1,
-      totalRequests: { $size: "$requests" },
-      totalMembers: { $size: "$members" },
-      totalThreads: { $size: "$threads" },
-      populatedRequests: "$requests",
-      populatedMembers: "$members"
-    }
-  }
-]);
+    const communityWithCounts = await Community.aggregate([
+      { $match: { _id: community._id } },
+      {
+        $lookup: {
+          from: "threads",
+          localField: "_id",
+          foreignField: "community",
+          as: "threads",
+        },
+      },
+      {
+        $project: {
+          requests: 1,
+          members: 1,
+          totalRequests: { $size: "$requests" },
+          totalMembers: { $size: "$members" },
+          totalThreads: { $size: "$threads" },
+          populatedRequests: "$requests",
+          populatedMembers: "$members",
+        },
+      },
+    ]);
 
-const result = communityWithCounts[0];
+    const result = communityWithCounts[0];
 
-return NextResponse.json(
-  {
-    success: true,
-    message: request === "do" 
-      ? "Join request submitted" 
-      : "Join request cancelled",
-    data: {
-      requests: await User.find({ _id: { $in: community.requests } })
-        .select("_id username profile_picture"),
-      members: await User.find({ _id: { $in: community.members } })
-        .select("_id username profile_picture"),
-      totalRequests: result.totalRequests,
-      totalMembers: result.totalMembers,
-      totalThreads: result.totalThreads,
-    },
-  },
-  { status: 200 }
-);
+    return NextResponse.json(
+      {
+        success: true,
+        message:
+          request === "do"
+            ? "Join request submitted"
+            : "Join request cancelled",
+        data: {
+          requests: await User.find({
+            _id: { $in: community.requests },
+          }).select("_id username profile_picture"),
+          members: await User.find({ _id: { $in: community.members } }).select(
+            "_id username profile_picture"
+          ),
+          totalRequests: result.totalRequests,
+          totalMembers: result.totalMembers,
+          totalThreads: result.totalThreads,
+        },
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Community fetch error:", error);
     return NextResponse.json(
@@ -273,49 +272,3 @@ return NextResponse.json(
     );
   }
 }
-
-/*try {
-      const clerkResponse = await fetch(
-        `https://api.clerk.com/v1/organizations/${clerkCommunityId}/memberships`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            role: "org:member",
-          }),
-        }
-      );
-
-      if (!clerkResponse.ok) {
-        const errorData = await clerkResponse.json();
-        console.error("Clerk API error:", errorData);
-        
-        // Rollback MongoDB change if Clerk fails
-        community.requests.pull(mongoUserId);
-        await community.save();
-        
-        return NextResponse.json(
-          { success: false, message: "Failed to add member to Clerk organization" },
-          { status: 500 }
-        );
-      }
-
-      //const clerkData = await clerkResponse.json();
-      //console.log("User added to Clerk organization:", clerkData);
-      
-    } catch (clerkError) {
-      console.error("Clerk membership error:", clerkError);
-      
-      // Rollback MongoDB change
-      community.requests.pull(mongoUserId);
-      await community.save();
-      
-      return NextResponse.json(
-        { success: false, message: "Failed to sync with Clerk" },
-        { status: 500 }
-      );
-    }*/

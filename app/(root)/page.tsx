@@ -31,7 +31,7 @@ const Page = () => {
     }
   }, [currentUserStatus, user?.onboarded, dispatch, currentPage]);
 
-  // Show loading while threads are being fetched
+  
   if (threadStatus === "loading") {
     return <ContentSkeleton items={5} avatar lines={3} title />;
   }

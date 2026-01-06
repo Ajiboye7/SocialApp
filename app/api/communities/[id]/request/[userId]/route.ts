@@ -8,7 +8,7 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
-  const { userId: authUserId } = await auth(); // Logged-in user (admin)
+  const { userId: authUserId } = await auth();
   const resolvedParams = await params;
 
   if (!authUserId) {
@@ -29,12 +29,10 @@ export async function PATCH(
 
   try {
     await connectToDatabase();
-    
-    // Request user ID from URL params (user being accepted/rejected)
+
     const requestUserMongoId = resolvedParams.userId;
     const mongoCommunityId = resolvedParams.id;
-    
-    // Get the logged-in user (admin)
+
     const authUser = await User.findOne({ id: authUserId });
 
     if (!authUser) {
@@ -44,7 +42,6 @@ export async function PATCH(
       );
     }
 
-    // Get the user being accepted/rejected
     const requestUser = await User.findById(requestUserMongoId);
     if (!requestUser) {
       return NextResponse.json(
@@ -61,19 +58,20 @@ export async function PATCH(
       );
     }
 
-    console.log('Community created by:', community.createdBy.toString());
-    console.log('Auth user (admin):', authUser._id.toString());
-    console.log('Request user being processed:', requestUserMongoId);
+    console.log("Community created by:", community.createdBy.toString());
+    console.log("Auth user (admin):", authUser._id.toString());
+    console.log("Request user being processed:", requestUserMongoId);
 
-    // FIXED: Check if the LOGGED-IN user is the admin, not the request user
     if (community.createdBy.toString() !== authUser._id.toString()) {
       return NextResponse.json(
-        { success: false, message: "Only community admins can accept/reject requests" },
+        {
+          success: false,
+          message: "Only community admins can accept/reject requests",
+        },
         { status: 403 }
       );
     }
 
-    // FIXED: Check if the REQUEST USER is in the request list
     if (!community.requests.includes(requestUserMongoId)) {
       return NextResponse.json(
         { success: false, message: "User not in request list" },
@@ -81,22 +79,18 @@ export async function PATCH(
       );
     }
 
-    // Remove the REQUEST USER from requests list
     community.requests = community.requests.filter(
       (id: any) => id.toString() !== requestUserMongoId
     );
 
     if (action === "accept") {
-      // Add REQUEST USER to members in MongoDB
       community.members.push(requestUserMongoId);
       requestUser.communities.push(mongoCommunityId);
 
-      // Save MongoDB changes first
       await Promise.all([community.save(), requestUser.save()]);
 
-      // Then sync with Clerk
-      const clerkCommunityId = community.id; // Clerk org ID
-      const clerkUserId = requestUser.id; // Clerk user ID of request user
+      const clerkCommunityId = community.id;
+      const clerkUserId = requestUser.id;
 
       try {
         const clerkResponse = await fetch(
@@ -118,7 +112,6 @@ export async function PATCH(
           const errorData = await clerkResponse.json();
           console.error("Clerk API error:", errorData);
 
-          // Rollback MongoDB changes if Clerk fails
           community.members = community.members.filter(
             (id: any) => id.toString() !== requestUserMongoId
           );
@@ -140,7 +133,6 @@ export async function PATCH(
       } catch (clerkError) {
         console.error("Clerk membership error:", clerkError);
 
-        // Rollback MongoDB changes
         community.members = community.members.filter(
           (id: any) => id.toString() !== requestUserMongoId
         );
@@ -157,11 +149,9 @@ export async function PATCH(
         );
       }
     } else {
-      // action === "reject" - just remove from requests, don't add to members
       await community.save();
     }
 
-    // Populate for response
     const populatedCommunity = await Community.findById(mongoCommunityId)
       .populate("requests", "_id username profile_picture")
       .populate("members", "_id username profile_picture");

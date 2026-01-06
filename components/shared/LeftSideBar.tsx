@@ -13,9 +13,11 @@ const LeftSideBar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const sidebarLinks = useSidebarLinks();
-  const { currentUser: user, status: userStatus } = useSelector(
-    (state: RootState) => state.user
+  const { item: user, status: userStatus } = useSelector(
+    (state: RootState) => state.user.currentUser
   );
+
+  console.log('current user', user);
 
   const username = user?.username;
   return (
@@ -28,8 +30,6 @@ const LeftSideBar = () => {
           //if (link.route === "/profile")
             //link.route = `${link.route}/${username}`;
           const href = link.route === "/profile" ? `/profile/${username}` : link.route;
-        
-
 
           return (
             <div key={link.label}>

@@ -8,10 +8,6 @@ import Community from "@/lib/models/community.model";
 export async function POST(request: Request) {
   const { userId } = await auth();
 
-  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
-
-  //console.log("User id", userId);
-
   if (!userId) {
     return NextResponse.json(
       { success: false, message: "Unauthorized: No user session found" },
@@ -84,8 +80,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET(req: Request) {
-  //const { userId } = await auth();
-  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  const { userId } = await auth();
   if (!userId) {
     return NextResponse.json(
       { success: false, message: "unauthorized" },

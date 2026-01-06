@@ -7,8 +7,8 @@ interface JoinRequestCardProps {
   name: string;
   username: string;
   imgUrl: string;
-  onAccept: () => void;
-  onReject: () => void;
+  onAccept: (userId: string) => void;  // Now accepts userId parameter
+  onReject: (userId: string) => void;  // Now accepts userId parameter
 }
 
 export default function JoinRequestCard({
@@ -45,14 +45,14 @@ export default function JoinRequestCard({
       {/* Action Buttons */}
       <div className="flex gap-2">
         <Button
-          onClick={() => onAccept()}
+          onClick={() => onAccept(id)}  // Pass the user id
           className="px-3 py-1.5 rounded-lg bg-green-600 text-light-1 text-sm font-semibold hover:bg-green-700 transition"
         >
           Accept
         </Button>
 
         <Button
-          onClick={() => onReject() }
+          onClick={() => onReject(id)}  // Pass the user id
           className="px-3 py-1.5 rounded-lg bg-red-600 text-light-1 text-sm font-semibold hover:bg-red-700 transition"
         >
           Reject

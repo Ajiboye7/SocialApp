@@ -22,10 +22,10 @@ const RightSideBar = () => {
 
   useEffect(() => {
     dispatch(clearUser())
-    dispatch(fetchSidebarUsers({ page: 1, limit: 3 }));
+    dispatch(fetchSidebarUsers({ page: 1, limit: 4 }));
     dispatch(clearCommunity())
-    dispatch(getSidebarCommunities({page: 1, limit: 3}));
-  }, [dispatch]);
+    dispatch(getSidebarCommunities({page: 1, limit: 4}));
+  }, [dispatch,]);
 
   
 

@@ -8,8 +8,8 @@ export async function GET(
   req: Request,
   
 ) {
-  //const { userId } = await auth();
-  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  const { userId } = await auth();
+  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   //const  userId = 'user_31uxzj4iC5fXhBxWeNhmTAi6IjL'
   //const userId = 'user_35QSrRZm9wI1YNGWc1mBjEmVBb9'
   //const { username } = params;

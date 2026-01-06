@@ -23,6 +23,7 @@ import UserCard from "@/cards/UserCard";
 import JoinRequestCard from "@/cards/RequestCard";
 import { joinRequestDecision } from "@/store/slices/communitySlice";
 import { toast } from "sonner";
+
 const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
     null
@@ -35,10 +36,8 @@ const page = () => {
     item: loggedInUser,
   } = useSelector((state: RootState) => state.user.currentUser);
 
-
   const {status, item : community, totals : {totalMembers, totalRequests, totalThreads}} = useSelector((state: RootState)=> state.community.community)
 
-  
   const {
     threads,
     status: threadStatus,
@@ -46,6 +45,7 @@ const page = () => {
     totalPages,
     totalUserThread: totalPost,
   } = useSelector((state: RootState) => state.thread);
+  
   const params = useParams();
   const communityId = params.id as string;
 
@@ -59,7 +59,6 @@ const page = () => {
       dispatch(
         getThreads({
           topLevelOnly: true,
-          //authorId: viewedUserId,
           page: currentPage - 1,
           limit: 5,
         })
@@ -72,7 +71,6 @@ const page = () => {
       dispatch(
         getThreads({
           topLevelOnly: true,
-          //authorId: viewedUserId,
           page: currentPage + 1,
           limit: 5,
         })
@@ -80,44 +78,44 @@ const page = () => {
     }
   };
 
-  
-  const handleAccept = async () => {
-  if (!community?._id || !loggedInUser?._id) return;
+  // FIXED: Now accepts requestUserId parameter
+  const handleAccept = async (requestUserId: string) => {
+    if (!community?._id || !requestUserId) return;
 
-  try {
-    const result = await dispatch(
-      joinRequestDecision({
-        id: community._id,
-        userId: loggedInUser?._id,
-        action: "accept",
-      })
-    ).unwrap();
+    try {
+      const result = await dispatch(
+        joinRequestDecision({
+          id: community._id,
+          userId: requestUserId, // Use the request user's ID, not logged in user
+          action: "accept",
+        })
+      ).unwrap();
 
-    toast.success(result.message);
-  } catch (err) {
-    toast.error(String(err));
-  }
-};
+      toast.success(result.message);
+    } catch (err) {
+      toast.error(String(err));
+    }
+  };
 
-  const handleReject = async () => {
-  if (!community?._id || !loggedInUser?._id) return;
+  // FIXED: Now accepts requestUserId parameter
+  const handleReject = async (requestUserId: string) => {
+    if (!community?._id || !requestUserId) return;
 
-  try {
-    const result = await dispatch(
-      joinRequestDecision({
-        id: community._id,
-        userId: loggedInUser?._id,
-        action: "reject",
-      })
-    ).unwrap();
+    try {
+      const result = await dispatch(
+        joinRequestDecision({
+          id: community._id,
+          userId: requestUserId, // Use the request user's ID, not logged in user
+          action: "reject",
+        })
+      ).unwrap();
 
-    toast.info(result.message);
-  } catch (err) {
-    toast.error(String(err));
-  }
-};
+      toast.info(result.message);
+    } catch (err) {
+      toast.error(String(err));
+    }
+  };
 
-  
   if (status === "loading") {
     return <p className="text-white text-center mt-10">Loading...</p>;
   }
@@ -167,15 +165,11 @@ const page = () => {
                     {totalRequests}
                   </p>
                 )}
-
-
-                
               </TabsTrigger>
             ))}
           </TabsList>
 
           <TabsContent value="threads">
-            
             {community?.threads.length === 0 ? (
               <p>No threads yet.</p>
             ) : (
@@ -235,8 +229,9 @@ const page = () => {
                     name={req.username}
                     username={req.username}
                     imgUrl={req.profile_picture}
-                    onAccept={handleAccept}
-                    onReject={handleReject}
+                    // FIXED: Pass the request user's ID to the handlers
+                    onAccept={() => handleAccept(req._id)}
+                    onReject={() => handleReject(req._id)}
                   />
                 ))
               )}

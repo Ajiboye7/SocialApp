@@ -158,8 +158,8 @@ export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  //const { userId } = await auth();
-  const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
+  const { userId } = await auth();
+  //const userId = "user_329ZC1gP0BLPxdsTTKeK4eAJDKv";
   //const userId = 'user_35QSrRZm9wI1YNGWc1mBjEmVBb9'
   const resolvedParams = await params;
 

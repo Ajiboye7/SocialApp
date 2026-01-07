@@ -11,8 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ThreadCard from "@/cards/ThreadCard";
 import { getThreads } from "@/store/slices/threadSlice";
 import { RootState, AppDispatch } from "@/store/store";
-import { clearThreads } from "@/store/slices/threadSlice";
-import { currentUser, fetchUser } from "@/store/slices/userSlice";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";

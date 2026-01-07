@@ -78,7 +78,6 @@ const Page = () => {
         </div>
       )}
 
-      {/* Pagination */}
       {threads.length > 0 && (
         <div className="flex flex-col xs:flex-row items-center justify-center gap-3 xs:gap-4 mt-6 xs:mt-8 sm:mt-10 pb-4">
           <button

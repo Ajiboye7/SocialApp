@@ -40,27 +40,3 @@ export default function RootLayout({
   );
 }
 
-
-//GROK
-{/*import { ClerkProvider } from '@clerk/nextjs';
-import "../globals.css";
-import { dark } from "@clerk/themes";
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark, // or 'light'
-        elements: {
-          formButtonPrimary: 'bg-blue-500 hover:bg-blue-600 text-white',
-          card: 'bg-gray-800 text-white',
-        },
-      }}
-    >
-      <html lang="en">
-        <body>{children}</body>
-      </html>
-    </ClerkProvider>
-  );
-}
-*/}

@@ -33,7 +33,7 @@ const Page = () => {
 
   
   if (threadStatus === "loading") {
-    return <ContentSkeleton items={5} avatar lines={3} title />;
+    return <ContentSkeleton items={5} avatar lines={3} title />
   }
 
   return (

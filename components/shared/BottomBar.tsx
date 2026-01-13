@@ -4,20 +4,29 @@ import React from 'react';
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from 'next/image';
+import { RootState, AppDispatch } from "@/store/store";
+import { useSelector, useDispatch } from "react-redux";
+import { SignOutButton, SignedIn, useAuth } from "@clerk/nextjs";
 
 const BottomBar = () => {
    const pathname = usePathname();
    const sidebarLinks = useSidebarLinks();
+   const { item: user, status: userStatus } = useSelector(
+       (state: RootState) => state.user.currentUser
+     );
+      const username = user?.username;
   return (
     <section className='bg-dark-2 md:hidden p-4 rounded-xl fixed bottom-0 w-full z-10'>
      <div className='flex justify-between '>
       {sidebarLinks.map((link)=>{
         const isActive =
         (pathname.includes(link.route) && link.route.length > 1 || pathname === link.route)
+
+         const href = link.route === "/profile" ? `/profile/${username}` : link.route;
         return(
           <div key={link.label} className=''>
             <Link 
-            href={link.route}
+            href={href}
             key={link.label}
            className={`flex flex-col items-center gap-1 rounded-lg p-2 md:p-4 ${
                   isActive && "bg-primary-500"

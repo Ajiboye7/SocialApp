@@ -17,7 +17,7 @@ const LeftSideBar = () => {
     (state: RootState) => state.user.currentUser
   );
 
-  console.log('current user', user);
+  //console.log('current user', user);
 
   const username = user?.username;
   return (

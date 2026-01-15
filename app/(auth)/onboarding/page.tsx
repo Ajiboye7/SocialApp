@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useRouter } from "next/navigation";
@@ -10,34 +10,43 @@ import { useUser } from "@clerk/nextjs";
 
 const Page = () => {
   const router = useRouter();
-  const { isLoaded, isSignedIn } = useUser();
-  const { item: user, status } = useSelector(
-    (state: RootState) => state.user.currentUser
+  const { isLoaded, isSignedIn, user: clerkUser } = useUser();
+  const [mounted, setMounted] = useState(false);
+  
+  const reduxUser = useSelector(
+    (state: RootState) => state.user?.currentUser?.item
+  );
+  const status = useSelector(
+    (state: RootState) => state.user?.currentUser?.status
   );
 
   useEffect(() => {
-    if (!isLoaded) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !isLoaded) return;
 
     if (!isSignedIn) {
       router.replace("/sign-in");
       return;
     }
 
-    if (status === "loading") return;
-
-    if (status === "succeeded" && user?.onboarded) {
+    if (status === "succeeded" && reduxUser?.onboarded) {
       router.replace("/");
     }
-  }, [isLoaded, isSignedIn, status, user?.onboarded, router]);
+  }, [mounted, isLoaded, isSignedIn, status, reduxUser?.onboarded, router]);
 
-  if (!isLoaded || status === "loading") {
+  // Wait for client-side mount
+  if (!mounted || !isLoaded || status === "loading") {
     return (
       <div className="mx-auto flex min-h-screen items-center justify-center">
         <LoadingSpinner />
       </div>
     );
   }
-  if (!isSignedIn || (status === "succeeded" && user?.onboarded)) {
+
+  if (!isSignedIn || (status === "succeeded" && reduxUser?.onboarded)) {
     return (
       <div className="mx-auto flex min-h-screen items-center justify-center">
         <LoadingSpinner />
@@ -57,11 +66,11 @@ const Page = () => {
   }
 
   const userData = {
-    id: user?._id ?? "",
-    username: user?.username ?? "",
-    name: user?.name ?? "",
-    bio: user?.bio ?? "",
-    image: user?.profile_picture ?? "",
+    id: reduxUser?._id ?? clerkUser?.id ?? "",
+    username: reduxUser?.username ?? "",
+    name: reduxUser?.name ?? clerkUser?.fullName ?? "",
+    bio: reduxUser?.bio ?? "",
+    image: reduxUser?.profile_picture ?? clerkUser?.imageUrl ?? "",
   };
 
   return (

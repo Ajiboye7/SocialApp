@@ -1,4 +1,3 @@
-import Community from "@/lib/models/community.model";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 

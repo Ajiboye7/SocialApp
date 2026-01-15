@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { deleteComment } from "@/store/slices/threadSlice";
 import { deleteThread } from "@/store/slices/threadSlice";
-import { useDispatch, UseDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { formatDateString } from "@/lib/utils";
 

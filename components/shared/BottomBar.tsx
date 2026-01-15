@@ -16,8 +16,8 @@ const BottomBar = () => {
      );
       const username = user?.username;
   return (
-    <section className='bg-dark-2 md:hidden p-4 rounded-xl fixed bottom-0 w-full z-10'>
-     <div className='flex justify-between '>
+    <section className='bottombar'>
+      <div className='bottombar_container'>
       {sidebarLinks.map((link)=>{
         const isActive =
         (pathname.includes(link.route) && link.route.length > 1 || pathname === link.route)
@@ -50,3 +50,5 @@ const BottomBar = () => {
 }
 
 export default BottomBar;
+
+

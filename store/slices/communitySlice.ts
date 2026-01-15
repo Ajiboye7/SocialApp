@@ -362,17 +362,16 @@ const communitySlice = createSlice({
       })
 
       .addCase(sendJoinRequest.fulfilled, (state, action) => {
-        state.community.status = "succeeded";
-        if (state.community) {
-          state.community.item = action.payload.data.requests;
-          state.community.totals.totalMembers =
-            action.payload.data.totalMembers;
-          state.community.totals.totalRequests =
-            action.payload.data.totalRequests;
-          state.community.totals.totalThreads =
-            action.payload.data.totalThreads;
-        }
-      })
+  state.community.status = "succeeded";
+  if (state.community.item) {
+    
+    state.community.item.requests = action.payload.data.requests;
+    state.community.item.members = action.payload.data.members;
+    state.community.totals.totalMembers = action.payload.data.totalMembers;
+    state.community.totals.totalRequests = action.payload.data.totalRequests;
+    state.community.totals.totalThreads = action.payload.data.totalThreads;
+  }
+})
 
       .addCase(sendJoinRequest.rejected, (state, action) => {
         state.community.status = "failed";

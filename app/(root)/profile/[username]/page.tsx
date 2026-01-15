@@ -16,6 +16,7 @@ import { currentUser, fetchUser } from "@/store/slices/userSlice";
 import { useParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { clearCurrentUser } from "@/store/slices/userSlice";
+import LoadingSpinner from "@/components/Spinner";
 
 const Page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
@@ -114,8 +115,13 @@ const Page = () => {
 
  
   if (userStatus === "loading" || threadStatus === "loading") {
-    return <p className="text-white text-center mt-10">Loading...</p>;
-  }
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <LoadingSpinner />
+    </div>
+  );
+}
+
 
   if (!user || userStatus === "failed") {
     return (

@@ -7,6 +7,7 @@ import { RootState, AppDispatch } from "@/store/store";
 import LoadingThread from "@/components/ContentSkeleton";
 import ContentSkeleton from "@/components/ContentSkeleton";
 import { currentUser } from "@/store/slices/userSlice";
+import UserCardSkeleton from "@/components/UserCardSkeleton";
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -14,15 +15,19 @@ const Page = () => {
   const { item, status } = useSelector(
     (state: RootState) => state.user.currentUser
   );
+
   const threads = item?.threads;
-  console.log("My Threads", threads);
 
   useEffect(() => {
-    dispatch(currentUser());
-  }, [dispatch]);
+    if (!item && status === "idle") {
+      dispatch(currentUser());
+    }
+  }, [dispatch, item, status]);
 
-  if (status === "loading") {
-    return <ContentSkeleton items={1} avatar title lines={1} />;
+  if (status === "loading" && !item) {
+    return Array.from({ length: 3 }).map((_, index) => (
+      <UserCardSkeleton key={index} button={true} />
+    ));
   }
 
   return (
@@ -41,8 +46,7 @@ const Page = () => {
           >
             <img
               src={comment.author?.profile_picture || "/default-avatar.png"}
-              alt={comment.author?.username}
-              className="w-10 h-10 rounded-full mr-3 object-cover"
+              className="w-10 h-10 rounded-full object-cover"
             />
             <div>
               <p className="text-white">

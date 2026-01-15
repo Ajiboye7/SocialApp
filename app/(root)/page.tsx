@@ -21,29 +21,35 @@ const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
+    if (currentUserStatus === "succeeded" && user?.onboarded) {
+      dispatch(clearThreads());
+      dispatch(getThreads({ topLevelOnly: true, page: 1, limit: 5 }));
+    }
+  }, [currentUserStatus, user?.onboarded, dispatch]);
+
+  useEffect(() => {
     if (
       currentUserStatus === "succeeded" &&
       user?.onboarded &&
-      threads.length === 0
+      currentPage > 1 &&
+      threads.length > 0
     ) {
-      dispatch(clearThreads());
       dispatch(getThreads({ topLevelOnly: true, page: currentPage, limit: 5 }));
     }
-  }, [currentUserStatus, user?.onboarded, dispatch, currentPage]);
+  }, [currentPage]);
 
-  
   if (threadStatus === "loading") {
-    return <ContentSkeleton items={5} avatar lines={3} title />
+    return <ContentSkeleton items={5} avatar lines={3} title />;
   }
 
   return (
-    <section className="w-full max-w-4xl mx-auto px-3 xs:px-4 sm:px-6 md:px-8 py-4 xs:py-5 sm:py-6">
+    <>
       <h1 className="text-2xl xs:text-[26px] sm:text-[28px] md:text-[30px] leading-[140%] font-semibold md:font-semibold text-light-1 mb-4 xs:mb-5 sm:mb-6">
         Home
       </h1>
 
       {threads.length > 0 ? (
-        <div className="space-y-0">
+        <div className="space-y-4">
           {threads.map((t) => (
             <ThreadCard
               parentId={t._id}
@@ -95,11 +101,11 @@ const Page = () => {
           >
             Previous
           </button>
-          
+
           <span className="text-white text-sm xs:text-base font-medium whitespace-nowrap">
             Page {currentPage} of {totalPages}
           </span>
-          
+
           <button
             disabled={currentPage >= totalPages}
             onClick={() =>
@@ -117,7 +123,7 @@ const Page = () => {
           </button>
         </div>
       )}
-    </section>
+    </>
   );
 };
 

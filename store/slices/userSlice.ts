@@ -245,7 +245,7 @@ const userSlice = createSlice({
         state.currentUser.status = "succeeded";
         state.currentUser.item = action.payload.data.currentUser;
         state.currentUser.error = null;
-        //console.log('current user redux ',action.payload.currentUser );
+        
       })
 
       .addCase(currentUser.rejected, (state, action) => {

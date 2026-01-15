@@ -16,19 +16,11 @@ import ReduxProvider from "@/components/ReduxProvider";
 import Loader from "@/components/Loader";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthGuard } from "@/components/AuthGuard";
-const geistSans = Inter({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = JetBrains_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Social App",
-  description: "A Next.js 15 Meta Social application",
+  title: "Threads",
+  description: "A Next.js 13 Meta Threads application",
 };
 
 export default function RootLayout({
@@ -45,16 +37,16 @@ export default function RootLayout({
       >
         <html lang="en">
           <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            className={inter.className}
           >
             <Loader />
 
             <TopBar />
-            <main className="flex">
+            <main className='flex flex-row'>
               <LeftSideBar />
               <AuthGuard>
-                <section className="bg-dark-1 flex-1 min-h-screen pt-30 px-10 lg:px-20 pb-20 ">
-                  <div className="mx-auto w-full max-w-4xl">{children} </div>
+                <section className='main-container'>
+                     <div className='w-full max-w-4xl'>{children}</div>
                 </section>
               </AuthGuard>
 
@@ -62,7 +54,19 @@ export default function RootLayout({
             </main>
 
             <BottomBar />
-            <Toaster />
+            <Toaster
+        theme="light"
+        richColors
+        position="top-right"
+        toastOptions={{
+          classNames: {
+            toast: "bg-[#0e0e12] border border-gray-700 text-white",
+            success: "border-green-500",
+            error: "border-red-500",
+            info: "border-blue-500",
+          },
+        }}
+      />
           </body>
         </html>
       </ClerkProvider>

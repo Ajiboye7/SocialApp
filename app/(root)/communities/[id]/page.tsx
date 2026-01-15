@@ -21,6 +21,7 @@ import UserCard from "@/cards/UserCard";
 import JoinRequestCard from "@/cards/RequestCard";
 import { joinRequestDecision } from "@/store/slices/communitySlice";
 import { toast } from "sonner";
+import LoadingSpinner from "@/components/Spinner";
 
 const page = () => {
   const [lastFetchedUsername, setLastFetchedUsername] = useState<string | null>(
@@ -113,9 +114,14 @@ const page = () => {
     }
   };
 
-  if (status === "loading") {
-    return <p className="text-white text-center mt-10">Loading...</p>;
-  }
+  if (status === "loading" || threadStatus === "loading") {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <LoadingSpinner />
+    </div>
+  );
+}
+
 
   return (
     <section className="w-full">

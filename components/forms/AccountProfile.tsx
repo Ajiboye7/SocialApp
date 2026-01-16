@@ -47,7 +47,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   );
 
   const dispatch = useDispatch<AppDispatch>();
-  const { startUpload } = useUploadThing("imageUploader");
+  const { startUpload } = useUploadThing("media");
   const [files, setFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -80,8 +80,8 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     if (hasImageChanged) {
       const imgRes = await startUpload(files);
 
-      if (imgRes && imgRes[0].ufsUrl) {
-        data.profile_photo = imgRes[0].ufsUrl;
+      if (imgRes && imgRes[0].url) {
+        data.profile_photo = imgRes[0].url;
       }
     }
     try {

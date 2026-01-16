@@ -3,7 +3,7 @@ import * as z from 'zod'
 
 export const profileValidation = z.object({
     
-    profile_photo : z.url().nonempty(),
+    profile_photo : z.string().url().nonempty(),
     name: z
     .string()
     .min(3, {message:'Minimum 3 characters.'})

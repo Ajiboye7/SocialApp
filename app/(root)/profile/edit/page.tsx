@@ -8,7 +8,7 @@ import { RootState } from "@/store/store";
 import { redirect } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 const page = () => {
-  const { currentUser: user } = useSelector((state: RootState) => state.user);
+  const { item: user } = useSelector((state: RootState) => state.user.currentUser);
   const state = useSelector((state: RootState) => state);
 
   /*const { isSignedIn } = useUser();

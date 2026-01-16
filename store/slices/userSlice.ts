@@ -10,6 +10,7 @@ interface UserData {
 
 interface AuthorInfo {
   _id: string;
+   id: string;
   username: string;
   profile_picture: string;
 }

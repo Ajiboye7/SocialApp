@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 import { useUploadThing } from "@/lib/uploadthing";
 import { isBase64Image } from "@/lib/utils";
 import { updateUser } from "@/store/slices/userSlice";
-import { useDispatch, UseDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -42,7 +42,9 @@ interface Props {
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
   const router = useRouter();
-  const { currentUser } = useSelector((state: RootState) => state.user);
+  const { item: currentUser } = useSelector(
+    (state: RootState) => state.user.currentUser
+  );
 
   const dispatch = useDispatch<AppDispatch>();
   const { startUpload } = useUploadThing("imageUploader");
@@ -85,13 +87,12 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     try {
       await dispatch(
         updateUser({
-          bio: data.bio,
-          name: data.name,
-          userName: data.username,
-          profile_picture: data.profile_photo,
+          bio: data.bio ?? "",
+          name: data.name ?? "",
+          userName: data.username ?? "",
+          profile_picture: data.profile_photo ?? "",
         })
-      ).unwrap();
-      console.log("Submitting profile data:", data);
+      );
 
       router.push("/");
     } catch (error: any) {

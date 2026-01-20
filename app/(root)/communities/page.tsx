@@ -79,29 +79,7 @@ const page = () => {
         )}
       </div>
 
-      {/*<div className={`flex gap-4 mt-6 ${status === 'loading' ? 'hidden' : ''}`}>
-        <button
-          disabled={currentPage <= 1}
-          onClick={() =>
-            dispatch(fetchUsers({ page: currentPage - 1, limit: 10 }))
-          }
-          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <span className="text-white">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          disabled={currentPage >= totalPages}
-          onClick={() =>
-            dispatch(fetchUsers({ page: currentPage + 1, limit: 10 }))
-          }
-          className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>*/}
+     
      
     </section>
   );

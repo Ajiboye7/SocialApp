@@ -13,31 +13,19 @@ import ContentSkeleton from "@/components/ContentSkeleton";
 
 const page = () => {
   const dispatch = useDispatch<AppDispatch>();
-  /*const {
-    users,
-    currentPage,
-    totalPages,
-    usersStatus: status,
-  } = useSelector((state: RootState) => state.user);*/
-
   const {items : communities, status, pagination: { currentPage },  } = useSelector((state : RootState)=> state.community.communities);
   
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    //dispatch(clearUser());
-    //dispatch(fetchUsers({ page: currentPage, limit: 10 })).unwrap();
     dispatch(clearCommunity())
     dispatch(getCommunities({page: currentPage, limit: 3}));
   }, [dispatch]);
-
-  //console.log("This is user listed", users);
 
   const filteredCommunities = communities.filter((community) => {
     const query = search.toLowerCase();
     return (
       community.name.toLowerCase().includes(query) 
-      //|| user.username.toLowerCase().includes(query)
     );
   });
 

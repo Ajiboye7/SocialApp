@@ -42,7 +42,7 @@ export default function JoinRequestCard({
         </div>
       </div>
 
-      {/* Action Buttons */}
+      
       <div className="flex gap-2">
         <Button
           onClick={() => onAccept(id)}  

@@ -45,14 +45,14 @@ export default function JoinRequestCard({
       {/* Action Buttons */}
       <div className="flex gap-2">
         <Button
-          onClick={() => onAccept(id)}  // Pass the user id
+          onClick={() => onAccept(id)}  
           className="px-3 py-1.5 rounded-lg bg-green-600 text-light-1 text-sm font-semibold hover:bg-green-700 transition"
         >
           Accept
         </Button>
 
         <Button
-          onClick={() => onReject(id)}  // Pass the user id
+          onClick={() => onReject(id)} 
           className="px-3 py-1.5 rounded-lg bg-red-600 text-light-1 text-sm font-semibold hover:bg-red-700 transition"
         >
           Reject

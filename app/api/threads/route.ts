@@ -205,7 +205,7 @@ export async function GET(req: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.log("error fetching threads", error);
+    console.log("error fetching threads!", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
       { status: 500 }

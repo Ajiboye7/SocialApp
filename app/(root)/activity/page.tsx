@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { getThreads, clearThreads } from "@/store/slices/threadSlice";
+
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
-import LoadingThread from "@/components/ContentSkeleton";
-import ContentSkeleton from "@/components/ContentSkeleton";
 import { currentUser } from "@/store/slices/userSlice";
 import UserCardSkeleton from "@/components/UserCardSkeleton";
 
@@ -13,7 +11,7 @@ const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const { item, status } = useSelector(
-    (state: RootState) => state.user.currentUser
+    (state: RootState) => state.user.currentUser,
   );
 
   const threads = item?.threads;
@@ -60,7 +58,7 @@ const Page = () => {
               </p>
             </div>
           </div>
-        ))
+        )),
       )}
     </div>
   );

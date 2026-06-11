@@ -51,7 +51,7 @@ const Page = () => {
                 <span className="font-semibold text-primary-500">
                   {comment.author?.username}
                 </span>{" "}
-                commented on your post
+                commented on your post npw
               </p>
               <p className="text-gray-400 text-xs">
                 {new Date(comment.createdAt).toLocaleString()}
